@@ -3,10 +3,10 @@ const fmt=value=>value==null?'Not defined at this pressure':Number(value).toLoca
 
 export function AtmosphereControls({form,setForm}) {
  return <fieldset className="optimizer-controls"><legend>Cabin atmosphere · fixed settings</legend>
-  <label className="checkbox-label"><input type="checkbox" checked={form.atmosphere_enabled} onChange={e=>setForm({...form,atmosphere_enabled:e.target.checked})}/>Screen pressure and inspired oxygen</label>
+  <label className="checkbox-label"><input type="checkbox" checked={form.atmosphere_enabled} onChange={e=>setForm({...form,atmosphere_enabled:e.target.checked})}/>Check cabin pressure and breathable oxygen</label>
   {!form.atmosphere_enabled?<p className="note">Pressure & oxygen screening off.</p>:<>
-   <label htmlFor="cabin_pressure_kpa">Total cabin pressure · kPa absolute<input id="cabin_pressure_kpa" type="number" required min="0" max="200" step="0.001" value={form.cabin_pressure_kpa} onChange={e=>setForm({...form,cabin_pressure_kpa:e.target.value===''?'':Number(e.target.value)})}/></label>
-   <label htmlFor="cabin_oxygen_percent">Dry cabin oxygen · % by volume<input id="cabin_oxygen_percent" type="number" required min="0" max="100" step="0.01" value={form.cabin_oxygen_percent} onChange={e=>setForm({...form,cabin_oxygen_percent:e.target.value===''?'':Number(e.target.value)})}/></label>
+   <label htmlFor="cabin_pressure_kpa">Air pressure inside<small className="field-technical">Total cabin pressure · kPa absolute</small><input id="cabin_pressure_kpa" type="number" required min="0" max="200" step="0.001" value={form.cabin_pressure_kpa} onChange={e=>setForm({...form,cabin_pressure_kpa:e.target.value===''?'':Number(e.target.value)})}/></label>
+   <label htmlFor="cabin_oxygen_percent">Oxygen in cabin air<small className="field-technical">Dry cabin oxygen · % by volume</small><input id="cabin_oxygen_percent" type="number" required min="0" max="100" step="0.01" value={form.cabin_oxygen_percent} onChange={e=>setForm({...form,cabin_oxygen_percent:e.target.value===''?'':Number(e.target.value)})}/></label>
    <details><summary>Criteria & assumptions</summary><p>Remaining dry gas is assumed inert diluent, nominally nitrogen. These are fixed design settings; no regulator, leak or gas-tank model maintains them.</p>
    <p className="note">Nominal screen: total pressure &gt;34.5 to ≤103 kPa, inspired O₂ 145–155 mmHg and ≥30% inert diluent. Inspired O₂ includes the 47 mmHg airway-water correction; it differs from dry cabin oxygen partial pressure.</p>
    <a href={standard} target="_blank" rel="noreferrer">NASA-STD-3001 Vol 2 Rev E · reference criteria ↗</a></details>

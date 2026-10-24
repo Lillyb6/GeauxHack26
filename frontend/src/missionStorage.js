@@ -66,6 +66,16 @@ function envelope(document){
 }
 export function validateMission(document,context){
  envelope(document);
+ if(document.model_version==='0.5.0' && context.modelVersion==='0.6.0'){
+  const previous=clone(document);
+  for(const key of ['thermal_capacity_enabled','heating_capacity_kw','cooling_capacity_kw']){
+   if(own(previous.configuration?.scenario || {},key))fail('Legacy mission contains unexpected thermal fields.');
+  }
+  exactKeys(previous.configuration.scenario,Object.keys(context.defaults).filter(key=>!['thermal_capacity_enabled','heating_capacity_kw','cooling_capacity_kw'].includes(key)),'Legacy mission scenario');
+  previous.configuration.scenario={...previous.configuration.scenario,thermal_capacity_enabled:false,heating_capacity_kw:0,cooling_capacity_kw:0};
+  previous.model_version=context.modelVersion;
+  return validateMission(previous,context);
+ }
  if(document.model_version!==context.modelVersion)fail(`This mission uses model ${document.model_version}; the app uses ${context.modelVersion}. Automatic migration is not supported.`);
  return {...clone(document),name:missionName(document.name),configuration:checkConfig(document.configuration,context)};
 }

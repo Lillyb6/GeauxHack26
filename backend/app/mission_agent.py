@@ -80,6 +80,7 @@ def model_turn(contents, key, model, remaining, tools_enabled=True):
         "No feasible search means no recommendation, not permission to change the user's constraints. "
         "Water yield is unvalidated; pressure, radiation and realistic thermal behavior are unresolved. "
         "Enable co2_enabled only when requested; it adds cabin CO2 screening and scrubber count optimization with an unvalidated response curve. "
+        "Enable thermal_capacity_enabled only when requested. Heating/cooling capacities are fixed design inputs in kW thermal; equipment search does not resize them. Distinguish thermal output from required electrical power. "
         "Enable atmosphere_enabled only when requested. This static screen uses fixed total cabin pressure and dry O2 percentage, and distinguishes dry ppO2 from humidified inspired PIO2. "
         "Do not claim oxygen generation or stored inventory changes these fixed atmosphere settings. No leaks, pressure control or gas-tank depletion are modeled. "
         "The selected nominal PIO2 target is not the complete NASA exposure envelope. "

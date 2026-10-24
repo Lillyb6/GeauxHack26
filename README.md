@@ -141,3 +141,8 @@ Frontend persistence checks: run `npm.cmd test` from frontend, then `npm.cmd run
 
 ### AI assistance update — mission save/load, 2026-10-24
 Codex implemented the standalone local mission library, versioned input-only files, schema/catalog validation, import preview, safe storage failures and stale-result invalidation; added 27 frontend tests and a backend contract-fixture test, and documented the handoff for the console redesign. Browser save/refresh/load/duplicate/delete/import/rerun workflows were verified. No new dependency, scientific model or external API integration was added.
+
+## Thermal capacity integration — model 0.6.0
+Optional heating/cooling screening now compares fixed design capacities against a steady conduction requirement, shared by simulation, optimizer and agent tools. Insufficient capacity stops before resource consumption. The controls use plain-language labels with technical terms underneath. See docs/thermal-integration.md and docs/assumptions.md for contracts, units and limitations. Existing 0.5.0 saved input snapshots migrate with this screen disabled.
+
+AI assistance: Codex integrated the team-authored thermal helper into the simulator, evidence and compact AI results; added focused integration tests, capacity UI, plain-language labels and a frontend handoff. Removed duplicate JSX that prevented the existing App from building. Research assumptions and hardware suitability still require team review.

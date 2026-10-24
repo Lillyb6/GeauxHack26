@@ -80,3 +80,23 @@ test('names are required and download names cannot contain path separators',()=>
  assert.throws(()=>createMission('x'.repeat(81),context.defaults,context.searchDefaults,context));
  assert.equal(filenameFor('../../Mars Demo'),'mars-demo.json');
 });
+
+
+test('model 0.5 inputs migrate with thermal screening disabled and no altered supplies',()=>{
+ const next=copy(context);next.modelVersion='0.6.0';
+ const fields={thermal_capacity_enabled:{type:'boolean'},heating_capacity_kw:{type:'number',minimum:0,maximum:1000},cooling_capacity_kw:{type:'number',minimum:0,maximum:1000}};
+ Object.assign(next.defaults,{thermal_capacity_enabled:false,heating_capacity_kw:0,cooling_capacity_kw:0});
+ Object.assign(next.schemas.HabitatRequest.properties,fields);
+ const old=document();old.model_version='0.5.0';
+ for(const key of ['thermal_capacity_enabled','heating_capacity_kw','cooling_capacity_kw'])delete old.configuration.scenario[key];
+ const migrated=validateMission(old,next);
+ assert.equal(migrated.model_version,'0.6.0');
+ assert.equal(migrated.configuration.scenario.thermal_capacity_enabled,false);
+ assert.equal(migrated.configuration.scenario.heating_capacity_kw,0);
+ assert.equal(migrated.configuration.scenario.water_kg,old.configuration.scenario.water_kg);
+ assert.equal(old.model_version,'0.5.0');
+ const broken=copy(old);delete broken.configuration.scenario.crew_size;
+ assert.throws(()=>validateMission(broken,next),/missing/);
+ const forged=copy(old);forged.configuration.scenario.thermal_capacity_enabled=true;
+ assert.throws(()=>validateMission(forged,next),/unexpected thermal/);
+});

@@ -37,6 +37,9 @@ class HabitatRequest(BaseModel):
     electrolyzer_kwh_kg_oxygen: float = Field(default=PARAMETERS["electrolyzer_kwh_kg_oxygen"]["value"], gt=0, le=100)
     heat_loss_kw_k: float = Field(default=PARAMETERS["heat_loss_kw_k"]["value"], gt=0, le=10)
     interior_temperature_c: float = Field(default=PARAMETERS["interior_temperature_c"]["value"], ge=10, le=30)
+    thermal_capacity_enabled: bool = False
+    heating_capacity_kw: float = Field(default=0, ge=0, le=1000, description="Total installed heating output in kW thermal; unvalidated design input.")
+    cooling_capacity_kw: float = Field(default=0, ge=0, le=1000, description="Total installed cooling output in kW thermal; unvalidated design input.")
     hvac_cop: float = Field(default=PARAMETERS["hvac_cop"]["value"], gt=0, le=10)
 
 class Reading(BaseModel):
@@ -58,12 +61,13 @@ class Event(BaseModel):
     message: str
 
 class SimulationResult(BaseModel):
-    assumptions_version: str = "0.5.0"
+    assumptions_version: str = "0.6.0"
     request: HabitatRequest
     resource_balance_complete: bool
     evaluated_hours: int
     demand_kw: float
     thermal_load_kw: float
+    thermal_summary: dict
     events: list[Event]
     readings: list[Reading]
     limitations: list[str]

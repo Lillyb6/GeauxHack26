@@ -1,3 +1,13 @@
+# Current validation — thermal integration, model 0.6.0
+
+- 203 backend tests passed, including 15 thermal integration cases plus the existing standalone helper tests. Coverage includes unchanged default balances, initial-state failures, exact/sufficient capacity, COP/battery accounting, planetary heating/cooling selection, API input bounds, source attribution, fixed optimizer constraints, and agent schema/compact evidence.
+- 28 frontend mission-storage tests passed, including explicit 0.5.0-to-0.6.0 input migration. Missing or forged legacy fields remain rejected.
+- Production frontend build passed. Existing chart bundle-size and Starlette/httpx advisories remain.
+- Browser verified one-day Mars with thermal screening enabled: 2 kW heating reports a 1.2 kW shortfall and zero hours; 3.2 kW heating completes 24 hours. Plain labels and technical subtitles render. No live Gemini request was made.
+- Capacity and COP are explicit design assumptions; conduction-only capacity screening is not a complete thermal model or planetary hardware qualification.
+
+## Prior validation records
+
 # Current validation — local mission save/load, 2026-10-24
 
 - Frontend: **27 persistence tests passed**, covering complete input snapshots, canonical key order, invalid values/versions/IDs, missing/extra fields, file-size limits, library corruption, storage/quota errors, unique names, deletion, list freshness and save limits. Production build passed; existing chart bundle-size advisory remains.

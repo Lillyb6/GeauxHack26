@@ -1,3 +1,4 @@
+from .thermal import check_thermal_capacity
 from .atmosphere import screen_atmosphere, atmosphere_evidence
 from .models import HabitatRequest, SimulationResult, Reading, Event
 from .environments import ENVIRONMENTS
@@ -16,7 +17,25 @@ LIMITATIONS = [
 def simulate(req: HabitatRequest) -> SimulationResult:
     env = next(e for e in ENVIRONMENTS if e["id"] == req.environment_id)
     # Conduction-only envelope proxy, not a validated whole-habitat thermal design.
-    thermal = abs(req.interior_temperature_c - env["temperature_c"]) * req.heat_loss_kw_k / req.hvac_cop
+    thermal_summary = check_thermal_capacity(
+        req.interior_temperature_c, env["temperature_c"], req.heat_loss_kw_k,
+        req.heating_capacity_kw, req.cooling_capacity_kw, req.hvac_cop,
+    )
+    thermal = thermal_summary["required_electric_kw"]
+    thermal_summary["enabled"] = req.thermal_capacity_enabled
+    thermal_summary["status"] = (
+        "sufficient" if thermal_summary["capacity_sufficient"] else "insufficient"
+    ) if req.thermal_capacity_enabled else "not_evaluated"
+    if not req.thermal_capacity_enabled:
+        # Electricity is still estimated; unused capacities must not imply a failed screen.
+        for key in ("available_thermal_kw", "margin_kw", "capacity_sufficient"):
+            thermal_summary[key] = None
+    thermal_summary["limitations"] = [
+        "Steady conduction only: Q = UA * abs(T_inside - T_outside).",
+        "Capacities and COP are design inputs, not NASA equipment ratings.",
+        "Required electricity is a setpoint requirement, not actual operation during a failed run.",
+        "No temperature trajectory, thermal inertia, internal heat, solar input, convection, radiation or heat-rejection feasibility is simulated.",
+    ]
     crew_water_day = req.crew_size * PARAMETERS["water_consumption_kg_person_day"]["value"]
     water_equipment_summary = None
     warnings = []
@@ -64,6 +83,16 @@ def simulate(req: HabitatRequest) -> SimulationResult:
     readings = [Reading(hour=0, oxygen_kg=oxygen, water_kg=water, battery_kwh=battery,co2_mmhg=co2_pressure,co2_removed_kg=0 if req.co2_enabled else None)]
     atmosphere_summary=screen_atmosphere(req)
     events = []
+    if req.thermal_capacity_enabled and not thermal_summary["capacity_sufficient"]:
+        events.append(Event(hour=0, resource="thermal", message=(
+            f"Insufficient {thermal_summary['mode']} capacity: this model requires "
+            f"{thermal_summary['required_thermal_kw']:.3f} kW thermal; selected capacity is "
+            f"{thermal_summary['available_thermal_kw']:.3f} kW thermal "
+            f"(shortfall {-thermal_summary['margin_kw']:.3f} kW). "
+            "The target indoor temperature cannot be maintained under the model assumptions; no mission hours evaluated."
+        )))
+    elif not req.thermal_capacity_enabled:
+        warnings.append("Heating/cooling capacity screening is disabled; HVAC electricity is estimated assuming the target temperature can be maintained.")
     if atmosphere_summary:
         events.extend(Event(hour=0,resource=check["id"],message=check["message"])
             for check in atmosphere_summary["checks"] if not check["passed"])
@@ -116,7 +145,7 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         evidence.update(atmosphere_evidence(req,atmosphere_summary))
     else:
         warnings.append("Cabin atmosphere screening is disabled; total pressure, inspired oxygen and inert diluent are not evaluated.")
-    limitations = list(LIMITATIONS)
+    limitations = list(LIMITATIONS) + thermal_summary["limitations"]
     if atmosphere_summary:
         limitations.extend(atmosphere_summary["limitations"])
     if co2_summary:
@@ -136,7 +165,7 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         "effective_recovery_fraction":recovered_total / (crew_water_day * hour / 24) if hour else 0,
     }
     return SimulationResult(equipment_summary=equipment_summary,request=req, resource_balance_complete=not events,
-        evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3),
+        evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3), thermal_summary=thermal_summary,
         events=events, readings=readings, limitations=limitations,
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
         water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,

@@ -1,5 +1,5 @@
 {
-  "modelVersion": "0.5.0",
+  "modelVersion": "0.6.0",
   "defaults": {
     "environment_id": "mars",
     "oxygen_equipment_id": null,
@@ -27,6 +27,9 @@
     "electrolyzer_kwh_kg_oxygen": 6.875,
     "heat_loss_kw_k": 0.04,
     "interior_temperature_c": 21.0,
+    "thermal_capacity_enabled": false,
+    "heating_capacity_kw": 0,
+    "cooling_capacity_kw": 0,
     "hvac_cop": 1.0
   },
   "searchDefaults": {
@@ -226,6 +229,27 @@
           "maximum": 30,
           "minimum": 10,
           "title": "Interior Temperature C",
+          "type": "number"
+        },
+        "thermal_capacity_enabled": {
+          "default": false,
+          "title": "Thermal Capacity Enabled",
+          "type": "boolean"
+        },
+        "heating_capacity_kw": {
+          "default": 0,
+          "description": "Total installed heating output in kW thermal; unvalidated design input.",
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Heating Capacity Kw",
+          "type": "number"
+        },
+        "cooling_capacity_kw": {
+          "default": 0,
+          "description": "Total installed cooling output in kW thermal; unvalidated design input.",
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Cooling Capacity Kw",
           "type": "number"
         },
         "hvac_cop": {
@@ -431,6 +455,27 @@
               "maximum": 30,
               "minimum": 10,
               "title": "Interior Temperature C",
+              "type": "number"
+            },
+            "thermal_capacity_enabled": {
+              "default": false,
+              "title": "Thermal Capacity Enabled",
+              "type": "boolean"
+            },
+            "heating_capacity_kw": {
+              "default": 0,
+              "description": "Total installed heating output in kW thermal; unvalidated design input.",
+              "maximum": 1000,
+              "minimum": 0,
+              "title": "Heating Capacity Kw",
+              "type": "number"
+            },
+            "cooling_capacity_kw": {
+              "default": 0,
+              "description": "Total installed cooling output in kW thermal; unvalidated design input.",
+              "maximum": 1000,
+              "minimum": 0,
+              "title": "Cooling Capacity Kw",
               "type": "number"
             },
             "hvac_cop": {

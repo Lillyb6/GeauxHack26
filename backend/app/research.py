@@ -17,9 +17,8 @@ SOURCES = {'bvad': {'title': 'NASA BVAD Rev. 2 (2022), Table 3-31, printed p.58 
                     'url': 'https://www.nasa.gov/missions/station/nasa-achieves-water-recovery-milestone-on-international-space-station/',
                     'context': '93–94% overall before BPA; 98% demonstrated with BPA on ISS. Not a '
                                'demonstrated recovery rate on Mars, Venus or Titan.'},
- 'conduction': {'title': 'NASA Passive Thermal Control Engineering Guidebook Rev.4 (2023), section '
-                         '4.2.1 / printed p.42',
-                'url': 'https://ntrs.nasa.gov/api/citations/20230013900/downloads/NASA%20Thermal%20Control%20Engineering%20Guidebook%20v4.pdf',
+ 'conduction': {'title': 'NASA Passive Thermal Control Engineering Guidebook Rev.5.1 (2024), section 4.2.1',
+                'url': 'https://ntrs.nasa.gov/api/citations/20220006584/downloads/NASAPassiveThermalGuidebookv5%201Public.pdf',
                 'context': 'Fourier conduction equation supports a steady conduction calculation, '
                            'not the demo UA, COP or an entire habitat thermal model.'},
  'electrolysis': {'title': 'NASA NTRS electrolysis study (2018), OGA description / PDF p.3',
@@ -160,6 +159,20 @@ def evidence_for(request, equipment_summary=None, water_equipment_summary=None):
             "value":request.water_equipment_quantity, "unit":"units", "classification":"scenario_input", "source_ids":[],
             "note":"Identical reference-case units; quantity scales feed budget, installed power and known hardware mass, not recovery fraction.",
         }
+    evidence["thermal_conduction_equation"] = {
+        "value": "Q_required = UA * abs(T_inside - T_outside); UA = k*A/L for a uniform slab (convert W/K to kW/K)",
+        "unit": "kW thermal", "classification": "derived_ideal", "source_ids": ["conduction"],
+        "note": "NASA Rev.5.1 section 4.2.1 gives Fourier conduction. Lumped UA, surface-to-air temperature substitution and whole-habitat applicability remain assumptions; COP is separately assumed.",
+    }
+    evidence["thermal_capacity_enabled"] = {
+        "value": request.thermal_capacity_enabled, "classification": "scenario_input", "source_ids": [],
+        "note": "Capacity screening is optional; required HVAC electricity remains in the energy balance even when screening is disabled.",
+    }
+    if request.thermal_capacity_enabled:
+        for name in ("heating_capacity_kw", "cooling_capacity_kw"):
+            evidence[name] = {"value": values[name], "unit": "kW thermal",
+                "classification": "unvalidated_design_input", "source_ids": [],
+                "note": "User-selected total installed output; no equipment operating envelope, mass or planetary suitability established."}
     return evidence
 
 
