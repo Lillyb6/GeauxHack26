@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import MissionControl from './MissionControl';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { api } from './api';
 import EquipmentSummary from './EquipmentSummary';
@@ -81,10 +82,11 @@ export default function App() {
    finally {if(token===runGeneration.current)setLoading(false);}
  }
  if (!form) return <main className="shell"><h1>Beyond Earth</h1><p role="status">{error || 'Loading research references…'}</p></main>;
- return <div className="shell">
+ return <div className="shell" data-planet={form.environment_id}>
   <header><a className="brand" href="#main"><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
   <main id="main"><div className="intro"><div><p className="eyebrow">GEAUXHACK 2026 / MISSION DESIGN LAB</p><h1>Mission control</h1><p className="subtitle">Configure. Simulate. Compare.</p></div><div className="mission-tag">01—03<br/><span>ENVIRONMENTS ONLINE</span></div></div>
   <nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className={`orb ${p.id}`} aria-hidden="true"/><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>
+  {env && <MissionControl form={form} setForm={setForm} env={env} result={result} stale={stale}/>}
   {error && <p role="alert" className="alert">{error}</p>}
   {env && <section className="environment panel"><div><p className="eyebrow">REFERENCE DATA · NOT LIVE</p><h2>{env.name} surface environment</h2><p>{env.atmosphere}</p><a href={env.source} target="_blank" rel="noreferrer">Scientific reference ↗</a></div><dl><div><dt>Temperature</dt><dd>{env.temperature_c} <small>°C</small></dd></div><div><dt>Pressure</dt><dd>{env.pressure_kpa.toLocaleString()} <small>kPa</small></dd></div><div><dt>Gravity</dt><dd>{env.gravity_ms2} <small>m/s²</small></dd></div></dl><details className="risk"><summary>Environment risks & resources</summary><p>{env.reference_context} {env.risk} {env.resources}</p></details></section>}
   <div className="workspace"><form className="panel config" onSubmit={run}><p className="eyebrow">01 / MANUAL CONFIGURATION</p><h2>Build your mission</h2><p className="muted">Exploratory model · not a survival certification.</p><div className="quick-inputs">{controls.slice(0,2).map(([key,label,min,max,step])=><label key={key} htmlFor={key}><FieldLabel field={key} technical={label}/><input id={key} type="number" required min={min} max={max} step={step} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value===''?'':Number(e.target.value)})}/></label>)}</div><details className="control-group" open><summary>Life support equipment</summary>

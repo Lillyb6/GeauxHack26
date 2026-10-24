@@ -119,3 +119,8 @@
 - Frontend observed at a narrow ~600px panel width; mobile stacking renders. Full desktop/device/accessibility audit remains team work.
 - Python dependency snapshot: backend/requirements.lock.txt; npm lockfile: frontend/package-lock.json.
 - Scientific calibration, full pressure/thermal/radiation validation and designer review are pending. This does not establish mission feasibility.
+
+### Mission-control UI — 2026-10-24
+Added three interactive mission-control monitors using the user's supplied Mars, Venus, Titan and crew artwork. Planet selection updates the surface view and dashboard accent colors. Current crew inputs render one selectable sprite per member (1–12); quick crew controls share the manual configuration state. The science monitor switches between environment references and resource inputs. Surface sprites represent configuration only, not modeled surface activity. Existing simulation and agent controls are retained. Frontend production build passed. Automated browser verification was attempted but could not complete because the local browser could not connect to the development server; visual verification remains pending.
+
+GitHub sync follow-up: updated local main to ec2d464 and resolved App.jsx/style.css overlaps by retaining upstream mission persistence, thermal controls and updated labels alongside the local mission-control monitors and planet themes. Frontend production build, all 28 frontend tests and all 203 backend tests passed. Backend tests required execution outside the sandbox after the sandboxed run stalled.
