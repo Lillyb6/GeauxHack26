@@ -1,3 +1,10 @@
+# Current validation — backend power-demand breakdown
+
+- 18 new focused cases passed; the complete backend suite passed all 224 cases. Existing Starlette/httpx deprecation warning remains.
+- Checked custom/catalog replacement, zero/multiple units, enabled CO2 loads, all three environments, component sums, COP behavior, unchanged default battery balance and hour-zero failure semantics.
+- API returned HTTP 200 with the typed power_breakdown; browser-forged input breakdown is rejected. Optimizer results and compact advisor/agent evidence carry the evaluated breakdown. No live Gemini request was made.
+- This is additive backend reporting of existing electrical requirements, not actual metered use. No frontend, scientific constants, saved-mission inputs or oxygen/water failure messages were changed.
+
 # Current validation — optional Mission Lab tutorial
 
 - Frontend production build passed; all 28 existing frontend tests passed. No backend logic was changed.
