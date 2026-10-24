@@ -63,3 +63,6 @@ Capacities default zero and are unvalidated design inputs, not NASA hardware spe
 
 ## Electrical-demand reporting
 Simulation results now expose power_breakdown: unrounded kW electrical for other habitat equipment, the selected water recycler, required thermal control, selected oxygen generation and enabled CO2 scrubbers, plus their total. The total is the same demand used in the hourly battery balance; demand_kw retains its three-decimal display value. This additive output does not change mission inputs or physical assumptions. It reports requirements even on hour-zero failures, not actual energy consumed. Generation is supply and stays outside this demand-only total.
+
+## Oxygen and water failure diagnostics
+Oxygen shortage messages expose crew requirement, modeled production, stored oxygen before the failed hour and the positive unmet balance. Water messages expose crew use, modeled recovery, ideal electrolysis feedwater, starting usable inventory and the unmet balance. Quantities are kg per one-hour step and are formatted to six decimals without changing calculation precision. Failed-hour values are diagnostic, not evidence that processing occurred despite missing water or power; unprocessed wastewater is not usable supply. Existing tolerance, clamping and simultaneous-event behavior are unchanged.

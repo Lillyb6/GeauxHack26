@@ -77,3 +77,6 @@ The new focused suite passed all 18 cases. The complete backend suite passed all
 
 ## 14. Project Document Entry
 I added a typed backend power-demand breakdown showing oxygen generation, water recycling, required HVAC electricity, enabled CO2 removal and other habitat loads. The same component sum drives battery accounting and the API output. I wrote tests first, confirmed the missing field failed, then verified all 18 new cases and the complete 224-test backend suite. I kept frontend display and oxygen/water failure-message changes outside this step. I committed step 1 on power-demand-breakdown for review before merging.
+
+## Combined Integration
+Both backend improvements were integrated with the current team main. Combined verification passed 235 backend tests, 28 frontend tests and the production frontend build. The power breakdown remains backend-only; oxygen/water messages use the existing event display. The separate feature branches preserve the original scopes.
