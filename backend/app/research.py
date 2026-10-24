@@ -103,7 +103,7 @@ PARAMETERS = {'oxygen_consumption_kg_person_day': {'value': 0.895,
                                 'water. ISS evidence does not validate this simplified boundary or '
                                 'other environments.'}}
 
-def evidence_for(request, equipment_summary=None):
+def evidence_for(request, equipment_summary=None, water_equipment_summary=None):
     values = request.model_dump()
     evidence = {}
     for name, entry in PARAMETERS.items():
@@ -136,16 +136,46 @@ def evidence_for(request, equipment_summary=None):
             "classification": "scenario_input", "source_ids": [],
             "note": "User-selected count of identical units at the published design point.",
         }
+    if water_equipment_summary is not None:
+        evidence.pop("recycling_fraction", None)
+        evidence.pop("recycler_power_kw", None)
+        source_id = "equipment:" + water_equipment_summary["equipment_id"]
+        for name, field, unit in (
+            ("water_feed_budget", "feed_capacity_kg_day", "kg feed/day"),
+                        ("water_equipment_power", "electrical_power_kw", "kW"),
+            ("water_equipment_hardware_mass", "known_hardware_mass_kg", "kg"),
+        ):
+            evidence[name] = {
+                "value":water_equipment_summary[field], "unit":unit,
+                "classification":water_equipment_summary["evidence_status"],
+                "source_ids":[source_id],
+                "note":"Derived historical reference case; feed budget and fixed power/mass are historical reference specifications; recovery yield is separately labeled as an assumption. See source derivations and limitations.",
+            }
+        evidence["water_processed_feed_recovery"] = {
+            "value":water_equipment_summary["recovery_fraction"], "unit":"fraction",
+            "classification":water_equipment_summary["recovery_evidence_status"], "source_ids":[],
+            "note":water_equipment_summary["derivations"]["recovery_fraction"],
+        }
+        evidence["water_equipment_quantity"] = {
+            "value":request.water_equipment_quantity, "unit":"units", "classification":"scenario_input", "source_ids":[],
+            "note":"Identical reference-case units; quantity scales feed budget, installed power and known hardware mass, not recovery fraction.",
+        }
     return evidence
 
 
-def sources_for(evidence, environment_id, equipment_summary=None):
+def sources_for(evidence, environment_id, equipment_summary=None, water_equipment_summary=None):
     sources = dict(SOURCES)
     if equipment_summary is not None:
         source = equipment_summary["source"]
         sources["equipment:" + equipment_summary["equipment_id"]] = {
             "title": source["title"], "url": source["url"],
             "context": source["location"] + "; " + "; ".join(equipment_summary["limitations"]),
+        }
+    if water_equipment_summary is not None:
+        source = water_equipment_summary["source"]
+        sources["equipment:" + water_equipment_summary["equipment_id"]] = {
+            "title":source["title"], "url":source["url"],
+            "context":source["location"] + "; " + "; ".join(water_equipment_summary["derivations"].values()) + "; " + "; ".join(water_equipment_summary["limitations"]),
         }
     used_ids = {source for item in evidence.values() for source in item["source_ids"]}
     used_ids.add(environment_id)

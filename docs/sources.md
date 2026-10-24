@@ -39,3 +39,10 @@ NASA, DOE and ESA do not endorse this project. No generated images/video or agen
 [NASA NTRS 19790028539](https://ntrs.nasa.gov/citations/19790028539), *Water electrolysis system - H2 and O2 generation*, ASME PAPER 78-ENAS-3, published July 1, 1978. Locator: abstract, first two paragraphs. Reported design values: 4.20 kg O2/day, 1.1 kW, 75 kg fixed hardware, 0.11 m3. Evidence classification: published historical design. Not a measured operating curve, current product, or validated planetary installation. Operating temperature limits remain null. No downloadable full paper is available in that record. Do not transfer limits from a different version of the equipment.
 
 In catalog mode, direct equipment power replaces the DOE energy proxy, and unused custom capacity/energy entries are omitted from result evidence. Sources are packaged with each result so a changed current selection cannot rewrite the previous run's provenance.
+
+
+## Initial water reference case — 2026-10-24
+
+[NASA-CR-160332, Ellis, Wynveen & Schubert (1979)](https://ntrs.nasa.gov/api/citations/19800002556/downloads/19800002556.pdf), NTRS 19800002556. Table 1 p.7 (PDF p.14), Table 4 p.17 (PDF p.24), Table 9 p.39 (PDF p.46). Derived external-feed budget: maximum total 18.1 minus internal quality-monitor recycle 0.9 = 17.2 kg/day. Combined historical mechanical/control power: (171 + 696)/1000 = 0.867 kW. Combined known dry setup mass: 143 + 100 = 243 kg. Design data and component sums are not universal measured operating curves.
+
+**No net recovery efficiency was established from this source for the chosen case. The model's 90% yield is an explicit unvalidated assumption.** Nominal product/feed division is not valid because internal recycle is included. Do not cite NASA for this yield. See water-recovery-walkthrough.md for interface restrictions and model limits. Other documents investigated (ISS UPA/WPA and VPCAR studies) were not used as numerical specifications for this catalog entry.

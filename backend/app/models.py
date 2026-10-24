@@ -12,6 +12,8 @@ class HabitatRequest(BaseModel):
         ge=0,
         le=8,
     )
+    water_equipment_id: str | None = None
+    water_equipment_quantity: int = Field(default=1, ge=0, le=8)
     crew_size: int = Field(default=4, ge=1, le=12)
     duration_days: int = Field(default=30, ge=1, le=180)
     oxygen_kg: float = Field(default=30, ge=0, le=10000)
@@ -33,6 +35,9 @@ class Reading(BaseModel):
     oxygen_kg: float
     water_kg: float
     battery_kwh: float
+    wastewater_kg: float = 0
+    recovered_water_kg: float = 0
+    brine_water_kg: float = 0
 
 class Event(BaseModel):
     hour: int
@@ -40,7 +45,7 @@ class Event(BaseModel):
     message: str
 
 class SimulationResult(BaseModel):
-    assumptions_version: str = "0.2.0"
+    assumptions_version: str = "0.3.0"
     request: HabitatRequest
     resource_balance_complete: bool
     evaluated_hours: int
@@ -54,3 +59,6 @@ class SimulationResult(BaseModel):
     sources: dict
     environment_reference: dict
     equipment_summary: dict | None = None
+    water_equipment_summary: dict | None = None
+    water_balance: dict
+    warnings: list[str] = Field(default_factory=list)

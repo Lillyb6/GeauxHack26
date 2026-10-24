@@ -52,7 +52,7 @@ def test_api_contract():
     assert len(client.get("/environments").json()) == 3
     response = client.post("/simulate", json={})
     assert response.status_code == 200
-    assert response.json()["assumptions_version"] == "0.2.0"
+    assert response.json()["assumptions_version"] == "0.3.0"
 
 
 def test_bvad_oxygen_rate_and_water_boundary():

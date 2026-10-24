@@ -26,5 +26,42 @@
       "Hardware mass excludes any additional installation, supplies, shielding or planetary support infrastructure.",
       "Full paper is not downloadable from this NTRS record."
     ]
+  },
+  {
+    "id": "vcds_1979_reference",
+    "name": "VCDS water recovery — 1979 reference case",
+    "category": "water_recovery",
+    "feed_capacity_kg_day": 17.2,
+    "recovery_fraction": 0.9,
+    "electrical_power_kw": 0.867,
+    "hardware_mass_kg": 243,
+    "volume_m3": null,
+    "operating_temperature_min_c": null,
+    "operating_temperature_max_c": null,
+    "evidence_status": "derived_historical_reference_case",
+    "source": {
+      "title": "Preprototype vapor compression distillation subsystem — NASA-CR-160332",
+      "organization": "NASA Technical Reports Server",
+      "document_id": "19800002556",
+      "report_number": "NASA-CR-160332 / LSI-ER-312-4",
+      "publication_date": "1979-08-01",
+      "url": "https://ntrs.nasa.gov/api/citations/19800002556/downloads/19800002556.pdf",
+      "location": "Table 1 p.7 (PDF p.14); Table 4 p.17 (PDF p.24); Table 9 p.39 (PDF p.46)"
+    },
+    "derivations": {
+      "feed_capacity_kg_day": "Table 1 maximum total 18.1 kg/day minus 0.9 kg/day internal water-quality-monitor recycle = 17.2 kg/day external-feed design budget (also 12 + 3.4 + 1.8). Treated as a fixed modeled budget, not measured maximum throughput.",
+      "recovery_fraction": "0.90 is an explicit illustrative model yield, not a measured VCDS recovery. Do not infer yield from 9.3/10.2: the nominal feed table includes internal quality-monitor recycle, so those totals do not establish net recovery.",
+      "electrical_power_kw": "Mechanical 171 W (Table 4, excludes instrumentation) + control/monitor 696 W (Table 9) = 867 W. Fixed installed load assumed while units are enabled.",
+      "hardware_mass_kg": "Mechanical dry mass 143 kg (Table 4) + separate instrumentation 100 kg (Table 9) = 243 kg historical setup; not flight installation mass."
+    },
+    "limitations": [
+      "Historical preprototype reference case; planetary suitability and modern potable-water compliance are not established.",
+      "Feed budget comes from the design specification; recovery yield is an explicit 90% illustrative assumption. No validated throughput/yield curve is available for this selected case.",
+      "The original subsystem processes pretreated urine/flush water and brine, not every untreated habitat waste stream. Applying it to the simplified potable-use return stream is an unvalidated feed-compatibility assumption.",
+      "Pretreatment chemicals, heat rejection, startup/drydown, consumables, quality-control rejection and reliability are not modeled.",
+      "Power and mass include the historical separate instrumentation; modern replacements are not assumed.",
+      "Wastewater queue is ideal and unbounded; storage tank capacity and overflow are not evaluated."
+    ],
+    "recovery_evidence_status": "unvalidated_design_assumption"
   }
 ]

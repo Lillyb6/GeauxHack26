@@ -78,3 +78,12 @@ Example: one unit on default Mars inputs uses 8.027 kW total modeled demand. For
 
 ### AI assistance update — 2026-10-24
 The user implemented the initial catalog, loader, API/model additions and simulation integration, including restoring initial inventories. Codex completed equipment-aware evidence reporting, React selection/quantity/summary controls, source display, regression tests and documentation. Added backend tests cover known/unknown specifications, quantity scaling, custom-mode separation, error responses and provenance. Full validation is recorded in docs/validation.md; independent scientific/hardware review remains pending.
+
+
+## Capacity-limited water recovery (model 0.3.0)
+Select **Water recovery system → VCDS water recovery — 1979 reference case** and choose a unit count. Catalog mode disables custom recovery/recycler-power fields, tracks wastewater waiting for processing, and displays effective recovery, brine/losses and overload warnings. Custom mode retains the previous unbounded-throughput assumption. Oxygen and water units can be selected together.
+
+The initial water entry uses a [historical NASA contractor report](https://ntrs.nasa.gov/api/citations/19800002556/downloads/19800002556.pdf) for a derived external-feed design budget and combined mechanical/instrumentation mass and power. **The 90% processed-feed recovery yield is an explicit unvalidated assumption, not a NASA measurement.** This case is a planning proxy, not qualified planetary equipment. See [the water-recovery walkthrough](docs/water-recovery-walkthrough.md) for derivations, equations, scope and a 12-person overload demo.
+
+### AI assistance update — water recovery, 2026-10-24
+Codex researched primary NASA references; implemented the water equipment resolver, capacity-limited queue and mass accounting, selection UI, provenance, regression tests and documentation. Source review excluded internal monitor recirculation from the external-feed budget and rejected an unsupported efficiency inference. The unresolved recovery yield remains clearly labeled. Team scientific review is pending; see docs/validation.md.

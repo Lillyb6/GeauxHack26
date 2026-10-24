@@ -27,3 +27,7 @@ Suggested ownership tomorrow: engine/catalog/tests; frontend/design; API/optimiz
 ## Equipment integration
 `backend/data/equipment.json` -> `equipment.py` resolves ID + quantity -> engine derives output/power -> `research.py` packages actual-run evidence -> API returns `equipment_summary` and readings -> React displays immutable run summary.
 `GET /equipment` provides selection metadata. `oxygen_equipment_id=null` retains custom mode. Catalog mode ignores the custom oxygen-capacity and energy inputs while retaining them for switching back. Equipment errors return 422. Published design-point copies are summed; this is not a duty-cycle, reliability or environmental qualification model. Source revisions require catalog/documentation review and backend restart.
+
+
+## Water-processing extension
+Independent water ID/count resolves into a water_equipment_summary. Engine derives throughput and power server-side, tracks queue/recovered/brine masses hourly, returns water_balance and warnings, and replaces unused custom water evidence. Recovery yield is a separately labeled assumption. No database is used; queues reset per simulation. See water-recovery-walkthrough.md.

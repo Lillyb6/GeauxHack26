@@ -1,4 +1,13 @@
-# Current validation — equipment extension, 2026-10-24
+# Current validation — water equipment, model 0.3.0, 2026-10-24
+
+- Backend: **61 tests passed** (22 new water cases). Checks include per-hour water conservation within the declared boundary, backlog, overload warnings, unit scaling, missing specs/unknown mass, source attribution, invalid selections, zero equipment and resource failures.
+- Frontend production build passed; existing chart bundle-size advisory remains.
+- Browser: water selection loaded, custom recovery/power fields disabled, reference derivations displayed. At 12 crew / one day / 100 kW generation, one unit recovered 15.48 kg and left 21.404 kg waiting. Three units recovered 34.7436 kg with zero queue and no capacity warning. Oxygen/custom compatibility remains covered by tests.
+- Final data audit excludes 0.9 kg/day internal recirculation from maximum design flow, giving 17.2 kg/day external-feed budget. The 90% recovery yield remains explicitly unvalidated and has no NASA source ID.
+- Starlette/httpx deprecation warning remains; no test failures. No hardware/planetary qualification implied.
+
+## Previous equipment validation (2026-10-24)
+
 
 - Backend: **39 tests passed**, including 13 equipment tests for quantity balances, custom/catalog separation, evidence/source consistency, unknown mass, missing specifications and invalid IDs/counts.
 - Frontend: `npm run build` passed. Existing chart bundle-size advisory remains.

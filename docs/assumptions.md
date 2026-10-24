@@ -38,3 +38,7 @@ Pressure vessel and atmosphere regulation; CO2 scrubbing; radiation; food; relia
 
 ## Catalog mode extension — 2026-10-24
 When an oxygen equipment ID is selected, q = catalog output * unit count and oxygen electrical demand = catalog power * count. This directly replaces the custom q*specific_energy/24 term. Feedwater uses q*1.125 as before. Published hardware mass is reported separately; it is not total mission mass. Unknown mass remains null; missing required output/power causes an error. Zero installed units has zero oxygen-system output/power. Multiple units are independent copies running at the published design point; no turndown, outages or redundancy benefit is simulated. Source values do not establish planetary compatibility.
+
+
+## Water equipment extension — 0.3.0
+Catalog water mode limits processed feed to a historical external-feed design budget times unit count. It stores excess in an ideal unbounded queue, returns processed*assumed_yield to usable water, and records the remainder as brine/losses. All modeled potable crew use becomes immediate feed as a boundary simplification; it is not a physiological wastewater model or demonstrated feed compatibility. Initial queue is zero, with no overflow/storage model. Recovery yield 0.90 is explicitly unvalidated. Installed historical mechanical/control power is constant, not duty-cycle optimized. Zero units recover nothing. Custom mode keeps its old effective unbounded-throughput recovery. See water-recovery-walkthrough.md for equations and unresolved research.
