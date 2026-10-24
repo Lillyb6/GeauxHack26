@@ -96,3 +96,7 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .activity-spinner{display:inline-block;width:13px;height:13px;border:2px solid #88dfcc55;border-top-color:#88dfcc;border-radius:50%;margin-right:8px;animation:action-spin 1s linear infinite}
 @keyframes action-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.activity-spinner{animation:none}}
+
+.custom-equipment{border-left:2px solid #88dfcc;padding:2px 12px 12px;margin-top:12px;background:#88dfcc08}.custom-equipment .field-help{display:block;font-size:12px;line-height:1.5;color:#bac9d7}
+
+.equipment-mode-guide{margin:12px 0;display:grid;gap:10px;padding:12px;border:1px solid #34485b;border-radius:6px}.equipment-mode-guide dt{color:#e6edf4;font-size:12px;font-weight:650}.equipment-mode-guide dd{margin:3px 0 0;color:#a6b8c8;font-size:12px;line-height:1.4}.equipment-compare-help{font-size:12px;padding-top:10px;border-top:1px solid #34485b}

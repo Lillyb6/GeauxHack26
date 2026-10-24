@@ -153,3 +153,9 @@ The optional /tutorial guide explains configuration fields, results, optimizatio
 AI assistance update: Codex helped adapt the approved tutorial prototype into the existing React tutorial placeholder, implement Help navigation with retained mission state, and document the changes. Tutorial copy and scientific scope remain available for team review. No generated image assets were added.
 
 Codex assisted with explicit progress/completion feedback and result-navigation buttons for simulation, optimization and AI goal testing.
+
+Codex assisted with revealing custom oxygen/water inputs directly beneath their equipment selectors and clarifying the historical static-feed design label.
+
+Codex assisted with inline Reference equipment / Custom design guidance, selector descriptions and explanation of how these modes participate in simulation and comparison.
+
+Codex assisted with plain-language equipment explanations and source disclosures. Specific catalog equipment names remain visible in selectors and summaries, with citations in equipment details.
