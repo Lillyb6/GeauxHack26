@@ -118,8 +118,28 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         }
         for resource, value in next_values.items():
             if value < -1e-9:
-                events.append(Event(hour=hour, resource=resource,
-                    message=f"{resource.capitalize()} demand cannot be met during hour {hour}."))
+                if resource == "power":
+                    message = (
+                        f"Power shortage during hour {hour}: "
+                        f"{demand:.3f} kWh required; "
+                         f"{req.generation_kw:.3f} kWh generated; "
+                         f"{battery:.3f} kWh available in the battery "
+                         f"at the start of the hour; "
+                         f"{-value:.3f} kWh shortfall."
+                    )
+                else:
+                    message = (
+                        f"{resource.capitalize()} demand cannot be met "
+                        f"during hour {hour}."
+                    )
+
+                events.append(
+                    Event(
+                        hour=hour,
+                        resource=resource,
+                        message=message,
+                    )
+                )
         co2_average=None
         if req.co2_enabled:
             co2_pressure,co2_average,removed=advance_pressure(co2_pressure,req.crew_size*CREW_CO2_KG_DAY/24,

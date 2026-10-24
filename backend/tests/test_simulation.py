@@ -92,6 +92,66 @@ def test_recycler_is_off_when_recovery_disabled():
     base = simulate(HabitatRequest(recycling_fraction=0, recycler_power_kw=100))
     assert base.demand_kw < 10
 
+def test_power_shortage_explains_demand_supply_and_deficit():
+    result = simulate(
+        HabitatRequest(
+            duration_days=1,
+            generation_kw=0,
+            battery_kwh=0,
+        )
+    )
+
+    event = next(
+        event for event in result.events
+        if event.resource == "power"
+    )
+
+    assert event.hour == 1
+    assert "required" in event.message.lower()
+    assert "generated" in event.message.lower()
+    assert "battery" in event.message.lower()
+    assert "shortfall" in event.message.lower()
+
+def test_power_shortage_reports_correct_energy_values():
+    result = simulate(
+        HabitatRequest(
+            duration_days=1,
+            generation_kw=2,
+            battery_kwh=1,
+        )
+    )
+
+    event = next(
+        event for event in result.events
+        if event.resource == "power"
+    )
+
+    assert event.hour == 1
+    assert "8.073 kWh required" in event.message
+    assert "2.000 kWh generated" in event.message
+    assert "1.000 kWh available in the battery" in event.message
+    assert "5.073 kWh shortfall" in event.message
+
+def test_power_shortage_uses_remaining_battery_energy():
+    result = simulate(
+        HabitatRequest(
+            duration_days=1,
+            generation_kw=2,
+            battery_kwh=10,
+        )
+    )
+
+    event = next(
+        event for event in result.events
+        if event.resource == "power"
+    )
+
+    assert event.hour == 2
+    assert "8.073 kWh required" in event.message
+    assert "2.000 kWh generated" in event.message
+    assert "3.927 kWh available in the battery" in event.message
+    assert "2.146 kWh shortfall" in event.message
 @pytest.mark.parametrize("body", [{"hvac_cop":0}, {"heat_loss_kw_k":-1}, {"recycler_power_kw":-1}])
 def test_invalid_engineering_inputs(body):
     assert client.post("/simulate",json=body).status_code == 422
+
