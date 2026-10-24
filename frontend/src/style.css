@@ -87,3 +87,12 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 @media(prefers-reduced-motion:reduce){.tutorial-chapter-content{animation:none}.tutorial-meter>span,.tutorial-sidebar progress::-webkit-progress-value{transition:none}}
 @media(max-width:800px){.tutorial-guide-layout{grid-template-columns:1fr;gap:25px}.tutorial-sidebar{border:0;padding:0}.tutorial-sidebar nav{grid-template-columns:repeat(2,minmax(0,1fr))}.tutorial-sidebar h2{margin-top:0}.tutorial-flow{grid-template-columns:1fr}.tutorial-guide-top{flex-wrap:wrap}.tutorial-guide-top>.welcome-secondary{margin-top:0}.mission-page-nav{margin-right:0}}
 @media(max-width:450px){.tutorial-sidebar nav button{font-size:11px;padding:9px 6px;gap:7px}.tutorial-lesson-actions{flex-direction:column;align-items:stretch}.tutorial-example{padding:15px}.tutorial-guide-top .welcome-secondary{width:100%}.shell>header{flex-wrap:wrap;gap:12px}.mission-page-nav{margin-left:0;width:100%}}
+
+/* Visible action lifecycle and keyboard-accessible result navigation. */
+.action-feedback:not(:empty){padding:12px;margin:10px 0;border:1px solid #4f9e92;border-radius:6px;background:#102b2c}
+.action-feedback p{margin:0 0 8px;color:#d4eee8;font-size:13px}
+.result-jump{padding:9px 12px;border:1px solid #88dfcc;border-radius:5px;background:#13252b;color:#b4f5e6;font-weight:600}
+.result-target{scroll-margin-top:24px}.result-target:focus{outline:2px solid #88dfcc;outline-offset:5px}
+.activity-spinner{display:inline-block;width:13px;height:13px;border:2px solid #88dfcc55;border-top-color:#88dfcc;border-radius:50%;margin-right:8px;animation:action-spin 1s linear infinite}
+@keyframes action-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.activity-spinner{animation:none}}
