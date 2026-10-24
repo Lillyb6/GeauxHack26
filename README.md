@@ -132,3 +132,8 @@ Enable **Screen pressure and inspired oxygen** to evaluate static interior press
 
 ### AI assistance update — atmosphere screening, 2026-10-24
 Codex researched pinned NASA-STD-3001 Vol 2 Rev E and OCHMO-TB-003 references; implemented the static screen, explicit dry/inspired oxygen distinction, source evidence, UI, optimizer/agent integration and 32 regression cases. All 176 tests and frontend build pass. Manual browser checks and a live gemini-3.8-flash simulation/Apply run passed; no credential was read or stored. Scientific and standards-compliance qualification remain outside the prototype.
+
+### AI contribution — October 24, 2026
+Codex assisted with simplifying interface copy and grouping advanced settings, scientific evidence, equipment specifications and AI audit information into expandable sections. Simulation and API behavior were unchanged.
+
+Codex also assisted with concise Gemini response instructions and a compact mission-agent result summary sourced directly from calculated results, with AI prose expandable on demand.
