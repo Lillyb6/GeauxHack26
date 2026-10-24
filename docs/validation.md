@@ -1,3 +1,9 @@
+# Current validation — oxygen and water diagnostics
+
+- 11 new focused diagnostic tests passed; all 217 backend tests passed on oxygen-water-diagnostics, independently based on origin/main. The 18 separate power-breakdown tests are not on this branch.
+- Numerical checks cover empty and partially depleted supplies, later failed hours, selected catalog output and throughput-limited recovery, unchanged custom/catalog precedence, zero electrolysis feedwater, simultaneous deficits and exact-zero balances.
+- API and compact evidence preserve the detailed events. No frontend, event schema, scientific constants or stopping rules changed. Existing Starlette/httpx warning remains; no live Gemini call was made.
+
 # Current validation — optional Mission Lab tutorial
 
 - Frontend production build passed; all 28 existing frontend tests passed. No backend logic was changed.

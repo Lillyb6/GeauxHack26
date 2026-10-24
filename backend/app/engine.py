@@ -102,17 +102,20 @@ def simulate(req: HabitatRequest) -> SimulationResult:
     for hour in range(1, (0 if events else req.duration_days * 24) + 1):
         # Oxygen capacity represents water electrolysis, not free atmospheric extraction.
         produced = oxygen_rate / 24
+        crew_oxygen_required = req.crew_size * PARAMETERS["oxygen_consumption_kg_person_day"]["value"] / 24
+        crew_water_used = crew_water_day / 24
+        electrolysis_feedwater = produced * PARAMETERS["electrolysis_water_ratio"]["value"]
         # Simplified accounting boundary: potable crew use becomes available feed immediately.
         # Food/metabolic water and true wastewater composition/delays remain outside this model.
-        wastewater += crew_water_day / 24
+        wastewater += crew_water_used
         processed = wastewater if feed_budget_day is None else min(wastewater, feed_budget_day / 24)
         recovered = processed * recovery_fraction
         wastewater -= processed
         recovered_total += recovered
         brine_total += processed - recovered
-        water_used = crew_water_day / 24 - recovered + produced * PARAMETERS["electrolysis_water_ratio"]["value"]
+        water_used = crew_water_used - recovered + electrolysis_feedwater
         next_values = {
-            "oxygen": oxygen + produced - req.crew_size * PARAMETERS["oxygen_consumption_kg_person_day"]["value"] / 24,
+            "oxygen": oxygen + produced - crew_oxygen_required,
             "water": water - water_used,
             "power": battery + req.generation_kw - demand,
         }
@@ -126,6 +129,26 @@ def simulate(req: HabitatRequest) -> SimulationResult:
                          f"{battery:.3f} kWh available in the battery "
                          f"at the start of the hour; "
                          f"{-value:.3f} kWh shortfall."
+                    )
+                elif resource == "oxygen":
+                    message = (
+                        f"Oxygen shortage during hour {hour}: "
+                        f"{crew_oxygen_required:.6f} kg required by the crew; "
+                        f"{produced:.6f} kg modeled production; "
+                        f"{oxygen:.6f} kg stored oxygen available at the start of the hour; "
+                        f"{-value:.6f} kg shortfall. "
+                        "Failed-hour balances do not establish successful equipment operation."
+                    )
+                elif resource == "water":
+                    message = (
+                        f"Water shortage during hour {hour}: "
+                        f"{crew_water_used:.6f} kg crew use; "
+                        f"{recovered:.6f} kg modeled recovery; "
+                        f"{electrolysis_feedwater:.6f} kg electrolysis feedwater required; "
+                        f"{water:.6f} kg usable water available at the start of the hour; "
+                        f"{-value:.6f} kg shortfall. "
+                        "Wastewater waiting for processing is not usable water. "
+                        "Failed-hour balances do not establish successful equipment operation."
                     )
                 else:
                     message = (
