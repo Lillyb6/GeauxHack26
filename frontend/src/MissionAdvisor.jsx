@@ -18,9 +18,9 @@ export default function MissionAdvisor({ comparison, stale }) {
  }
  return <section className="advisor" aria-label="Mission advisor">
   <p className="eyebrow">MISSION ADVISOR / GEMINI</p><h3>Understand your design</h3>
-  <p>Gemini explains the calculated results and scientific assumptions. The simulator determines the numbers.</p>
-  <button className="run" type="button" onClick={explain} disabled={busy||stale}>{busy?'Preparing explanation…':'Explain this comparison with Gemini'}</button>
-  <p className="muted">Requesting an explanation sends this mission configuration, computed summaries and reference evidence to Google Gemini when configured. No API key is sent to the browser.</p>
+  <p>AI explains calculated results.</p>
+  <button className="run" type="button" onClick={explain} disabled={busy||stale}>{busy?'Preparing explanation…':'Explain comparison'}</button>
+  <p className="muted">Sends mission settings, results and evidence to Google Gemini.</p>
   {stale&&<p className="alert">Optimize again before requesting advice for changed inputs.</p>}
   <div aria-live="polite" aria-busy={busy}>
    {error&&<p className="alert">{error}</p>}

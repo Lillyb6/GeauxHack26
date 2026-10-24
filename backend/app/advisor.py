@@ -52,7 +52,7 @@ def generate_text(packet, key, model):
         "When optimized is null, explain that there is no recommendation within these bounds. "
         "Constraint counts may overlap and describe observed stopping conditions, not every cause or separate groups of failed candidates. "
         "Use plain language, describe tradeoffs and useful next steps. Cite only source IDs in supplied sources. "
-        "Return summary, tradeoffs, next_steps and source_ids as JSON. Keep prose concise.")
+        "Return summary, tradeoffs, next_steps and source_ids as JSON. Limit the summary to 60 words, tradeoffs to two short items, and next_steps to two short items. Avoid headings, raw catalog IDs and equipment specification lists.")
     # No URL, model identifier, or API key comes from the browser request.
     with httpx.Client(timeout=25.0, trust_env=False) as client:
         response = client.post(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",

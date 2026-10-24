@@ -6,8 +6,8 @@ export default function WaterEquipmentSummary({equipment, title='Water equipment
    <div><dt>Assumed processed-feed recovery</dt><dd>{number(equipment.recovery_fraction*100)}%</dd></div>
    <div><dt>Installed power incl. historical controls</dt><dd>{number(equipment.electrical_power_kw)} kW</dd></div>
    <div><dt>Known setup hardware mass</dt><dd>{equipment.known_hardware_mass_kg == null ? 'Unknown' : `${number(equipment.known_hardware_mass_kg)} kg`}</dd></div>
-  </dl><p>Historical feed/power/mass reference with an unvalidated 90% yield assumption. Yield applies only to processed feed; crew-wide recovery falls when wastewater exceeds the feed budget. Planetary operating envelope is not validated.</p>
+  </dl><details><summary>Sources & limitations</summary><p>Historical feed/power/mass reference with an unvalidated 90% yield assumption. Yield applies only to processed feed; crew-wide recovery falls when wastewater exceeds the feed budget. Planetary operating envelope is not validated.</p>
   <a href={equipment.source.url} target="_blank" rel="noreferrer">{equipment.source.title} ↗</a><p>{equipment.source.location}</p>
-  <details><summary>Water equipment derivations and limitations</summary><ul>{Object.entries(equipment.derivations || {}).map(([key,note])=><li key={key}>{note}</li>)}{equipment.limitations.map(note=><li key={note}>{note}</li>)}</ul></details>
+  <ul>{Object.entries(equipment.derivations || {}).map(([key,note])=><li key={key}>{note}</li>)}{equipment.limitations.map(note=><li key={note}>{note}</li>)}</ul></details>
  </section>;
 }
