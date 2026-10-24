@@ -1,3 +1,11 @@
+# Current validation — optional Mission Lab tutorial
+
+- Frontend production build passed; all 28 existing frontend tests passed. No backend logic was changed.
+- Browser verified home/tutorial/Mission Lab navigation, top Help, Skip, Finish, chapter selection, expandable sections and the local heating example.
+- Five crew / one day / 380 kg starting water and a completed resource result survived Help -> Back and tutorial Finish. The guide does not edit mission data.
+- No horizontal overflow at 390 px and 900 px. Reduced-motion preference disables tutorial motion. Tutorial contains no image elements or new assets.
+- Existing chart bundle-size advisory remains. No live Gemini request was made.
+
 # Current validation — thermal integration, model 0.6.0
 
 - 203 backend tests passed, including 15 thermal integration cases plus the existing standalone helper tests. Coverage includes unchanged default balances, initial-state failures, exact/sufficient capacity, COP/battery accounting, planetary heating/cooling selection, API input bounds, source attribution, fixed optimizer constraints, and agent schema/compact evidence.
