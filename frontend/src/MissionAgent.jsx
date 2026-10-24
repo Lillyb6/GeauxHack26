@@ -28,6 +28,7 @@ export default function MissionAgent({baseline,onApply}) {
   <p className="eyebrow">GEMINI / LOCAL SIMULATION TOOLS</p><h2>Ask your mission designer</h2>
   <p>Describe a mission goal. Gemini can test proposed inputs and search catalog equipment counts. Review every change before applying it.</p>
   <form onSubmit={submit}><label htmlFor="agent_goal">Mission goal<textarea id="agent_goal" required minLength={5} maxLength={1500} rows={4} value={goal} onChange={e=>{setGoal(e.target.value);setApplied(false);}}/></label><button className="run" disabled={busy||goal.trim().length<5}>{busy?'Evaluating mission goal…':'Test mission goal with agent'}</button></form>
+  <button type="button" className="agent-example" onClick={()=>{setGoal('Enable cabin CO2 screening for six crew for 30 days on Mars, with 100 m3 free cabin volume, 0.4 mmHg initial CO2, 14 kW generation, 400 kg initial water and no ending wastewater backlog. Find the lightest catalog design. Keep all other inputs unchanged.');setApplied(false);}}>Try a CO₂ screening goal</button>
   <p className="muted">Uses the existing Gemini API only. Your goal, current settings, catalog evidence and compact tool results are sent to Google. Up to three local tool calls and four Gemini requests per run. Starting supplies and settings change only in a reviewable proposal.</p>
   <div aria-live="polite" aria-busy={busy}>
    {error&&<p role="alert" className="alert">{error}</p>}

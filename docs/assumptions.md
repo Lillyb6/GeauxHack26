@@ -46,3 +46,7 @@ Catalog water mode limits processed feed to a historical external-feed design bu
 
 ## Optimizer boundary
 The count optimizer changes only the two selected catalog systems and their counts, and evaluates each through the same engine. Fixed supplies are not optimized; the objective excludes unknown/supporting hardware and total mission mass. A zero-unit solution may be sufficient for modeled consumables over a short mission. End wastewater storage remains ideal unless the optional no-ending-backlog constraint is selected. The 90% recovery yield is still unvalidated. Bounded resource feasibility is not survival certification; see optimizer-walkthrough.md.
+
+
+## Model 0.4.0: opt-in cabin CO2
+CO2 is evaluated only when co2_enabled=true. A constant-temperature/volume well-mixed ideal-gas balance uses the BVAD 1.085 kg/person/day nominal load. The historical CDRA point is 4.16 kg/day at 2 mmHg, 1 kW, 450 lb. A linear-below-reference/capped-above response is unvalidated. Exact piecewise integration computes one-hour means; 3 mmHg is a nominal screen, not a lethal threshold. Initial ppCO2 above it is rejected at hour zero. Installed scrubber power and mass are counted; extra cooling/vacuum/regeneration infrastructure is not solved. Disabled runs explicitly omit CO2. See co2-walkthrough.md for all equations, source locations and scope.

@@ -1,3 +1,14 @@
+# Current validation — CO2 screening, 2026-10-24
+
+- Backend: **144 tests passed**, including 25 CO2 cases for analytical/numerical agreement, conservation, initial violations, hourly-mean vs endpoint screening, zero/multiple units, volume, provenance, invalid values, third-dimension optimization and agent tools.
+- Frontend production build passed; existing bundle advisory and Starlette/httpx warning remain.
+- Browser: opt-in controls and source links rendered; four crew / zero scrubbers exceeded the one-hour mean screen at hour 4. Six crew exceeded it at hour 3. At 14 kW, 400 kg water and no ending wastewater backlog, CO2-aware optimization evaluated 405 candidates / four feasible, selecting 2 oxygen + 2 water + 2 CDRA units, 1044.233133 kg, 12.334 kW and 720 completed hours. Ending CO2 was 1.564904 mmHg. CO2 comparison chart rendered.
+- Historical CDRA reference is NASA-authored and USEA-hosted; away-from-design-point response remains an assumption. NASA technology goals were excluded from actual equipment specifications. Team scientific qualification is pending.
+- Live CO2 Gemini tool use has not been verified; mocked agent decisions exercised the real optimizer. Gemini remains the only runtime external API integration.
+- Agent checkpoint already existed at e9674b0; no duplicate checkpoint commit was needed.
+
+## Previous mission agent validation
+
 # Current validation — tool-using mission agent, 2026-10-24
 
 - Backend: **119 tests passed**, including 20 agent cases covering real optimizer/simulation tools, canonical validation, unknown tools, fixed-baseline patch semantics, count/turn limits, signature/call-ID preservation, incomplete provider turns, no-backlog proposals and endpoint input restrictions.

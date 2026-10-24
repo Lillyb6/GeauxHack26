@@ -2,10 +2,11 @@ from .models import HabitatRequest, SimulationResult, Reading, Event
 from .environments import ENVIRONMENTS
 from .equipment import resolve_oxygen_equipment, resolve_water_equipment
 from .research import PARAMETERS, evidence_for, sources_for
+from .co2 import resolve_co2_equipment, pressure_per_kg, advance_pressure, co2_evidence, CREW_CO2_KG_DAY, CO2_LIMIT_MMHG
 
 LIMITATIONS = [
     "Resource-balance prototype; completion does not establish human survival or mission feasibility.",
-    "Pressure vessels, radiation, CO2 scrubbing, food, waste, medical risks and equipment reliability are not modeled.",
+    "Pressure vessels, radiation, food, waste, medical risks and equipment reliability are not modeled. CO2 screening is opt-in and idealized.",
     "Fixed exterior temperature, simplified conduction/HVAC, ideal battery, continuous generation and instant potable-water recovery are unvalidated assumptions.",
     "ISS equipment and recovery references are transferred proxies, not validated performance in planetary environments.",
     "Venus surface materials and cooling feasibility are not validated; Titan is a moon, not a planet.",
@@ -49,15 +50,22 @@ def simulate(req: HabitatRequest) -> SimulationResult:
             * req.electrolyzer_kwh_kg_oxygen
             / 24
         )
-    demand = (req.other_load_kw + recycler + thermal + oxygen_power)
+    co2_summary=resolve_co2_equipment(req.co2_equipment_id,req.co2_equipment_quantity) if req.co2_enabled else None
+    alpha=pressure_per_kg(req.habitat_volume_m3,req.interior_temperature_c) if req.co2_enabled else None
+    co2_pressure=req.initial_co2_mmhg if req.co2_enabled else None
+    co2_removed=0.0
+    demand = (req.other_load_kw + recycler + thermal + oxygen_power + (co2_summary["electrical_power_kw"] if co2_summary else 0))
     oxygen, water, battery = (
         req.oxygen_kg,
         req.water_kg,
         req.battery_kwh,
     )
-    readings = [Reading(hour=0, oxygen_kg=oxygen, water_kg=water, battery_kwh=battery)]
+    readings = [Reading(hour=0, oxygen_kg=oxygen, water_kg=water, battery_kwh=battery,co2_mmhg=co2_pressure,co2_removed_kg=0 if req.co2_enabled else None)]
     events = []
-    for hour in range(1, req.duration_days * 24 + 1):
+    hour=0
+    if req.co2_enabled and co2_pressure>CO2_LIMIT_MMHG+1e-9:
+        events.append(Event(hour=0,resource="co2",message="Initial cabin CO2 exceeds the 3 mmHg screening level; no mission hours evaluated."))
+    for hour in range(1, (0 if events else req.duration_days * 24) + 1):
         # Oxygen capacity represents water electrolysis, not free atmospheric extraction.
         produced = oxygen_rate / 24
         # Simplified accounting boundary: potable crew use becomes available feed immediately.
@@ -78,16 +86,30 @@ def simulate(req: HabitatRequest) -> SimulationResult:
             if value < -1e-9:
                 events.append(Event(hour=hour, resource=resource,
                     message=f"{resource.capitalize()} demand cannot be met during hour {hour}."))
+        co2_average=None
+        if req.co2_enabled:
+            co2_pressure,co2_average,removed=advance_pressure(co2_pressure,req.crew_size*CREW_CO2_KG_DAY/24,
+                co2_summary["co2_capacity_kg_day"]/24,alpha,co2_summary["reference_ppco2_mmhg"])
+            co2_removed+=removed
+            if co2_average>CO2_LIMIT_MMHG+1e-9:
+                events.append(Event(hour=hour,resource="co2",message=f"Cabin CO2 one-hour average exceeds the 3 mmHg screening limit during hour {hour}."))
         # End-of-hour balances; stop on first deficient hour. Battery capacity is initial charge.
         oxygen = max(0, next_values["oxygen"])
         water = max(0, next_values["water"])
         battery = max(0, min(req.battery_kwh, next_values["power"]))
         readings.append(Reading(hour=hour, oxygen_kg=round(oxygen,6), water_kg=round(water,6), battery_kwh=round(battery,6),
-            wastewater_kg=round(wastewater,6), recovered_water_kg=round(recovered_total,6), brine_water_kg=round(brine_total,6)))
+            wastewater_kg=round(wastewater,6), recovered_water_kg=round(recovered_total,6), brine_water_kg=round(brine_total,6), co2_mmhg=round(co2_pressure,6) if req.co2_enabled else None,
+            co2_hour_average_mmhg=round(co2_average,6) if req.co2_enabled else None,co2_removed_kg=round(co2_removed,6) if req.co2_enabled else None))
         if events:
             break
     evidence = evidence_for(req, equipment_summary, water_equipment_summary)
+    if req.co2_enabled:
+        evidence.update(co2_evidence(req,co2_summary))
+    else:
+        warnings.append("CO2 screening is disabled; cabin CO2 accumulation and scrubber power/mass are not evaluated.")
     limitations = list(LIMITATIONS)
+    if co2_summary:
+        limitations.extend(co2_summary["limitations"])
     if equipment_summary is not None:
         limitations.extend(equipment_summary["limitations"])
     if water_equipment_summary is not None:
@@ -100,10 +122,14 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         "recovered_water_kg":round(recovered_total,6),
         "unprocessed_wastewater_kg":round(wastewater,6),
         "brine_water_kg":round(brine_total,6),
-        "effective_recovery_fraction":recovered_total / (crew_water_day * hour / 24),
+        "effective_recovery_fraction":recovered_total / (crew_water_day * hour / 24) if hour else 0,
     }
     return SimulationResult(equipment_summary=equipment_summary,request=req, resource_balance_complete=not events,
         evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3),
         events=events, readings=readings, limitations=limitations,
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
-        water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings)
+        water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,
+        co2_equipment_summary=co2_summary,
+        co2_balance={"initial_kg":req.initial_co2_mmhg/alpha,"generated_kg":req.crew_size*CREW_CO2_KG_DAY*hour/24,
+            "removed_kg":co2_removed,"end_kg":co2_pressure/alpha,"limit_mmhg":CO2_LIMIT_MMHG,
+            "limit_basis":"one-hour average; initial state separately screened","response_curve":"unvalidated linear below 2 mmHg, capped above"} if req.co2_enabled else None)

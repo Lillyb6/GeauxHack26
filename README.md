@@ -114,3 +114,10 @@ Use **Ask your mission designer** to describe a goal. The agent can call local s
 
 ### AI assistance update — mission agent, 2026-10-24
 Codex implemented the bounded Gemini function-calling loop, canonical input validation, local tool audit, proposal review/apply UI, regression tests and documentation. Default model updated to gemini-3.8-flash after the user's successful advisor test. All 119 backend tests and frontend production build pass. Browser checks used clearly labeled mocked Gemini decisions with the real optimizer; live agent function-calling verification remains pending. No additional external provider or generative visual assets were added. Scientific assumptions remain unvalidated; team review is pending.
+
+
+## Cabin CO2 screening — model 0.4.0
+Enable **Evaluate cabin CO2 and scrubber load** to model a well-mixed interior cabin, NASA BVAD crew CO2 generation, historical CDRA units, power and hardware mass, and a NASA-referenced 3 mmHg one-hour-average design screen. Screening is off for existing scenarios and explicitly labeled not evaluated. Enabled optimization includes scrubber quantities (up to 405 candidates); the agent has a CO2 goal example. Historical operating-point data is distinguished from the unvalidated response curve and cabin assumptions. [Full sources, equations and demo](docs/co2-walkthrough.md). No additional external API is introduced.
+
+### AI assistance update — CO2 extension, 2026-10-24
+Codex researched NASA/NIST primary references, excluded technology targets from equipment-performance claims, implemented analytical CO2 balances, explicit opt-in controls, source-attributed equipment, optimizer/agent integration, charts, 25 regression cases and documentation. All 144 backend tests and frontend build pass; browser simulation and optimization checks passed. Live CO2 agent verification and team scientific review remain pending. The existing agent checkpoint was already committed as e9674b0 before this extension.

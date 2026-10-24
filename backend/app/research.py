@@ -180,3 +180,7 @@ def sources_for(evidence, environment_id, equipment_summary=None, water_equipmen
     used_ids = {source for item in evidence.values() for source in item["source_ids"]}
     used_ids.add(environment_id)
     return {key: value for key, value in sources.items() if key in used_ids}
+
+
+from .co2 import CO2_SOURCES
+SOURCES.update(CO2_SOURCES)

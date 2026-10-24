@@ -14,6 +14,12 @@ class HabitatRequest(BaseModel):
     )
     water_equipment_id: str | None = None
     water_equipment_quantity: int = Field(default=1, ge=0, le=8)
+    # Opt-in extension preserves previously saved oxygen/water-only scenarios.
+    co2_enabled: bool = False
+    co2_equipment_id: str = "cdra_2019_reference"
+    co2_equipment_quantity: int = Field(default=1, ge=0, le=4)
+    habitat_volume_m3: float = Field(default=100, ge=10, le=10000)
+    initial_co2_mmhg: float = Field(default=0.4, ge=0, le=20)
     crew_size: int = Field(default=4, ge=1, le=12)
     duration_days: int = Field(default=30, ge=1, le=180)
     oxygen_kg: float = Field(default=30, ge=0, le=10000)
@@ -39,13 +45,17 @@ class Reading(BaseModel):
     recovered_water_kg: float = 0
     brine_water_kg: float = 0
 
+    co2_mmhg: float | None = None
+    co2_hour_average_mmhg: float | None = None
+    co2_removed_kg: float | None = None
+
 class Event(BaseModel):
     hour: int
     resource: str
     message: str
 
 class SimulationResult(BaseModel):
-    assumptions_version: str = "0.3.0"
+    assumptions_version: str = "0.4.0"
     request: HabitatRequest
     resource_balance_complete: bool
     evaluated_hours: int
@@ -60,6 +70,8 @@ class SimulationResult(BaseModel):
     environment_reference: dict
     equipment_summary: dict | None = None
     water_equipment_summary: dict | None = None
+    co2_equipment_summary: dict | None = None
+    co2_balance: dict | None = None
     water_balance: dict
     warnings: list[str] = Field(default_factory=list)
 
@@ -71,10 +83,12 @@ class OptimizationRequest(BaseModel):
     water_equipment_id: str
     max_oxygen_units: int = Field(default=8, ge=0, le=8)
     max_water_units: int = Field(default=8, ge=0, le=8)
+    max_co2_units: int = Field(default=4, ge=0, le=4)
     require_no_wastewater_backlog: bool = False
 
 
 class CandidateSummary(BaseModel):
+    co2_units: int | None = None
     oxygen_units: int
     water_units: int
     eligible: bool

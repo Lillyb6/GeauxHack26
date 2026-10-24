@@ -63,5 +63,28 @@
       "Wastewater queue is ideal and unbounded; storage tank capacity and overflow are not evaluated."
     ],
     "recovery_evidence_status": "unvalidated_design_assumption"
+  },
+  {
+    "id": "cdra_2019_reference",
+    "name": "CDRA — NASA 2019 historical reference",
+    "category": "co2_removal",
+    "co2_capacity_kg_day": 4.16,
+    "reference_ppco2_mmhg": 2.0,
+    "electrical_power_kw": 1.0,
+    "hardware_mass_kg": 204.1165665,
+    "evidence_status": "historical_reference_with_unvalidated_response_curve",
+    "source": {
+      "title": "Darrell Jan (NASA Ames), NASA CO2 Removal, July 24 2019",
+      "organization": "NASA Ames; hosted by USEA",
+      "url": "https://usea.org/sites/default/files/event-/JAN_NASA%20DCA%207-24-2019sW2.pdf",
+      "location": "Slide 36 / PDF page 36, historical CDRA specifications",
+      "publication_date": "2019-07-24"
+    },
+    "limitations": [
+      "Historical stated performance: 4.16 kg/day at 2 mmHg inlet CO2, 1000 W and 450 lb; NASA-authored presentation hosted by USEA, not a new flight qualification.",
+      "Capacity below 2 mmHg is assumed proportional to partial pressure, capped at the reference rate above it. No measured performance curve is supplied.",
+      "Power is charged continuously per installed unit, including low-load operation. Regeneration, vacuum infrastructure, humidity, maintenance, leakage, extra cooling and environmental qualification are not modeled.",
+      "Removed CO2 leaves the modeled cabin; no oxygen or water recovery credit is assigned. Hardware mass excludes supporting infrastructure."
+    ]
   }
 ]

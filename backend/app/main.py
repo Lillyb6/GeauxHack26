@@ -4,7 +4,7 @@ from .engine import simulate
 from .equipment import EQUIPMENT
 from .environments import ENVIRONMENTS
 
-app = FastAPI(title="Beyond Earth", version="0.3.0", description="Hourly resource-balance prototype")
+app = FastAPI(title="Beyond Earth", version="0.4.0", description="Hourly resource-balance prototype")
 
 @app.get("/health")
 def health():
@@ -32,7 +32,7 @@ def run_simulation(request: HabitatRequest):
 @app.get("/model-reference")
 def model_reference():
     from .research import SOURCES, PARAMETERS
-    return {"version":"0.3.0", "sources":SOURCES, "parameters":PARAMETERS,
+    return {"version":"0.4.0", "sources":SOURCES, "parameters":PARAMETERS,
             "default_request":HabitatRequest().model_dump()}
 
 

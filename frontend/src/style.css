@@ -16,3 +16,6 @@ select{font:inherit}.config select{display:block;width:100%;margin-top:7px;borde
 .mission-agent .agent-message {white-space:pre-wrap;}
 .mission-agent .muted {font-size:12px; color:#a6b8c8;}
 .mission-agent .run:disabled {cursor:default;}
+
+.agent-example {border:1px solid #375166; border-radius:5px; padding:9px 12px; color:#9fe4d5; margin-bottom:10px;}
+.co2-result {padding:12px 0;border-top:1px solid #375166;margin-top:15px;}

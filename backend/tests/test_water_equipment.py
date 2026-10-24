@@ -37,7 +37,7 @@ def test_overload_warns_without_pretending_to_be_immediate_failure():
     assert r.warnings
     assert r.water_balance["effective_recovery_fraction"] < .5
     assert r.readings[-1].wastewater_kg > 20
-    assert simulate(request(crew_size=4)).warnings == []
+    assert not any("Water processor" in warning for warning in simulate(request(crew_size=4)).warnings)
 
 def test_more_units_improve_processing_without_multiplying_efficiency():
     a=simulate(request(crew_size=12,water_equipment_quantity=1))
