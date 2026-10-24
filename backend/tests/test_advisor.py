@@ -115,3 +115,16 @@ def test_safe_http_diagnostic(monkeypatch,code):
     assert result["status"]=="unavailable"
     assert str(code) in result["message"]
     assert "private-key" not in json.dumps(result)
+
+
+def test_explanation_compares_original_and_verified_resources():
+    req=request()
+    req.scenario=HabitatRequest(crew_size=7)
+    result=advisor.explain(req,allow_improvement=True)
+    rows={row["resource"]:row for row in result["resource_comparison"]}
+    assert rows["Mission duration"]["manual"]=="318 / 720 hours"
+    assert rows["Mission duration"]["optimized"]=="720 / 720 hours"
+    assert rows["Starting water"]["manual"]=="300 kg"
+    assert rows["Starting water"]["optimized"]!="300 kg"
+    assert result["manual_stopping_events"][0]["resource"]=="oxygen"
+    assert "why_manual_failed" in result["advice"]

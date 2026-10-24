@@ -61,3 +61,18 @@ from .mission_agent import AgentRequest
 def mission_agent(request: AgentRequest):
     from .mission_agent import run_agent
     return run_agent(request)
+
+
+@app.post("/improve", response_model=OptimizationResult)
+def improve_habitat(request: OptimizationRequest):
+    from .improvement import improve
+    try:
+        return improve(request)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/explain-improvement")
+def explain_improvement(request: OptimizationRequest):
+    from .advisor import explain
+    return explain(request, allow_improvement=True)
