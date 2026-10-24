@@ -14,7 +14,7 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
    <a className="console-link" href="#crew_size">Edit mission parameters ↘</a>
   </aside>
   <section className="console-monitor center-monitor">
-   <div className="monitor-bar"><span>02 / {env.name.toUpperCase()} SURFACE VIEW</span><span>CONFIGURATION PREVIEW</span></div>
+   {!sceneOnly&&<div className="monitor-bar"><span>02 / {env.name.toUpperCase()} SURFACE VIEW</span><span>CONFIGURATION PREVIEW</span></div>}
    <div className="planet-scene">
     <img className="planet-art" src={`/mission/${form.environment_id}.webp`} alt={`${env.name} surface artwork`} />
     <div className="scene-label"><span className="signal-dot"/> {env.name.toUpperCase()} / CREW {count.toString().padStart(2,'0')}</div>

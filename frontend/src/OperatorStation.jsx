@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 
 function Monitor({ id, title, children, className = '' }) {
- return <section className={`operator-monitor station-${id} ${className}`} data-station={id} aria-label={title}>
-  <div className="operator-bezel"><span>BE / {title.toUpperCase()}</span><span className="operator-led" aria-hidden="true"/></div>
+ return <><section className={`operator-monitor station-${id} ${className}`} data-station={id} aria-label={title}>
+  <div className="operator-bezel"><span>{title.toUpperCase()}</span><span className="operator-led" aria-hidden="true"/></div>
   <div className="operator-screen" tabIndex={0} aria-label={`${title} monitor content`}>{children}</div>
   <div className="operator-chin"><span>BEYOND EARTH</span><span>● &nbsp; ▰</span></div>
- </section>;
+ </section><div className={`monitor-support support-${id}`} aria-hidden="true"><span/></div></>;
 }
 
 export default function OperatorStation({ setup, designer, surface, systems, active, booting = false, editingSetup = false }) {
  const viewport=useRef(null), pointer=useRef(null), wake=useRef(()=>{});
  const [locked,setLocked]=useState(null);
  const [reducedMotion,setReducedMotion]=useState(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches);
- const [motion,setMotion]=useState(true);
  useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setReducedMotion(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
 
  function lookAt(id, focus=false) {
@@ -32,7 +31,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
  },[active,editingSetup]);
  useEffect(()=>{if(active&&editingSetup){setLocked('setup');lookAt('setup',true);}},[active,editingSetup]);
  useEffect(()=>{
-  if(!active||locked||reducedMotion||!motion||booting)return;
+  if(!active||locked||reducedMotion||booting)return;
   let frame=0,last=null,vx=0,vy=0;
   const edge=(v,size)=>v<size*.4?-(1-v/(size*.4)):v>size*.6?(v-size*.6)/(size*.4):0;
   function update(now) {
@@ -51,7 +50,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
   }
   wake.current=()=>{if(!frame)frame=requestAnimationFrame(update);};
   return ()=>{cancelAnimationFrame(frame);wake.current=()=>{};pointer.current=null;};
- },[active,locked,reducedMotion,motion,booting]);
+ },[active,locked,reducedMotion,booting]);
  function onFocus(e) {
   const monitor=e.target.closest('[data-station]');if(!monitor)return;
   setLocked(monitor.dataset.station);pointer.current=null;
@@ -62,14 +61,12 @@ export default function OperatorStation({ setup, designer, surface, systems, act
  }
  useEffect(()=>{if(!active)return;const release=e=>{if(e.key==='Escape'){pointer.current=null;setLocked(null);document.activeElement?.blur();}};window.addEventListener('keydown',release);return()=>window.removeEventListener('keydown',release);},[active]);
  return <div className={`operator-experience ${booting?'station-booting':''}`}>
-  <div className="operator-toolbar"><div><span className="operator-live-dot"/> OPERATOR STATION <small>{locked?'Camera locked. Press Escape or click outside a monitor to look around.':'Move toward the edges to glide around. Click a monitor to work.'}</small></div><label className="station-motion"><input type="checkbox" checked={motion&&!reducedMotion} disabled={reducedMotion} onChange={e=>setMotion(e.target.checked)}/> Gentle drift{reducedMotion?' (reduced motion)':''}</label><span className="camera-status" role="status">{booting?'POWERING ON…':locked?'MONITOR FOCUSED':'MISSION CONTROL ONLINE'}</span></div>
-  <nav className="station-navigation" aria-label="Choose a mission control monitor">{[['setup','Mission brief'],['surface','Surface'],['systems','Systems & results'],['designer','AI assistance']].map(([id,label])=><button type="button" key={id} disabled={booting} onClick={()=>{setLocked(id);lookAt(id,true);}}>{label}</button>)}</nav>
   <div ref={viewport} className="operator-viewport" onPointerMove={e=>{if(e.pointerType==='mouse'){const rect=e.currentTarget.getBoundingClientRect();pointer.current={x:e.clientX-rect.left,y:e.clientY-rect.top};wake.current();}}} onPointerLeave={()=>{pointer.current=null;wake.current();}} onPointerDown={e=>{pointer.current=null;const monitor=e.target.closest('[data-station]');if(monitor)setLocked(monitor.dataset.station);else{setLocked(null);document.activeElement?.blur();}}} onClick={e=>{const monitor=e.target.closest('[data-station]');if(monitor&&!e.target.closest('.result-jump')&&!window.matchMedia('(max-width: 800px)').matches)lookAt(monitor.dataset.station);}} onFocusCapture={onFocus}>
    <div className="operator-room" inert={booting}>
     <div className="room-wall-label">BEYOND EARTH / HABITAT OPERATIONS DIVISION</div>
     <Monitor id="setup" title="01 / Mission brief">{setup}</Monitor>
     <Monitor id="designer" title="02 / AI assistance">{designer}</Monitor>
-    <Monitor id="surface" title="03 / Surface observation">{surface}</Monitor>
+    <Monitor id="surface" title="03 / Surface observation & view">{surface}</Monitor>
     <Monitor id="systems" title="04 / Systems & results">{systems}</Monitor>
     <div className="operator-desk" aria-hidden="true"><div className="desk-keyboard"/><div className="desk-plaque">BEYOND EARTH &nbsp; / &nbsp; FLIGHT DIRECTOR</div></div>
    </div>
