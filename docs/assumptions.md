@@ -1,26 +1,36 @@
-# Scientific and mathematical scope — v0.1.0
+# Model scope and equations — 0.2.0
 
-This is a deterministic resource-balance teaching prototype, not life-support engineering software. No readiness score or survival probability is reported.
+Exploratory resource-balance model. Every result contains provenance. A sourced parameter does not validate a cross-environment engineering model.
 
-## Sourced reference values
-Environment cards use representative published values, not site-specific readings or live mission telemetry. Sources and units are in sources.md. Pressure and gravity are context only in this milestone. Fixed exterior temperature affects the assumed thermal power load. Available resources are contextual; no extraction is simulated.
+## Evidence categories
+- reference_baseline: NASA nominal crew inputs.
+- derived_ideal: rounded electrolysis stoichiometry.
+- derived_technology_proxy: DOE terrestrial electrolysis status converted to O2 basis; linear scaling assumed.
+- transferred_reference: ISS recovery and recycler power transferred to this model without off-Earth calibration.
+- design_setpoint / unvalidated_design_input: explicit example design values with no claim of published hardware performance.
+- scenario_input: crew, duration, supplies and capacities selected by the user.
+- user_override: a user replaces a reference default; the original citation remains context only.
 
-## Modeled assumptions (not spacecraft equipment specifications)
-- One step is one Earth hour; maximum 180 Earth days, 12 people.
-- Oxygen consumption: 0.84 kg/person/day, a NASA nominal reference rather than an individual prediction.
-- Crew water use: 3.5 kg/person/day (team-review assumption). The selected fraction is recovered immediately; hygiene, waste storage, recovery delay, leakage and recycler throughput are omitted.
-- Electrolyzer continuously produces selected kg O2/day. Feedwater = 1.125 kg per kg O2 from ideal stoichiometry. Energy = 5 kWh/kg O2 (assumed). Hydrogen vented; no recovery modeled.
-- Thermal electric load = 0.04 kW/K * abs(21 C - exterior temperature). Assumed UA and ideal COP=1. No inertia, radiation heat exchange, HVAC capacity or materials validation. This is particularly inadequate for Venus surface cooling.
-- Other loads: 0.8 kW/person plus 0.5 kW for recycling (even at zero recovery).
-- Power supply is constant external generation, not a solar array. Fuel, hardware mass, outages and local illumination are omitted. Battery starts full; capacity equals entered initial charge. Charging/discharging are ideal without rate limits.
-- Oxygen storage is ideal and unbounded in this milestone. No leaks, pressure or mixture model.
+## Balance equations (one Earth hour per step)
+Let N=crew, q=oxygen capacity kg/day, r=effective potable-water recovery.
+O2_next = O2 + q/24 - N*0.895/24.
+Water_next = water - N*3.217*(1-r)/24 - q*1.125/24.
+Thermal_electric_kW = UA*abs(T_set - T_exterior)/COP.
+Recycler_kW = configured load if r>0, otherwise 0.
+Demand_kW = other_load + recycler + thermal_electric + q*specific_electrolyzer_energy/24.
+Battery_next = min(capacity, battery + generation - demand).
 
-## Hourly balances
-O2_next = O2 + electrolyzer_kg_day/24 - crew*0.84/24.
-Water_next = water - crew*3.5*(1-recovery)/24 - electrolyzer_kg_day*1.125/24.
-Battery_next = min(capacity, battery + generation_kW - demand_kW).
-Demand = crew*0.8 + 0.5 + thermal + electrolyzer_kg_day*5/24.
+UA and COP are unvalidated inputs, not NASA measurements. This envelope proxy omits convection/radiation, solar input, internal/metabolic heat, thermal inertia, materials and heat rejection. No thermal control capacity check exists. In particular, a viable Venus cooling system cannot be inferred from this calculation.
 
-If any next inventory is below -1e-9, record an unmet-demand event in that hour and stop. Values clamp to zero for display. An exact zero end-of-step balance is allowed; the next step must still meet demand. Failed-hour rows are diagnostic attempted balances, not evidence equipment operated without power/water. Failure timing has one-hour resolution, not a medical survival deadline.
+Recovery is instantaneous and applied to potable intake as an effective loss factor. Food/metabolic water, hygiene, waste-stream flows and recovery delays are omitted: this is not a full human mass balance or a reproduction of ISS ECLSS. Electrolysis hydrogen is vented; no Sabatier loop. The 1.125 ratio is rounded ideal net chemistry, not circulating water flow.
 
-Resource completion means only that the three simplified balances completed. Pressure vessels, CO2 scrubbing, radiation, food, medical effects, reliability, structural mass, fuel and thermal feasibility remain unevaluated. Switching to Venus or Titan changes assumed thermal demand; it does not validate habitable conditions there.
+The battery begins full, with ideal charge/discharge and no rate limit or degradation. Generation is continuous external power, with no solar/fuel/infrastructure model. Oxygen storage has no upper bound or leakage. Crew load is constant, not an activity schedule.
+
+Stop at the first attempted hourly inventory below -1e-9. Record all deficits in that hour. Display clamps to zero; failed-hour balances are diagnostic, not evidence that equipment operated without water/electricity. Exact zero is allowed if that hour's demand was covered. Failure time is an hourly resource shortage, not a medical survival deadline.
+
+## Default audit example
+4 crew / 30 days / 30 kg O2 / 300 kg water / 100 kWh battery / 8 kW generation / 4 kg O2/day / 0.93 recovery.
+Mars: -59 C -> 3.2 kW assumed thermal load. Total demand about 8.073 kW. Initial battery covers the approximately 52.44 kWh mission shortfall. Final O2 42.6 kg; water 137.9772 kg. This changed from v0.1; old demo numbers are historical.
+
+## Not evaluated
+Pressure vessel and atmosphere regulation; CO2 scrubbing; radiation; food; reliability; equipment mass; medical effects; resource extraction; power plant fuel and temperature operating envelopes. Pressure and gravity are reference context only. All three environments remain exploratory even if resource balances complete.

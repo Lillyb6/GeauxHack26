@@ -10,7 +10,7 @@ def test_default_mars_completes():
     r = simulate(HabitatRequest())
     assert r.resource_balance_complete
     assert len(r.readings) == 721
-    assert r.readings[-1].water_kg == pytest.approx(123)
+    assert r.readings[-1].water_kg == pytest.approx(137.9772)
 
 def test_deterministic():
     assert simulate(HabitatRequest()) == simulate(HabitatRequest())
@@ -25,7 +25,7 @@ def test_empty_battery_with_insufficient_generation_fails():
     assert any(e.resource == "power" for e in r.events)
 
 def test_exact_oxygen_balance_is_valid():
-    r = simulate(HabitatRequest(oxygen_kg=0, oxygen_capacity_kg_day=3.36))
+    r = simulate(HabitatRequest(oxygen_kg=0, oxygen_capacity_kg_day=3.58))
     assert r.resource_balance_complete
     assert r.readings[-1].oxygen_kg == pytest.approx(0)
 
@@ -52,4 +52,46 @@ def test_api_contract():
     assert len(client.get("/environments").json()) == 3
     response = client.post("/simulate", json={})
     assert response.status_code == 200
-    assert response.json()["assumptions_version"] == "0.1.0"
+    assert response.json()["assumptions_version"] == "0.2.0"
+
+
+def test_bvad_oxygen_rate_and_water_boundary():
+    r = simulate(HabitatRequest(duration_days=1, generation_kw=100))
+    assert r.readings[-1].oxygen_kg == pytest.approx(30 + 4 - 4 * 0.895, abs=1e-6)
+    expected_water = 300 - 4 * 3.217 * (1 - 0.93) - 4 * 1.125
+    assert r.readings[-1].water_kg == pytest.approx(expected_water, abs=1e-6)
+
+def test_reference_data_units_and_traceability():
+    envs = client.get("/environments").json()
+    assert envs[0]["pressure_kpa"] == 0.636
+    assert envs[1]["pressure_kpa"] == 9200
+    assert envs[2]["pressure_kpa"] == 146
+    for env in envs:
+        for field in ("temperature_c", "pressure_kpa", "gravity_ms2", "atmosphere"):
+            assert env["field_sources"][field].startswith("https://")
+
+def test_every_evidence_source_resolves():
+    r = simulate(HabitatRequest())
+    for item in r.evidence.values():
+        assert item["classification"]
+        for source in item["source_ids"]:
+            assert r.sources[source]["url"].startswith("https://")
+    assert r.evidence["heat_loss_kw_k"]["classification"] == "unvalidated_design_input"
+
+def test_override_does_not_claim_reference_status():
+    r = simulate(HabitatRequest(recycler_power_kw=2))
+    assert r.evidence["recycler_power_kw"]["classification"] == "user_override"
+    assert r.evidence["recycler_power_kw"]["value"] == 2
+
+def test_model_reference_defaults_match_api():
+    ref = client.get("/model-reference").json()
+    assert ref["default_request"] == HabitatRequest().model_dump()
+    assert ref["parameters"]["electrolyzer_kwh_kg_oxygen"]["value"] == 55 / 8
+
+def test_recycler_is_off_when_recovery_disabled():
+    base = simulate(HabitatRequest(recycling_fraction=0, recycler_power_kw=100))
+    assert base.demand_kw < 10
+
+@pytest.mark.parametrize("body", [{"hvac_cop":0}, {"heat_loss_kw_k":-1}, {"recycler_power_kw":-1}])
+def test_invalid_engineering_inputs(body):
+    assert client.post("/simulate",json=body).status_code == 422

@@ -1,28 +1,30 @@
 from .models import HabitatRequest, SimulationResult, Reading, Event
 from .environments import ENVIRONMENTS
+from .research import PARAMETERS, SOURCES, evidence_for
 
 LIMITATIONS = [
     "Resource-balance prototype; completion does not establish human survival or mission feasibility.",
     "Pressure vessels, radiation, CO2 scrubbing, food, waste, medical risks and equipment reliability are not modeled.",
-    "Fixed exterior temperature, ideal thermal control, continuous external generation and immediate water recovery are assumptions.",
+    "Fixed exterior temperature, simplified conduction/HVAC, ideal battery, continuous generation and instant potable-water recovery are unvalidated assumptions.",
+    "ISS equipment and recovery references are transferred proxies, not validated performance in planetary environments.",
     "Venus surface materials and cooling feasibility are not validated; Titan is a moon, not a planet.",
 ]
 
 def simulate(req: HabitatRequest) -> SimulationResult:
     env = next(e for e in ENVIRONMENTS if e["id"] == req.environment_id)
-    # Simplified heat leak UA = 0.04 kW/K; ideal heater/cooler COP = 1.
-    thermal = abs(21 - env["temperature_c"]) * 0.04
-    # 0.8 kW/person hotel load + 0.5 kW recycler + 5 kWh/kg electrolysis.
-    demand = req.crew_size * 0.8 + 0.5 + thermal + req.oxygen_capacity_kg_day * 5 / 24
+    # Conduction-only envelope proxy, not a validated whole-habitat thermal design.
+    thermal = abs(req.interior_temperature_c - env["temperature_c"]) * req.heat_loss_kw_k / req.hvac_cop
+    recycler = req.recycler_power_kw if req.recycling_fraction > 0 else 0
+    demand = req.other_load_kw + recycler + thermal + req.oxygen_capacity_kg_day * req.electrolyzer_kwh_kg_oxygen / 24
     oxygen, water, battery = req.oxygen_kg, req.water_kg, req.battery_kwh
     readings = [Reading(hour=0, oxygen_kg=oxygen, water_kg=water, battery_kwh=battery)]
     events = []
     for hour in range(1, req.duration_days * 24 + 1):
         # Oxygen capacity represents water electrolysis, not free atmospheric extraction.
         produced = req.oxygen_capacity_kg_day / 24
-        water_used = req.crew_size * 3.5 * (1 - req.recycling_fraction) / 24 + produced * 1.125
+        water_used = req.crew_size * PARAMETERS["water_consumption_kg_person_day"]["value"] * (1 - req.recycling_fraction) / 24 + produced * PARAMETERS["electrolysis_water_ratio"]["value"]
         next_values = {
-            "oxygen": oxygen + produced - req.crew_size * 0.84 / 24,
+            "oxygen": oxygen + produced - req.crew_size * PARAMETERS["oxygen_consumption_kg_person_day"]["value"] / 24,
             "water": water - water_used,
             "power": battery + req.generation_kw - demand,
         }
@@ -39,4 +41,5 @@ def simulate(req: HabitatRequest) -> SimulationResult:
             break
     return SimulationResult(request=req, resource_balance_complete=not events,
         evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3),
-        events=events, readings=readings, limitations=LIMITATIONS)
+        events=events, readings=readings, limitations=LIMITATIONS,
+        evidence=evidence_for(req), sources=SOURCES, environment_reference=env)

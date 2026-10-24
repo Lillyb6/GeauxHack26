@@ -31,7 +31,7 @@ macOS/Linux: use `python3 -m venv .venv`, `.venv/bin/python` (or `../.venv/bin/p
 3. Restore power to 8 kW and select Venus or Titan. The simplified thermal load changes and the same design fails earlier.
 4. Change supplies or power and run again. Charts retain their last result until rerun; changed inputs are flagged.
 
-**Scope:** this is a resource-balance prototype, not proof of human survival. Pressure, radiation, CO2 scrubbing, food, structural protection and realistic HVAC are not yet evaluated. Scientific reference values are marked separately from assumed equipment parameters. There is no live telemetry, optimizer, Gemini integration, database, or deployment yet.
+**Scope:** this is a resource-balance prototype, not proof of human survival. Pressure, radiation, CO2 scrubbing, food, structural protection and realistic HVAC are not yet evaluated. Scientific reference values are marked separately from assumed equipment parameters. Model 0.2 adds an in-app evidence register, NASA crew baselines and environmental references, a DOE electrolysis proxy, and explicit editable unvalidated engineering inputs. This remains research-informed rather than scientifically validated. There is no live telemetry, optimizer, Gemini integration, database, or deployment yet.
 
 ## Checks
 ```powershell
@@ -49,6 +49,7 @@ Backend tests cover balances, conservation of electrolysis feedwater, empty reso
 - [Architecture and next milestones](docs/architecture.md)
 - [Model equations and limitations](docs/assumptions.md)
 - [Scientific source attribution](docs/sources.md)
+- [Research audit and remaining validation gaps](docs/research-audit.md)
 
 Tomorrow: review scientific assumptions, define an equipment catalog, then add constraints and a deterministic optimizer before Gemini explanations. See the architecture document for suggested ownership. No secret keys are needed for this milestone; keep future Gemini keys server-side and outside Git.
 
@@ -60,3 +61,7 @@ Update this log with every substantial AI contribution. Team review remains pend
 | 2026-10-23 | OpenAI Codex (GPT-6 family assistant) | Proposed architecture; generated starter API, simulator, UI, tests, and documentation | frontend/, backend/, docs/, README.md, .gitignore | Automated test/build results recorded in docs/validation.md; team scientific and visual review pending |
 
 Original visual direction and final artwork will be supplied by the team. No generative image/video assets are included. Scientific references are attributed above. Add team names and the final demo/deployment links before submission; confirm all event-specific README requirements against the official rubric.
+
+
+### AI assistance update — 2026-10-23
+Codex researched primary NASA/DOE sources, revised constants and provenance, exposed unsupported design assumptions, updated the evidence UI/docs, and added research regression tests. Changes are AI-assisted; team scientific review is pending. Sources support individual inputs in their stated contexts, not full mission feasibility. See docs/validation.md for verification.

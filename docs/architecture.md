@@ -6,6 +6,7 @@ The engine never calls an LLM. Environment reference data and scenario assumptio
 ## Contracts
 - GET /health -> {status: "ok"}
 - GET /environments -> reference values, units, risks and source URLs for Mars, Venus surface and Titan surface.
+- GET /model-reference -> versioned sources, parameter classifications and canonical default request.
 - POST /simulate -> HabitatRequest -> SimulationResult. Pydantic is the canonical contract; explore /docs and /openapi.json with the server running.
 - Numeric input bounds are enforced on both sides; unsupported environments and extra fields return 422.
 - Results contain the original request, assumptions_version, hourly readings, first deficient-hour events and limitations.

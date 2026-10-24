@@ -1,4 +1,13 @@
-# Validation — 2026-10-23
+# Current validation — model 0.2.0, 2026-10-23
+
+- Backend: **26 tests passed**. Includes nominal crew balances, source-ID resolution, parameter override labeling, environment unit conversions, model-default consistency and engineering input validation.
+- Frontend: production build passed. Existing bundle-size advisory remains.
+- Browser: NASA Mars references loaded; model defaults fetched from API; revised Mars simulation completed 720 hours with 8.073 kW demand; source panel displayed nominal crew values, source links and unvalidated input labels.
+- Existing Starlette/httpx TestClient deprecation warning remains; no failed tests.
+- Passing software checks confirms the code implements the stated model, not scientific calibration. See research-audit.md for unresolved gaps.
+
+## Historical initial milestone checks (v0.1.0)
+
 
 - Python 3.12: `python -m pytest -q` from backend — **17 passed**.
 - One upstream Starlette warning about httpx TestClient deprecation; no failed tests.
