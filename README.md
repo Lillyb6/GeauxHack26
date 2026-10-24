@@ -121,3 +121,7 @@ Enable **Evaluate cabin CO2 and scrubber load** to model a well-mixed interior c
 
 ### AI assistance update — CO2 extension, 2026-10-24
 Codex researched NASA/NIST primary references, excluded technology targets from equipment-performance claims, implemented analytical CO2 balances, explicit opt-in controls, source-attributed equipment, optimizer/agent integration, charts, 25 regression cases and documentation. All 144 backend tests and frontend build pass; browser simulation and optimization checks passed. Live CO2 agent verification and team scientific review remain pending. The existing agent checkpoint was already committed as e9674b0 before this extension.
+
+Compatibility follow-up: Codex added a startup capability check that identifies an older running backend missing CO2 fields/catalog support and displays restart instructions, preventing the updated frontend from silently using an incomplete contract. Frontend production build verified.
+
+Live integration follow-up — 2026-10-24: Codex verified the real Gemini CO2 mission goal and explicit Apply workflow after the user restarted backend 0.4.0. The live agent made one optimizer call and returned the expected 405-candidate, two-plus-two-plus-two result. Validation evidence is recorded in docs/validation.md; no credential was read or added to Git. Scientific qualification remains pending.

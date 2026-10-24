@@ -1,3 +1,14 @@
+# Live CO2 agent verification — 2026-10-24
+
+- Confirmed running backend model 0.4.0 after the user restarted their keyed terminal.
+- Used the real Gemini gemini-3.8-flash connection through the browser; no secret was read or copied.
+- Submitted the built-in CO2 goal: six crew, 30 days on Mars, 100 m3 cabin, 0.4 mmHg initial CO2, 14 kW generation, 400 kg water, no ending wastewater backlog.
+- Gemini made one optimize_habitat call. The real optimizer evaluated 405 candidates, found four feasible and selected 2 oxygen + 2 water + 2 CO2 units: 1044.233133 kg known hardware, 12.334 kW, 720 completed hours, 1.564904 mmHg ending/hour-average CO2 and zero ending wastewater backlog.
+- Checked that the proposal table included enabling CO2, installing two scrubbers and the requested mission changes. Before Apply, manual inputs remained at the baseline values.
+- Clicked Apply in the verification tab: manual controls updated to six crew, 400 kg water, 14 kW, CO2 enabled, two scrubbers, two oxygen and two water units, and no-backlog checked. Result charts displayed the evaluated 720-hour / 12.334 kW design.
+- Gemini's explanation correctly noted overlapping constraint counts and the unvalidated water/scrubber response assumptions. AI prose remains subject to review; model completion is not survival certification.
+- The existing 144-test suite/build verification remains applicable. This run adds live integration evidence, not scientific validation. No additional external provider was used.
+
 # Current validation — CO2 screening, 2026-10-24
 
 - Backend: **144 tests passed**, including 25 CO2 cases for analytical/numerical agreement, conservation, initial violations, hourly-mean vs endpoint screening, zero/multiple units, volume, provenance, invalid values, third-dimension optimization and agent tools.
