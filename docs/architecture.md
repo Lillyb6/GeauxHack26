@@ -48,3 +48,7 @@ Model 0.4.0 adds an opt-in co2.py analytical cabin balance, reference equipment,
 
 ## Model 0.5.0: static cabin atmosphere screen
 atmosphere.py checks optional fixed cabin pressure/O2 settings before hourly resource simulation. Invalid settings emit hour-zero events; valid settings add no invented regulator power, mass or gas usage. atmosphere_summary and source evidence are included in simulator, optimizer and agent responses. AtmospherePanel.jsx distinguishes dry ppO2 and humidified PIO2, while the capability guard identifies outdated backends. No new external API; see atmosphere-walkthrough.md.
+
+
+## Local mission snapshots
+MissionLibrary.jsx and missionStorage.js implement browser-local, versioned input snapshots with portable JSON. App supplies the existing API schema/default/catalog context and owns load/result invalidation. There are no new backend routes, cloud dependencies or external APIs. The independent component can move into the console redesign; see mission-save-load.md.

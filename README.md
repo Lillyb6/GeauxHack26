@@ -133,7 +133,11 @@ Enable **Screen pressure and inspired oxygen** to evaluate static interior press
 ### AI assistance update — atmosphere screening, 2026-10-24
 Codex researched pinned NASA-STD-3001 Vol 2 Rev E and OCHMO-TB-003 references; implemented the static screen, explicit dry/inspired oxygen distinction, source evidence, UI, optimizer/agent integration and 32 regression cases. All 176 tests and frontend build pass. Manual browser checks and a live gemini-3.8-flash simulation/Apply run passed; no credential was read or stored. Scientific and standards-compliance qualification remain outside the prototype.
 
-### AI contribution — October 24, 2026
-Codex assisted with simplifying interface copy and grouping advanced settings, scientific evidence, equipment specifications and AI audit information into expandable sections. Simulation and API behavior were unchanged.
 
-Codex also assisted with concise Gemini response instructions and a compact mission-agent result summary sourced directly from calculated results, with AI prose expandable on demand.
+## Save, load and share missions
+The mission library stores named input snapshots in browser local storage, with load, duplicate, confirmed deletion and JSON export/import. Loading clears old results and proposals and requires a fresh run. Files include all mission/screening/equipment/search settings and model version, not results or credentials. Browser storage is specific to the site origin/profile; export JSON to share with teammates or back up data. No new external API or cloud service. [Usage, format and frontend handoff](docs/mission-save-load.md).
+
+Frontend persistence checks: run `npm.cmd test` from frontend, then `npm.cmd run build`. Backend checks include a fixture-contract test to keep frontend validation tests aligned with the canonical models.
+
+### AI assistance update — mission save/load, 2026-10-24
+Codex implemented the standalone local mission library, versioned input-only files, schema/catalog validation, import preview, safe storage failures and stale-result invalidation; added 27 frontend tests and a backend contract-fixture test, and documented the handoff for the console redesign. Browser save/refresh/load/duplicate/delete/import/rerun workflows were verified. No new dependency, scientific model or external API integration was added.

@@ -1,0 +1,511 @@
+{
+  "modelVersion": "0.5.0",
+  "defaults": {
+    "environment_id": "mars",
+    "oxygen_equipment_id": null,
+    "oxygen_equipment_quantity": 1,
+    "water_equipment_id": null,
+    "water_equipment_quantity": 1,
+    "atmosphere_enabled": false,
+    "cabin_pressure_kpa": 101.325,
+    "cabin_oxygen_percent": 20.9,
+    "co2_enabled": false,
+    "co2_equipment_id": "cdra_2019_reference",
+    "co2_equipment_quantity": 1,
+    "habitat_volume_m3": 100,
+    "initial_co2_mmhg": 0.4,
+    "crew_size": 4,
+    "duration_days": 30,
+    "oxygen_kg": 30,
+    "water_kg": 300,
+    "battery_kwh": 100,
+    "generation_kw": 8,
+    "oxygen_capacity_kg_day": 4,
+    "recycling_fraction": 0.93,
+    "other_load_kw": 3.2,
+    "recycler_power_kw": 0.527,
+    "electrolyzer_kwh_kg_oxygen": 6.875,
+    "heat_loss_kw_k": 0.04,
+    "interior_temperature_c": 21.0,
+    "hvac_cop": 1.0
+  },
+  "searchDefaults": {
+    "max_oxygen_units": 8,
+    "max_water_units": 8,
+    "max_co2_units": 4,
+    "require_no_wastewater_backlog": false
+  },
+  "schemas": {
+    "HabitatRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "environment_id": {
+          "default": "mars",
+          "enum": [
+            "mars",
+            "venus",
+            "titan"
+          ],
+          "title": "Environment Id",
+          "type": "string"
+        },
+        "oxygen_equipment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Oxygen Equipment Id"
+        },
+        "oxygen_equipment_quantity": {
+          "default": 1,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Oxygen Equipment Quantity",
+          "type": "integer"
+        },
+        "water_equipment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Water Equipment Id"
+        },
+        "water_equipment_quantity": {
+          "default": 1,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Water Equipment Quantity",
+          "type": "integer"
+        },
+        "atmosphere_enabled": {
+          "default": false,
+          "title": "Atmosphere Enabled",
+          "type": "boolean"
+        },
+        "cabin_pressure_kpa": {
+          "default": 101.325,
+          "maximum": 200,
+          "minimum": 0,
+          "title": "Cabin Pressure Kpa",
+          "type": "number"
+        },
+        "cabin_oxygen_percent": {
+          "default": 20.9,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Cabin Oxygen Percent",
+          "type": "number"
+        },
+        "co2_enabled": {
+          "default": false,
+          "title": "Co2 Enabled",
+          "type": "boolean"
+        },
+        "co2_equipment_id": {
+          "default": "cdra_2019_reference",
+          "title": "Co2 Equipment Id",
+          "type": "string"
+        },
+        "co2_equipment_quantity": {
+          "default": 1,
+          "maximum": 4,
+          "minimum": 0,
+          "title": "Co2 Equipment Quantity",
+          "type": "integer"
+        },
+        "habitat_volume_m3": {
+          "default": 100,
+          "maximum": 10000,
+          "minimum": 10,
+          "title": "Habitat Volume M3",
+          "type": "number"
+        },
+        "initial_co2_mmhg": {
+          "default": 0.4,
+          "maximum": 20,
+          "minimum": 0,
+          "title": "Initial Co2 Mmhg",
+          "type": "number"
+        },
+        "crew_size": {
+          "default": 4,
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Crew Size",
+          "type": "integer"
+        },
+        "duration_days": {
+          "default": 30,
+          "maximum": 180,
+          "minimum": 1,
+          "title": "Duration Days",
+          "type": "integer"
+        },
+        "oxygen_kg": {
+          "default": 30,
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Oxygen Kg",
+          "type": "number"
+        },
+        "water_kg": {
+          "default": 300,
+          "maximum": 100000,
+          "minimum": 0,
+          "title": "Water Kg",
+          "type": "number"
+        },
+        "battery_kwh": {
+          "default": 100,
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Battery Kwh",
+          "type": "number"
+        },
+        "generation_kw": {
+          "default": 8,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Generation Kw",
+          "type": "number"
+        },
+        "oxygen_capacity_kg_day": {
+          "default": 4,
+          "maximum": 30,
+          "minimum": 0,
+          "title": "Oxygen Capacity Kg Day",
+          "type": "number"
+        },
+        "recycling_fraction": {
+          "default": 0.93,
+          "maximum": 0.98,
+          "minimum": 0,
+          "title": "Recycling Fraction",
+          "type": "number"
+        },
+        "other_load_kw": {
+          "default": 3.2,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Other Load Kw",
+          "type": "number"
+        },
+        "recycler_power_kw": {
+          "default": 0.527,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Recycler Power Kw",
+          "type": "number"
+        },
+        "electrolyzer_kwh_kg_oxygen": {
+          "default": 6.875,
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Electrolyzer Kwh Kg Oxygen",
+          "type": "number"
+        },
+        "heat_loss_kw_k": {
+          "default": 0.04,
+          "exclusiveMinimum": 0,
+          "maximum": 10,
+          "title": "Heat Loss Kw K",
+          "type": "number"
+        },
+        "interior_temperature_c": {
+          "default": 21.0,
+          "maximum": 30,
+          "minimum": 10,
+          "title": "Interior Temperature C",
+          "type": "number"
+        },
+        "hvac_cop": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "maximum": 10,
+          "title": "Hvac Cop",
+          "type": "number"
+        }
+      },
+      "title": "HabitatRequest",
+      "type": "object"
+    },
+    "OptimizationRequest": {
+      "$defs": {
+        "HabitatRequest": {
+          "additionalProperties": false,
+          "properties": {
+            "environment_id": {
+              "default": "mars",
+              "enum": [
+                "mars",
+                "venus",
+                "titan"
+              ],
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "oxygen_equipment_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Oxygen Equipment Id"
+            },
+            "oxygen_equipment_quantity": {
+              "default": 1,
+              "maximum": 8,
+              "minimum": 0,
+              "title": "Oxygen Equipment Quantity",
+              "type": "integer"
+            },
+            "water_equipment_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Water Equipment Id"
+            },
+            "water_equipment_quantity": {
+              "default": 1,
+              "maximum": 8,
+              "minimum": 0,
+              "title": "Water Equipment Quantity",
+              "type": "integer"
+            },
+            "atmosphere_enabled": {
+              "default": false,
+              "title": "Atmosphere Enabled",
+              "type": "boolean"
+            },
+            "cabin_pressure_kpa": {
+              "default": 101.325,
+              "maximum": 200,
+              "minimum": 0,
+              "title": "Cabin Pressure Kpa",
+              "type": "number"
+            },
+            "cabin_oxygen_percent": {
+              "default": 20.9,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Cabin Oxygen Percent",
+              "type": "number"
+            },
+            "co2_enabled": {
+              "default": false,
+              "title": "Co2 Enabled",
+              "type": "boolean"
+            },
+            "co2_equipment_id": {
+              "default": "cdra_2019_reference",
+              "title": "Co2 Equipment Id",
+              "type": "string"
+            },
+            "co2_equipment_quantity": {
+              "default": 1,
+              "maximum": 4,
+              "minimum": 0,
+              "title": "Co2 Equipment Quantity",
+              "type": "integer"
+            },
+            "habitat_volume_m3": {
+              "default": 100,
+              "maximum": 10000,
+              "minimum": 10,
+              "title": "Habitat Volume M3",
+              "type": "number"
+            },
+            "initial_co2_mmhg": {
+              "default": 0.4,
+              "maximum": 20,
+              "minimum": 0,
+              "title": "Initial Co2 Mmhg",
+              "type": "number"
+            },
+            "crew_size": {
+              "default": 4,
+              "maximum": 12,
+              "minimum": 1,
+              "title": "Crew Size",
+              "type": "integer"
+            },
+            "duration_days": {
+              "default": 30,
+              "maximum": 180,
+              "minimum": 1,
+              "title": "Duration Days",
+              "type": "integer"
+            },
+            "oxygen_kg": {
+              "default": 30,
+              "maximum": 10000,
+              "minimum": 0,
+              "title": "Oxygen Kg",
+              "type": "number"
+            },
+            "water_kg": {
+              "default": 300,
+              "maximum": 100000,
+              "minimum": 0,
+              "title": "Water Kg",
+              "type": "number"
+            },
+            "battery_kwh": {
+              "default": 100,
+              "maximum": 10000,
+              "minimum": 0,
+              "title": "Battery Kwh",
+              "type": "number"
+            },
+            "generation_kw": {
+              "default": 8,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Generation Kw",
+              "type": "number"
+            },
+            "oxygen_capacity_kg_day": {
+              "default": 4,
+              "maximum": 30,
+              "minimum": 0,
+              "title": "Oxygen Capacity Kg Day",
+              "type": "number"
+            },
+            "recycling_fraction": {
+              "default": 0.93,
+              "maximum": 0.98,
+              "minimum": 0,
+              "title": "Recycling Fraction",
+              "type": "number"
+            },
+            "other_load_kw": {
+              "default": 3.2,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Other Load Kw",
+              "type": "number"
+            },
+            "recycler_power_kw": {
+              "default": 0.527,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Recycler Power Kw",
+              "type": "number"
+            },
+            "electrolyzer_kwh_kg_oxygen": {
+              "default": 6.875,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Electrolyzer Kwh Kg Oxygen",
+              "type": "number"
+            },
+            "heat_loss_kw_k": {
+              "default": 0.04,
+              "exclusiveMinimum": 0,
+              "maximum": 10,
+              "title": "Heat Loss Kw K",
+              "type": "number"
+            },
+            "interior_temperature_c": {
+              "default": 21.0,
+              "maximum": 30,
+              "minimum": 10,
+              "title": "Interior Temperature C",
+              "type": "number"
+            },
+            "hvac_cop": {
+              "default": 1.0,
+              "exclusiveMinimum": 0,
+              "maximum": 10,
+              "title": "Hvac Cop",
+              "type": "number"
+            }
+          },
+          "title": "HabitatRequest",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "$ref": "#/$defs/HabitatRequest"
+        },
+        "oxygen_equipment_id": {
+          "title": "Oxygen Equipment Id",
+          "type": "string"
+        },
+        "water_equipment_id": {
+          "title": "Water Equipment Id",
+          "type": "string"
+        },
+        "max_oxygen_units": {
+          "default": 8,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Max Oxygen Units",
+          "type": "integer"
+        },
+        "max_water_units": {
+          "default": 8,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Max Water Units",
+          "type": "integer"
+        },
+        "max_co2_units": {
+          "default": 4,
+          "maximum": 4,
+          "minimum": 0,
+          "title": "Max Co2 Units",
+          "type": "integer"
+        },
+        "require_no_wastewater_backlog": {
+          "default": false,
+          "title": "Require No Wastewater Backlog",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "scenario",
+        "oxygen_equipment_id",
+        "water_equipment_id"
+      ],
+      "title": "OptimizationRequest",
+      "type": "object"
+    }
+  },
+  "equipment": [
+    {
+      "id": "static_feed_electrolyzer_1978",
+      "category": "oxygen_generation"
+    },
+    {
+      "id": "vcds_1979_reference",
+      "category": "water_recovery"
+    },
+    {
+      "id": "cdra_2019_reference",
+      "category": "co2_removal"
+    }
+  ]
+}

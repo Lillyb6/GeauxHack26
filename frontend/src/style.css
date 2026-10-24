@@ -44,3 +44,13 @@ select{font:inherit}.config select{display:block;width:100%;margin-top:7px;borde
 summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #88dfcc;outline-offset:4px}
 
 .agent-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:16px 0}.agent-metrics>div{background:#0a141e;border:1px solid #293746;border-radius:6px;padding:12px}.agent-metrics span{display:block;font-size:11px;color:#9fb1c2}.agent-metrics strong{display:block;font-size:21px;margin-top:5px;font-weight:550}
+.mission-library label {display:block;margin:14px 0 7px;color:#bac9d7;font-size:13px;}
+.mission-library input,.mission-library select,.mission-library textarea {display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:10px 12px;border:1px solid #375166;border-radius:5px;background:#0a141e;color:#e6edf4;font:inherit;}
+.mission-library textarea {resize:vertical;}
+.mission-actions {display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.mission-library button {border:1px solid #476176;background:#152837;color:#d6efe9;border-radius:5px;padding:9px 12px;cursor:pointer;}
+.mission-library button:disabled {opacity:.45;cursor:default;}
+.mission-library button:focus-visible,.mission-library input:focus-visible,.mission-library select:focus-visible,.mission-library textarea:focus-visible {outline:2px solid #88dfcc;outline-offset:3px;}
+.mission-library .muted {font-size:12px;color:#a6b8c8;margin-top:15px;}
+.mission-library details {margin-top:15px;}
+.mission-import-preview {border:1px solid #375166;padding:12px;border-radius:5px;margin-top:12px;}

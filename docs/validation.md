@@ -1,3 +1,13 @@
+# Current validation — local mission save/load, 2026-10-24
+
+- Frontend: **27 persistence tests passed**, covering complete input snapshots, canonical key order, invalid values/versions/IDs, missing/extra fields, file-size limits, library corruption, storage/quota errors, unique names, deletion, list freshness and save limits. Production build passed; existing chart bundle-size advisory remains.
+- Backend: **177 tests passed**, including a frontend fixture/API contract alignment check; existing Starlette/httpx deprecation warning remains.
+- Browser: named save persisted after refresh; loading restored saved inputs and cleared prior results/agent state. Duplicate created a separate snapshot; deleting the test duplicate required confirmation and preserved current inputs. A portable six-person JSON snapshot was validated, imported, loaded with both screening systems/equipment/search settings intact, and rerun to produce fresh 720-hour / 12.334 kW results without a false stale-input warning.
+- JSON serialization/export round-trip is covered by tests; browser download action was exercised but the browser-managed output location was not independently inspected. File import and pasted JSON use the same validator; browser import was verified via pasted JSON.
+- No backend production routes, scientific equations or external API integrations changed. Saves contain input settings, not computed results or credentials. Browser origin/profile storage scope and unsupported cross-model migration are documented in mission-save-load.md.
+
+## Previous atmosphere validation
+
 # Current validation — atmosphere screening, 2026-10-24
 
 - Backend: **176 tests passed**, including 32 atmosphere cases for dry/inspired equations, strict pressure bounds and nominal target endpoints, inert diluent, low-pressure null handling, hour-zero events, unchanged resource balances, source provenance, input validation, optimizer constraints and agent integration.
