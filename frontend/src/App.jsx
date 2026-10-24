@@ -2,6 +2,7 @@ import ResultNotices from './ResultNotices';
 import {comparisonState} from './comparisonState';
 import { useEffect, useRef, useState } from 'react';
 import MissionControl from './MissionControl';
+import MissionOutcome from './MissionOutcome';
 import OperatorStation from './OperatorStation';
 import MissionSetup from './MissionSetup';
 import { createMission, saveMissionRun } from './missionStorage';
@@ -39,7 +40,16 @@ function referenceDefaults(defaults,catalog) {
  };
 }
 export default function App({ onHome, onHelp, active = true }) {
+export default function App({ onHome, onHelp, active = true, onConfiguredChange }) {
  const runGeneration=useRef(0);
+ const [stationReady,setStationReady]=useState(false),[hasPoweredOn,setHasPoweredOn]=useState(false),[booting,setBooting]=useState(false);
+ const preparationHeading=useRef(null);
+ const [editVersion,setEditVersion]=useState(0),[editingMission,setEditingMission]=useState(false);
+ const labActive=active&&stationReady;
+ useEffect(()=>{if(!booting)return;const timer=setTimeout(()=>setBooting(false),1100);return()=>clearTimeout(timer);},[booting]);
+ function launchMission(){if(loading)return;setEditingMission(false);setStationReady(true);setBooting(!hasPoweredOn);setHasPoweredOn(true);setResult(null);setComparison(null);onConfiguredChange?.(true);window.scrollTo(0,0);void run('simulate');}
+ function editMission(){setEditVersion(value=>value+1);setEditingMission(true);setStationReady(true);setBooting(false);}
+
  const [missionName,setMissionName]=useState(''),[savedMissionId,setSavedMissionId]=useState(null),[saveState,setSaveState]=useState(null);
  const comparisonTarget=useRef(null), simulationTarget=useRef(null);
  const [actionState,setActionState]=useState(null);
@@ -75,14 +85,18 @@ export default function App({ onHome, onHelp, active = true }) {
  function missionContext(){return {defaults:reference.default_request,searchDefaults:{max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false},schemas,equipment,modelVersion:reference.version};}
  function newMission(){
   runGeneration.current++;setLoading(false);setForm(referenceDefaults(reference.default_request,equipment));setSearch({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});setMissionName('');setSavedMissionId(null);setSaveState(null);setResult(null);setComparison(null);setLoadedName('');setActionState(null);setError('');setMissionEpoch(value=>value+1);
+  setEditingMission(false);setEditVersion(0);
+  setStationReady(false);setHasPoweredOn(false);setBooting(false);onConfiguredChange?.(false);
+  runGeneration.current++;setLoading(false);setForm({...reference.default_request});setSearch({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});setMissionName('');setSavedMissionId(null);setSaveState(null);setResult(null);setComparison(null);setLoadedName('');setActionState(null);setError('');setMissionEpoch(value=>value+1);
  }
  function loadMission(configuration,name,id=null) {
    runGeneration.current++;setMissionName(name);setSavedMissionId(id);setSaveState(null);
    setForm(configuration.scenario);setSearch(configuration.search);setResult(null);setComparison(null);
    setError('');setLoading(false);setActionState(null);setLoadedName(name);setMissionEpoch(value=>value+1);
  }
- async function run(e) {
-   e.preventDefault(); const action=e.nativeEvent.submitter?.value;
+ function submitRun(e){e.preventDefault();void run(e.nativeEvent.submitter?.value || 'simulate');}
+ async function run(action = 'simulate') {
+   if(loading)return;
    const token=++runGeneration.current;
    setLoading(true);setError('');setSaveState(null);setActionState({action:action==='optimize'?'optimize':'simulate',status:'running'});
    try {
@@ -99,6 +113,7 @@ export default function App({ onHome, onHelp, active = true }) {
    finally {if(token===runGeneration.current)setLoading(false);}
  }
  if (!form) return <main className="shell"><h1>Beyond Earth</h1><p role="status">{error || 'Loading research references…'}</p><a href="/tutorial" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help: how to use Mission Lab</a></main>;
+ const setupWizard=<MissionSetup form={form} setForm={setForm} search={search} setSearch={setSearch} equipment={equipment} environments={environments} controls={controls} name={missionName} setName={setMissionName} onNew={newMission} loading={loading} editVersion={editVersion} onLaunch={launchMission} library={<MissionLibrary scenario={form} search={search} context={missionContext()} onLoad={loadMission}/>}/>;
  return <div className="shell operator-shell" data-planet={form.environment_id}>
   <header><a className="brand" href="/" onClick={onHome ? e=>{e.preventDefault();onHome();} : undefined}><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><nav className="mission-page-nav" aria-label="Mission Lab navigation"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome();}:undefined}>Home</a><a href="/tutorial" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help</a></nav><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
   <main id="main" aria-label="Mission control">
@@ -114,8 +129,26 @@ export default function App({ onHome, onHelp, active = true }) {
   <Trend active={active} result={result} field="oxygen_kg" label="Oxygen · kg" color="#73d9c5"/><Trend active={active} result={result} field="water_kg" label="Water · kg" color="#74aaff"/><Trend active={active} result={result} field="battery_kwh" label="Battery · kWh" color="#eab676"/>
   {result.request.co2_enabled&&<Trend active={active} result={result} field="co2_hour_average_mmhg" label="Cabin CO₂ · one-hour average mmHg" color="#f38b91"/>}
   {result.water_equipment_summary && <Trend active={active} result={result} field="wastewater_kg" label="Unprocessed wastewater · kg" color="#d2a6ee"/>}
+  <section className="mission-preparation" hidden={stationReady} aria-labelledby="preparation-title">
+   <div className="preparation-intro"><p className="eyebrow">MISSION PREPARATION</p><h1 id="preparation-title" ref={preparationHeading} tabIndex={-1}>Build your mission</h1><p>Configure your habitat, then Run mission to power on the monitors and evaluate your build.</p></div>
+   <div className="preparation-card">{!hasPoweredOn&&setupWizard}</div>
+   {!stationReady&&<details className="preparation-ai"><summary>Optional: ask the AI mission designer for help</summary><p>Review a suggestion, then Apply it to these settings. Run mission opens mission control and evaluates the build.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={(scenario,nextSearch,evaluated)=>{runGeneration.current++;setLoading(false);setActionState(null);setLoadedName('');setForm(scenario);setSearch(nextSearch);setResult(evaluated);setComparison(null);}}/></details>}
+  </section>
+  {hasPoweredOn&&<div hidden={!stationReady}>
+  <OperatorStation active={labActive} booting={booting} editingSetup={editingMission}
+   setup={editingMission?<><div className="monitor-edit-heading"><button type="button" className="wizard-back" onClick={()=>setEditingMission(false)}>← Back to mission brief</button></div>{setupWizard}</>:<section className="mission-brief"><p className="eyebrow">MISSION CONFIGURED</p><h2>{missionName || 'Your mission'}</h2><dl className="launch-summary"><div><dt>Destination</dt><dd>{env?.name}</dd></div><div><dt>Crew</dt><dd>{form.crew_size}</dd></div><div><dt>Duration</dt><dd>{form.duration_days} days</dd></div><div><dt>Generation</dt><dd>{form.generation_kw} kW</dd></div></dl><p>Review your build, run it again, or edit its configuration on this monitor.</p><button type="button" className="wizard-back" onClick={editMission}>Edit mission configuration</button><form onSubmit={submitRun}><button className="run" type="submit" name="action" value="simulate" disabled={loading||booting}>{loading?'Evaluating…':result&&!stale?'Run again →':'Run simulation →'}</button><button className="wizard-back" type="submit" name="action" value="optimize" disabled={loading||booting}>Optimize & compare</button></form><div role="status">{actionState?.status==='running'&&<p>Evaluating your mission…</p>}{actionState?.status==='done'&&<button className="result-jump" onClick={()=>showResult(actionState.action==='optimize'?comparisonTarget:simulationTarget)}>View results →</button>}{actionState?.status==='error'&&<p className="alert">The run failed. Check Systems & results for details.</p>}{saveState?.message&&<p className={saveState.error?'alert':'note'}>{saveState.message}</p>}</div></section>}
+   designer={stationReady?<><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={(scenario,nextSearch,evaluated)=>{runGeneration.current++;setLoading(false);setActionState(null);setLoadedName('');setForm(scenario);setSearch(nextSearch);setResult(evaluated);setComparison(null);}}/></>:null}
+   surface={<><nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className={`orb ${p.id}`} aria-hidden="true"/><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>{env && <MissionControl sceneOnly form={form} setForm={setForm} env={env} result={result} stale={stale}/>}</>}
+   systems={<><MissionOutcome outcomeRef={simulationTarget} result={result} loading={loading} error={error} stale={stale}/>{error && <p role="alert" className="alert">{error}</p>}{env && <section className="environment panel"><div><p className="eyebrow">REFERENCE DATA · NOT LIVE</p><h2>{env.name} surface environment</h2><p>{env.atmosphere}</p><a href={env.source} target="_blank" rel="noreferrer">Scientific reference ↗</a></div><dl><div><dt>Temperature</dt><dd>{env.temperature_c} <small>°C</small></dd></div><div><dt>Pressure</dt><dd>{env.pressure_kpa.toLocaleString()} <small>kPa</small></dd></div><div><dt>Gravity</dt><dd>{env.gravity_ms2} <small>m/s²</small></dd></div></dl><details className="risk"><summary>Environment risks & resources</summary><p>{env.reference_context} {env.risk} {env.resources}</p></details></section>}<div className="results" aria-live="polite">{loadedName&&!result&&<p role="status" className="note">Loaded “{loadedName}”. {loading?'Evaluating loaded mission…':'Run a fresh simulation or optimization to evaluate these inputs.'}</p>}{comparison && <div ref={comparisonTarget} tabIndex={-1} className="result-target" aria-label="Optimization comparison"><DesignComparison active={labActive} comparison={comparison} stale={comparisonStale}/></div>}<section className="panel"><p className="eyebrow">EVIDENCE / MODEL TRANSPARENCY</p><h2>References are not validation.</h2><p>Current inputs: NASA crew and environment baselines; {catalogMode ? 'published historical oxygen equipment' : 'DOE electrolysis proxy'}; user-selected habitat design. {waterCatalogMode ? ' Water recovery uses a capacity-limited historical reference case.' : ' Custom water recovery has no throughput limit.'} Thermal conductance, HVAC performance and other loads are not validated equipment data.</p><details><summary>Inspect parameter sources and assumptions</summary><EvidenceList evidence={liveEvidence} sources={reference.sources}/><p>Crew, mission length, starting supplies, generation and oxygen capacity are scenario choices. Their defaults are demo selections, not published mission specifications. In catalog mode the selected unit count replaces the custom oxygen capacity; its source and totals appear in the selection preview.</p><ul>{Object.entries(env.field_sources).map(([key,url])=><li key={key}>{key}: <a href={url} target="_blank" rel="noreferrer">published reference ↗</a></li>)}</ul></details></section>{!result?<section className="panel empty"><span className="crosshair" aria-hidden="true">◎</span><p className="eyebrow">AWAITING MISSION PARAMETERS</p><h2>Your habitat starts here.</h2><p>Run the current configuration, then adjust power or switch environments to explore a constraint.</p><div className="note">This milestone evaluates oxygen, water, electricity and optional cabin CO₂. It does not certify a habitat as safe.</div></section>:<>
+  <section tabIndex={-1} aria-label="Simulation results" className="panel status result-target"><p className="eyebrow">02 / SIMULATION RESULT · {result.request.environment_id.toUpperCase()}</p>{stale && <p className="alert">Inputs changed. Run again to update these results.</p>}<h2>Detailed simulation results</h2><p className="note">{result.scientific_status}</p><p>{result.evaluated_hours} / {result.request.duration_days*24} hours evaluated</p><div className="stats"><div><small>Total demand</small><strong>{result.demand_kw} kW</strong></div><div><small>Heating/cooling electricity needed</small><strong>{result.thermal_load_kw} kW</strong></div></div>{result.events.map(e=><p className="alert" key={e.resource}>{e.message}</p>)}<ThermalResult result={result}/><details className="result-details"><summary>Equipment & cabin checks</summary>{result.equipment_summary ? <EquipmentSummary equipment={result.equipment_summary}/> : <p>Evaluated oxygen system: custom configuration.</p>}
+  {result.water_equipment_summary ? <WaterEquipmentSummary equipment={result.water_equipment_summary}/> : <p>Evaluated water system: custom effective recovery with unbounded throughput.</p>}
+  <AtmosphereResult result={result}/><Co2Result result={result}/><section className="water-balance"><h3>Water processing balance</h3><p>Over the evaluated hours: {result.water_balance.recovered_water_kg.toFixed(3)} kg recovered · {result.water_balance.unprocessed_wastewater_kg.toFixed(3)} kg waiting · {result.water_balance.brine_water_kg.toFixed(3)} kg in modeled brine/losses.</p><p>Effective recovery of modeled crew use: {(result.water_balance.effective_recovery_fraction*100).toFixed(2)}%. Feed composition, pretreatment, delay and storage limits remain assumptions.</p></section>
+  </details>{result.warnings.map(warning=><p key={warning} className="alert">{warning}</p>)}<details><summary>Simulation evidence</summary><p>This record belongs to the last run, even when current inputs change.</p><EvidenceList evidence={result.evidence} sources={result.sources}/></details><p className="note">Completion means only that the modeled resources covered this scenario. Pressure regulation and radiation remain unevaluated; optional atmosphere screening checks fixed settings only.</p></section>
+  <Trend active={labActive} result={result} field="oxygen_kg" label="Oxygen · kg" color="#73d9c5"/><Trend active={labActive} result={result} field="water_kg" label="Water · kg" color="#74aaff"/><Trend active={labActive} result={result} field="battery_kwh" label="Battery · kWh" color="#eab676"/>
+  {result.request.co2_enabled&&<Trend active={labActive} result={result} field="co2_hour_average_mmhg" label="Cabin CO₂ · one-hour average mmHg" color="#f38b91"/>}
+  {result.water_equipment_summary && <Trend active={labActive} result={result} field="wastewater_kg" label="Unprocessed wastewater · kg" color="#d2a6ee"/>}
   <details className="panel"><summary>Inspect hourly data and limitations</summary><ul>{result.limitations.map(l=><li key={l}>{l}</li>)}</ul><div className="table-wrap"><table><caption>Hourly resource inventories (model {result.assumptions_version})</caption><thead><tr><th>Hour</th><th>O₂ kg</th><th>Water kg</th><th>Battery kWh</th><th>Waiting water kg</th><th>Recovered kg</th><th>Brine/loss kg</th></tr></thead><tbody>{result.readings.map(p=><tr key={p.hour}><td>{p.hour}</td><td>{p.oxygen_kg.toFixed(2)}</td><td>{p.water_kg.toFixed(2)}</td><td>{p.battery_kwh.toFixed(2)}</td><td>{p.wastewater_kg.toFixed(2)}</td><td>{p.recovered_water_kg.toFixed(2)}</td><td>{p.brine_water_kg.toFixed(2)}</td></tr>)}</tbody></table></div></details></>}
 </div></>}
-  />
+  /></div>}
   </main></div>;
 }
