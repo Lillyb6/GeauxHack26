@@ -4,11 +4,12 @@ import EvidenceList from './EvidenceList';
 
 const format=value=>value===null?'None / custom':String(value);
 export default function MissionAgent({baseline,onApply}) {
- const [goal,setGoal]=useState('Find the lightest catalog design for six crew for 30 days on Mars, using 12 kW generation, 400 kg initial water and no wastewater backlog. Keep all other inputs unchanged.');
+ const [goal,setGoal]=useState('Find a working optimized design for my current mission. You may propose increases to continuous power and starting water if needed. Keep crew, duration, destination and screening settings unchanged. Explain why my manual design fails or succeeds and why the tested proposal works.');
  const [response,setResponse]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[applied,setApplied]=useState(false);
+ const [allowAdjustments,setAllowAdjustments]=useState(true);
  const generation=useRef(0), resultTarget=useRef(null);
  function viewResponse(){resultTarget.current?.focus();resultTarget.current?.scrollIntoView({block:"start",behavior:"instant"});}
- const stale=response&&(JSON.stringify(response.baseline)!==JSON.stringify(baseline)||response.goal!==goal.trim());
+ const stale=response&&(JSON.stringify(response.baseline)!==JSON.stringify(baseline)||response.goal!==goal.trim()||response.allow_resource_adjustments!==allowAdjustments);
  const run=response?.comparison?.optimized||response?.simulation;
  const changes=response?.proposed_scenario ? [
   ...Object.entries(response.proposed_scenario).filter(([key,value])=>value!==response.baseline.scenario[key]).map(([key,value])=>[key,response.baseline.scenario[key],value]),
@@ -17,7 +18,7 @@ export default function MissionAgent({baseline,onApply}) {
  async function submit(e) {
   e.preventDefault();const token=++generation.current;
   setBusy(true);setResponse(null);setError('');setApplied(false);
-  try {const result=await api('/agent',{goal:goal.trim(),baseline});if(token===generation.current)setResponse(result);}
+  try {const result=await api('/agent',{goal:goal.trim(),baseline,allow_resource_adjustments:allowAdjustments});if(token===generation.current)setResponse(result);}
   catch {if(token===generation.current)setError('The mission agent could not connect. Check the updated backend and try again.');}
   finally {if(token===generation.current)setBusy(false);}
  }
@@ -28,7 +29,7 @@ export default function MissionAgent({baseline,onApply}) {
  return <section className="panel mission-agent" aria-label="Mission design agent">
   <p className="eyebrow">GEMINI / LOCAL SIMULATION TOOLS</p><h2>AI mission designer</h2>
   <p>Describe your goal. Review changes before applying.</p>
-  <form onSubmit={submit}><label htmlFor="agent_goal">Mission goal<textarea id="agent_goal" required minLength={5} maxLength={1500} rows={4} value={goal} onChange={e=>{setGoal(e.target.value);setApplied(false);}}/></label><button className="run" disabled={busy||goal.trim().length<5}>{busy?'Testing goal… please wait':response?(stale&&!applied?'Inputs changed · Test again':'✓ Response received · Test again'):error?'Try goal again':'Test goal'}</button></form>
+  <form onSubmit={submit}><label htmlFor="agent_goal">Mission goal<textarea id="agent_goal" required minLength={5} maxLength={1500} rows={4} value={goal} onChange={e=>{setGoal(e.target.value);setApplied(false);}}/></label><label className="checkbox-label agent-adjustment"><input type="checkbox" checked={allowAdjustments} onChange={e=>{setAllowAdjustments(e.target.checked);setApplied(false);}}/>Allow AI to propose more power and starting water. Review before applying.</label><button className="run" disabled={busy||goal.trim().length<5}>{busy?'Testing goal… please wait':response?(stale&&!applied?'Inputs changed · Test again':'✓ Response received · Test again'):error?'Try goal again':'Test goal'}</button></form>
   <div className="action-feedback" role="status" aria-live="polite" aria-atomic="true">{busy&&<p><span className="activity-spinner" aria-hidden="true"/>Testing your goal with Gemini and local tools. This can take up to a minute. Results will appear below.</p>}{response&&<><p>{applied?'Proposal applied. Manual inputs and simulation charts now show this design.':stale?'Goal or inputs changed. Test again to refresh this response.':response.proposed_scenario?'Goal tested. Review the proposed changes below; manual settings have not changed.':response.status==='needs_clarification'?'More information needed. Read the response below.':response.status==='unavailable'?'AI unavailable. Read the response below for the reason.':response.status==='partial'||response.status==='limited'?'Goal test stopped early. Review the available results below.':'Goal test finished. Read the result below; no design is available to apply.'}</p><button type="button" className="result-jump" onClick={viewResponse}>View goal response ↓</button></>}{error&&<p>Goal test failed. See the error below, then try again.</p>}</div>
   <details><summary>Example goals</summary><button type="button" className="agent-example" onClick={()=>{setGoal('Enable cabin CO2 screening for six crew for 30 days on Mars, with 100 m3 free cabin volume, 0.4 mmHg initial CO2, 14 kW generation, 400 kg initial water and no ending wastewater backlog. Find the lightest catalog design. Keep all other inputs unchanged.');setApplied(false);}}>Try a CO₂ screening goal</button>
   <button type="button" className="agent-example" onClick={()=>{setGoal('Enable cabin atmosphere screening and evaluate the current design at 101.325 kPa total cabin pressure and 20.9 percent dry oxygen. Keep every other mission, equipment, supply and screening setting unchanged. Explain dry versus inspired oxygen partial pressure.');setApplied(false);}}>Try an atmosphere screening goal</button>

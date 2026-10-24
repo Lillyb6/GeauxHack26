@@ -164,7 +164,7 @@ def test_transport_only_google_and_preserves_tool_declarations(monkeypatch):
     assert req.headers["x-goog-api-key"]=="private-secret"
     assert "private-secret" not in str(req.url)
     tools=json.loads(req.content)["tools"][0]["functionDeclarations"]
-    assert {t["name"] for t in tools}=={"simulate_habitat","optimize_habitat"}
+    assert {t["name"] for t in tools}=={"simulate_habitat","optimize_habitat","improve_habitat"}
 
 
 def test_endpoint_validates_goal_and_forbids_supplied_results(monkeypatch):
@@ -176,3 +176,25 @@ def test_endpoint_validates_goal_and_forbids_supplied_results(monkeypatch):
     assert client.post("/agent",json=body).status_code==422
     body.pop("result");body["goal"]="x"*1501
     assert client.post("/agent",json=body).status_code==422
+
+
+def test_agent_can_request_verified_repairs_when_enabled(monkeypatch):
+    req=request()
+    req.goal="Find a working design; allow more power and starting water."
+    req.allow_resource_adjustments=True
+    req.baseline.scenario=HabitatRequest(crew_size=7)
+    before=req.model_dump()
+    seen=sequence(monkeypatch,[call("improve_habitat"),answer("More power and water let the verified design finish.")])
+    result=agent.run_agent(req)
+    assert req.model_dump()==before
+    assert result["comparison"]["optimized"]["evaluated_hours"]==720
+    assert result["proposed_scenario"]["water_kg"]>300
+    assert result["proposed_scenario"]["generation_kw"]>8
+    assert seen[1][2]["parts"][0]["functionResponse"]["response"]["resource_comparison"]
+
+
+def test_agent_repair_tool_cannot_bypass_disabled_adjustments(monkeypatch):
+    sequence(monkeypatch,[call("improve_habitat"),answer("Adjustments were not enabled.")])
+    result=agent.run_agent(request())
+    assert result["proposed_scenario"] is None
+    assert result["audit"][0]["status"]=="rejected"
