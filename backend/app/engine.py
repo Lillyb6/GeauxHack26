@@ -1,6 +1,6 @@
 from .thermal import check_thermal_capacity
 from .atmosphere import screen_atmosphere, atmosphere_evidence
-from .models import HabitatRequest, SimulationResult, Reading, Event
+from .models import HabitatRequest, SimulationResult, Reading, Event, PowerDemandBreakdown
 from .environments import ENVIRONMENTS
 from .equipment import resolve_oxygen_equipment, resolve_water_equipment
 from .research import PARAMETERS, evidence_for, sources_for
@@ -74,7 +74,17 @@ def simulate(req: HabitatRequest) -> SimulationResult:
     alpha=pressure_per_kg(req.habitat_volume_m3,req.interior_temperature_c) if req.co2_enabled else None
     co2_pressure=req.initial_co2_mmhg if req.co2_enabled else None
     co2_removed=0.0
-    demand = (req.other_load_kw + recycler + thermal + oxygen_power + (co2_summary["electrical_power_kw"] if co2_summary else 0))
+    # Use the same selected loads for reporting and the hourly energy balance.
+    # Catalog/custom replacement was resolved above, so no equipment is counted twice.
+    power_components = {
+        "other_habitat_kw": req.other_load_kw,
+        "water_recycling_kw": recycler,
+        "thermal_control_kw": thermal,
+        "oxygen_generation_kw": oxygen_power,
+        "co2_removal_kw": co2_summary["electrical_power_kw"] if co2_summary else 0,
+    }
+    demand = sum(power_components.values())
+    power_breakdown = PowerDemandBreakdown(**power_components, total_kw=demand)
     oxygen, water, battery = (
         req.oxygen_kg,
         req.water_kg,
@@ -185,7 +195,7 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         "effective_recovery_fraction":recovered_total / (crew_water_day * hour / 24) if hour else 0,
     }
     return SimulationResult(equipment_summary=equipment_summary,request=req, resource_balance_complete=not events,
-        evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3), thermal_summary=thermal_summary,
+        evaluated_hours=hour, demand_kw=round(demand,3), power_breakdown=power_breakdown, thermal_load_kw=round(thermal,3), thermal_summary=thermal_summary,
         events=events, readings=readings, limitations=limitations,
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
         water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,

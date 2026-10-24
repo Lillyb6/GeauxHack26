@@ -153,3 +153,8 @@ The optional /tutorial guide explains configuration fields, results, optimizatio
 AI assistance update: Codex helped adapt the approved tutorial prototype into the existing React tutorial placeholder, implement Help navigation with retained mission state, and document the changes. Tutorial copy and scientific scope remain available for team review. No generated image assets were added.
 
 Codex assisted with explicit progress/completion feedback and result-navigation buttons for simulation, optimization and AI goal testing.
+
+## Backend power-demand breakdown
+Simulation results include a typed power_breakdown with electrical requirements for other habitat equipment, water recycling, thermal control, oxygen generation and enabled CO2 removal, plus the unrounded total in kW. The same total drives resource accounting; existing demand_kw remains rounded for display. It is a requirement, not measured consumption, including when an initial check stops a run. No frontend changes are included. See docs/power-demand-breakdown.md for code explanations, tests and the display handoff.
+
+AI assistance: Codex helped implement and test this additive backend reporting field and document its existing model assumptions. No new scientific constants, runtime providers, or visual assets were introduced.
