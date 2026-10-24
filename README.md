@@ -101,9 +101,16 @@ Codex implemented deterministic bounded enumeration, API contracts/endpoint, man
 ## Gemini mission advisor
 After optimizing, click **Explain this comparison with Gemini**. The backend recomputes outcomes, sends compact results and source evidence to Gemini, and validates the structured explanation. Without configuration or on failure, the UI labels computed fallback guidance honestly. Keep GEMINI_API_KEY server-side. See [setup and implementation](docs/gemini-advisor.md). AI prose requires review against authoritative calculated results and source documents.
 
-**Planned next milestone:** a custom Gemini-powered tool-using mission-design agent with bounded calls to simulate/optimize, validated inputs and reviewable proposed configuration changes. This is planned, not implemented.
+**Mission-design agent:** a custom Gemini-powered agent with bounded calls to local simulate/optimize tools, validated inputs and explicit proposal review/apply. See docs/mission-agent.md.
 
 ### AI assistance update — Gemini advisor, 2026-10-24
 Codex implemented the backend explanation endpoint, compact evidence payload, structured provider response validation, redacted fallback handling, advisor UI, mocked regression tests and setup documentation. The integration uses Google's documented generateContent API; no live Gemini response has been verified without a supplied API key. The simulator remains authoritative. Team review is pending.
 
 Advisor diagnostics follow-up: Codex added static HTTP-status, timeout and connection hints without returning provider bodies or credentials; regression tests cover redaction.
+
+
+## Mission-design agent and external API budget
+Use **Ask your mission designer** to describe a goal. The agent can call local simulation and optimization tools, show an audit and present all proposed changes for explicit application to Manual Mode. It uses the existing Gemini integration only: one runtime external API provider, within the stated two-integration limit. NASA references are bundled and attributed; there are no runtime NASA API requests. A run may make multiple Gemini requests. See [the agent guide](docs/mission-agent.md).
+
+### AI assistance update — mission agent, 2026-10-24
+Codex implemented the bounded Gemini function-calling loop, canonical input validation, local tool audit, proposal review/apply UI, regression tests and documentation. Default model updated to gemini-3.8-flash after the user's successful advisor test. All 119 backend tests and frontend production build pass. Browser checks used clearly labeled mocked Gemini decisions with the real optimizer; live agent function-calling verification remains pending. No additional external provider or generative visual assets were added. Scientific assumptions remain unvalidated; team review is pending.

@@ -36,3 +36,7 @@ Independent water ID/count resolves into a water_equipment_summary. Engine deriv
 
 ## Gemini advisor and agent roadmap
 POST /explain accepts OptimizationRequest and recomputes results server-side before generating an explanation. advisor.py calls Gemini using a backend environment key, validates structured output/source IDs and provides labeled computed fallback guidance. MissionAdvisor.jsx renders it within the comparison. Next: the planned custom tool-using Gemini agent with bounded, validated simulate/optimize calls; see gemini-advisor.md.
+
+
+## Tool-using mission agent
+POST /agent accepts goal + baseline OptimizationRequest. mission_agent.py offers exactly two allowlisted local tools, validates patches against the original request, executes at most three tool calls/four Gemini turns, retains an audit and returns only calculated proposals. MissionAgent.jsx requires explicit apply and blocks stale proposals. Gemini remains the only external API integration. See mission-agent.md. Next: live agent verification, scientific review and richer supported physical constraints.

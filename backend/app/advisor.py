@@ -79,7 +79,7 @@ def explain(request: OptimizationRequest):
                    "Water yield is unvalidated; pressure, radiation and realistic thermal constraints remain unresolved."],
         next_steps=["Review the source evidence and assumptions before changing the mission design."], source_ids=[])
     key = os.environ.get("GEMINI_API_KEY", "").strip()
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
+    model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash").strip()
     state, reason, advice = "unavailable", "Gemini is not configured on the backend. Showing computed guidance.", fallback
     if key:
         if not re.fullmatch(r"[a-zA-Z0-9._-]{1,100}", model):

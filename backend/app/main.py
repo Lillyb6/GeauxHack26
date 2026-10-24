@@ -52,3 +52,12 @@ def explain_design(request: OptimizationRequest):
         return explain(request)
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+from .mission_agent import AgentRequest
+
+
+@app.post("/agent")
+def mission_agent(request: AgentRequest):
+    from .mission_agent import run_agent
+    return run_agent(request)

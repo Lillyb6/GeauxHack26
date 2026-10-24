@@ -1,3 +1,13 @@
+# Current validation — tool-using mission agent, 2026-10-24
+
+- Backend: **119 tests passed**, including 20 agent cases covering real optimizer/simulation tools, canonical validation, unknown tools, fixed-baseline patch semantics, count/turn limits, signature/call-ID preservation, incomplete provider turns, no-backlog proposals and endpoint input restrictions.
+- Frontend production build passed; existing bundle-size advisory and Starlette/httpx warning remain.
+- Browser: isolated fixture with explicitly labeled mocked Gemini decisions and real optimizer evaluated 81 candidates, found three feasible and selected two-plus-two units for six crew / 30 days / 12 kW / 400 kg water. Manual inputs stayed unchanged until Apply. Editing crew disabled the stale proposal; explicit Apply updated settings and 720-hour result charts.
+- User previously confirmed live Gemini advisor generation with gemini-3.8-flash. New agent function-calling still requires live verification with the user's local key. No secret was read or added to the repo.
+- External API usage: existing Gemini integration only; local tools and bundled NASA reference data add no external provider. Multiple Gemini HTTP requests per run are bounded, not limited to two calls.
+
+## Previous advisor validation
+
 # Current validation — Gemini advisor, 2026-10-24
 
 - Backend: **93 tests passed**, including 14 advisor cases for unconfigured fallback, recomputed evidence packet, provider failure redaction, unknown citations, malformed/truncated/blocked responses, model validation and rejecting browser-forged outcomes.

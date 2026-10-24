@@ -10,3 +10,9 @@ select{font:inherit}.config select{display:block;width:100%;margin-top:7px;borde
 .advisor button {margin: .6rem 0;}
 .advisor h4 {margin: 1rem 0 .4rem;}
 .advisor .muted {font-size: .8rem; color: #a6b8c8;}
+
+.mission-agent textarea {display:block; width:100%; box-sizing:border-box; min-height:110px; margin-top:8px; border:1px solid #375166; border-radius:6px; padding:12px; background:#0a141e; color:#e6edf4; resize:vertical; font:inherit;}
+.mission-agent pre {white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px; background:#0a141e; padding:10px; border-radius:5px;}
+.mission-agent .agent-message {white-space:pre-wrap;}
+.mission-agent .muted {font-size:12px; color:#a6b8c8;}
+.mission-agent .run:disabled {cursor:default;}
