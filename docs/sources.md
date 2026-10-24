@@ -50,3 +50,7 @@ In catalog mode, direct equipment power replaces the DOE energy proxy, and unuse
 
 ## CO2 extension sources
 See co2-walkthrough.md for exact document titles, locations and links. BVAD Table 3-31 supports the 1.085 kg/person/day nominal load; OCHMO supports a 3 mmHg one-hour mean design screen. The NASA-authored Jan 2019 presentation, hosted by USEA, supports the historical CDRA operating point, power and mass. NASA Glenn/NIST support ideal-gas conversion constants. Cabin conditions and the piecewise scrubber response are explicitly unvalidated. Technology-gap aspirational limits were excluded from equipment specifications.
+
+
+## Atmosphere screening sources
+NASA-STD-3001 Vol 2 Rev E (May 2 2025), V2 6002/6003/6006, Table 6.2-1 and PDF pp.49–51, supports the referenced criteria. NASA OCHMO-TB-003 Habitable Atmosphere Rev A (Nov 30 2023), PDF p.4, supports dry and inspired oxygen equations and the airway-water correction. This is a pinned reference-based nominal screen, not a complete exposure/qualification model. Exact links and assumptions are in atmosphere-walkthrough.md.

@@ -44,3 +44,7 @@ POST /agent accepts goal + baseline OptimizationRequest. mission_agent.py offers
 
 ## CO2 screening extension
 Model 0.4.0 adds an opt-in co2.py analytical cabin balance, reference equipment, hourly mean screen, installed power/mass and exact-run evidence. Optimization adds a third count dimension only when enabled (maximum 405). Existing agent tools expose the validated fields; no external service is added. Co2Panel.jsx and charts distinguish disabled screening and historical inputs from unvalidated response assumptions. See co2-walkthrough.md.
+
+
+## Model 0.5.0: static cabin atmosphere screen
+atmosphere.py checks optional fixed cabin pressure/O2 settings before hourly resource simulation. Invalid settings emit hour-zero events; valid settings add no invented regulator power, mass or gas usage. atmosphere_summary and source evidence are included in simulator, optimizer and agent responses. AtmospherePanel.jsx distinguishes dry ppO2 and humidified PIO2, while the capability guard identifies outdated backends. No new external API; see atmosphere-walkthrough.md.

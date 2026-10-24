@@ -15,6 +15,9 @@ class HabitatRequest(BaseModel):
     water_equipment_id: str | None = None
     water_equipment_quantity: int = Field(default=1, ge=0, le=8)
     # Opt-in extension preserves previously saved oxygen/water-only scenarios.
+    atmosphere_enabled: bool = False
+    cabin_pressure_kpa: float = Field(default=101.325, ge=0, le=200)
+    cabin_oxygen_percent: float = Field(default=20.9, ge=0, le=100)
     co2_enabled: bool = False
     co2_equipment_id: str = "cdra_2019_reference"
     co2_equipment_quantity: int = Field(default=1, ge=0, le=4)
@@ -55,7 +58,7 @@ class Event(BaseModel):
     message: str
 
 class SimulationResult(BaseModel):
-    assumptions_version: str = "0.4.0"
+    assumptions_version: str = "0.5.0"
     request: HabitatRequest
     resource_balance_complete: bool
     evaluated_hours: int
@@ -70,6 +73,7 @@ class SimulationResult(BaseModel):
     environment_reference: dict
     equipment_summary: dict | None = None
     water_equipment_summary: dict | None = None
+    atmosphere_summary: dict | None = None
     co2_equipment_summary: dict | None = None
     co2_balance: dict | None = None
     water_balance: dict

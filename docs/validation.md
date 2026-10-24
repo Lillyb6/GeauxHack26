@@ -1,3 +1,13 @@
+# Current validation — atmosphere screening, 2026-10-24
+
+- Backend: **176 tests passed**, including 32 atmosphere cases for dry/inspired equations, strict pressure bounds and nominal target endpoints, inert diluent, low-pressure null handling, hour-zero events, unchanged resource balances, source provenance, input validation, optimizer constraints and agent integration.
+- Frontend build passed; existing bundle advisory and Starlette/httpx warning remain.
+- Browser: 101.325 kPa / 20.9% passed the nominal screen (21.176925 kPa dry ppO2, approximately 149.017 mmHg inspired PIO2). At 50 kPa / 20.9%, inspired pressure was approximately 68.558 mmHg and the run stopped at hour zero.
+- Live Gemini gemini-3.8-flash: one simulate_habitat call evaluated the nominal atmosphere request over 720 hours, preserving four crew, default supplies/equipment and CO2 disabled. The proposal changed atmosphere_enabled only. Apply updated Manual Mode and showed the evaluated atmosphere result.
+- Screening uses pinned NASA references and static setpoint assumptions; it does not validate a regulator, coupled gas mixture, exposure safety or full standards compliance. No new external API was added.
+
+## Previous CO2/live agent validation
+
 # Live CO2 agent verification — 2026-10-24
 
 - Confirmed running backend model 0.4.0 after the user restarted their keyed terminal.

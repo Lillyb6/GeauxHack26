@@ -19,3 +19,10 @@ select{font:inherit}.config select{display:block;width:100%;margin-top:7px;borde
 
 .agent-example {border:1px solid #375166; border-radius:5px; padding:9px 12px; color:#9fe4d5; margin-bottom:10px;}
 .co2-result {padding:12px 0;border-top:1px solid #375166;margin-top:15px;}
+
+.atmosphere-result {border-top:1px solid #375166; padding-top:15px; margin-top:15px;}
+.atmosphere-metrics {display:grid; grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:15px 0;}
+.atmosphere-metrics dt {font-size:12px;color:#a6b8c8;}
+.atmosphere-metrics dd {margin:5px 0;font-size:20px;}
+.agent-example {margin-right:8px;}
+@media(max-width:500px){.atmosphere-metrics{grid-template-columns:1fr;}}

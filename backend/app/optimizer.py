@@ -103,5 +103,6 @@ def optimize(request: OptimizationRequest) -> OptimizationResult:
             "Only the chosen catalog design in each category is searched, from zero to each inclusive maximum (81 oxygen/water candidates; up to 405 when CO2 screening is enabled). No global optimum outside that set is claimed.",
             "Objective excludes habitat, power plant, tanks, spares, infrastructure and other unknown masses. Custom-mode baseline mass/savings cannot be established.",
             "Water recovery yield remains an unvalidated 90% assumption. Optional CO2 uses an unvalidated response curve; disabled CO2 is not evaluated. Thermal behavior, total pressure, radiation and operating envelopes remain unresolved.",
+            "Optional atmosphere screening evaluates fixed pressure/O2 settings; equipment quantities cannot repair invalid atmosphere setpoints. It is not a coupled gas/pressure-control model.",
             "A resource-complete candidate may accumulate wastewater unless the no-backlog constraint is enabled; storage is otherwise ideal and unbounded.",
         ])

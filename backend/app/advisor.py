@@ -24,7 +24,7 @@ def compact_run(run):
             "end_inventory": run.readings[-1].model_dump(),
             "events": [e.model_dump() for e in run.events], "warnings": run.warnings,
             "evidence": run.evidence, "equipment_summary": run.equipment_summary,
-            "water_equipment_summary": run.water_equipment_summary, "co2_equipment_summary":run.co2_equipment_summary, "co2_balance":run.co2_balance}
+            "water_equipment_summary": run.water_equipment_summary, "co2_equipment_summary":run.co2_equipment_summary, "co2_balance":run.co2_balance, "atmosphere_summary":run.atmosphere_summary}
 
 
 def evidence_packet(result):
@@ -48,6 +48,7 @@ def generate_text(packet, key, model):
         "Do not change or claim to have optimized the design yourself. The bounded deterministic search selected it. "
         "Distinguish observed references from assumptions. Resource completion is not survival certification. "
         "Mention the unvalidated water yield and unresolved pressure/radiation/thermal constraints. CO2 is checked only when co2_enabled is true; its curve is unvalidated. "
+        "Atmosphere screening, when enabled, only checks fixed pressure/O2 settings against a selected nominal target. It does not model regulators or gas depletion; dry ppO2 differs from inspired PIO2. "
         "When optimized is null, explain that there is no recommendation within these bounds. "
         "Constraint counts may overlap and describe observed stopping conditions, not every cause or separate groups of failed candidates. "
         "Use plain language, describe tradeoffs and useful next steps. Cite only source IDs in supplied sources. "

@@ -125,3 +125,10 @@ Codex researched NASA/NIST primary references, excluded technology targets from 
 Compatibility follow-up: Codex added a startup capability check that identifies an older running backend missing CO2 fields/catalog support and displays restart instructions, preventing the updated frontend from silently using an incomplete contract. Frontend production build verified.
 
 Live integration follow-up — 2026-10-24: Codex verified the real Gemini CO2 mission goal and explicit Apply workflow after the user restarted backend 0.4.0. The live agent made one optimizer call and returned the expected 405-candidate, two-plus-two-plus-two result. Validation evidence is recorded in docs/validation.md; no credential was read or added to Git. Scientific qualification remains pending.
+
+
+## Fixed cabin atmosphere screening — model 0.5.0
+Enable **Screen pressure and inspired oxygen** to evaluate static interior pressure and dry oxygen percentage, distinguish dry oxygen partial pressure from inspired oxygen, and check the selected NASA-referenced nominal criteria. The feature does not model leaks, regulators, gas replenishment, pressure-vessel protection or a dynamically coupled gas mixture. CO2 screening remains separate and opt-in. Invalid atmosphere settings stop at hour zero, and optimization cannot fix them by adding equipment. Try the new agent atmosphere goal, inspect the audit and Apply. [Sources, equations, interpretation and demo](docs/atmosphere-walkthrough.md). No additional external API.
+
+### AI assistance update — atmosphere screening, 2026-10-24
+Codex researched pinned NASA-STD-3001 Vol 2 Rev E and OCHMO-TB-003 references; implemented the static screen, explicit dry/inspired oxygen distinction, source evidence, UI, optimizer/agent integration and 32 regression cases. All 176 tests and frontend build pass. Manual browser checks and a live gemini-3.8-flash simulation/Apply run passed; no credential was read or stored. Scientific and standards-compliance qualification remain outside the prototype.

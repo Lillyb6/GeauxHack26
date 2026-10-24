@@ -184,3 +184,6 @@ def sources_for(evidence, environment_id, equipment_summary=None, water_equipmen
 
 from .co2 import CO2_SOURCES
 SOURCES.update(CO2_SOURCES)
+
+from .atmosphere import ATMOSPHERE_SOURCES
+SOURCES.update(ATMOSPHERE_SOURCES)

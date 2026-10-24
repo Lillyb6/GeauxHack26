@@ -50,3 +50,7 @@ The count optimizer changes only the two selected catalog systems and their coun
 
 ## Model 0.4.0: opt-in cabin CO2
 CO2 is evaluated only when co2_enabled=true. A constant-temperature/volume well-mixed ideal-gas balance uses the BVAD 1.085 kg/person/day nominal load. The historical CDRA point is 4.16 kg/day at 2 mmHg, 1 kW, 450 lb. A linear-below-reference/capped-above response is unvalidated. Exact piecewise integration computes one-hour means; 3 mmHg is a nominal screen, not a lethal threshold. Initial ppCO2 above it is rejected at hour zero. Installed scrubber power and mass are counted; extra cooling/vacuum/regeneration infrastructure is not solved. Disabled runs explicitly omit CO2. See co2-walkthrough.md for all equations, source locations and scope.
+
+
+## Model 0.5.0: fixed pressure and oxygen composition
+Atmosphere screening is opt-in and separate from CO2. Pressure and dry O2 percentage are static setpoints, assumed maintained without a regulator/leak/gas-mixture simulation. Dry ppO2=P*F differs from inspired PIO2=(PB_mmHg-47)*F. The program selects the pinned NASA normoxia target as a design screen, rather than implementing every exposure category. At least 30% inert balance is assumed, not chemically analyzed. Stored oxygen remains a separate inventory and cannot set cabin composition. Passing is not pressure-vessel, ignition, decompression/EVA, physiological or full-standard qualification. See atmosphere-walkthrough.md for exact criteria, units, equations and source locations.

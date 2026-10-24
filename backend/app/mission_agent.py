@@ -78,6 +78,9 @@ def model_turn(contents, key, model, remaining, tools_enabled=True):
         "No feasible search means no recommendation, not permission to change the user's constraints. "
         "Water yield is unvalidated; pressure, radiation and realistic thermal behavior are unresolved. "
         "Enable co2_enabled only when requested; it adds cabin CO2 screening and scrubber count optimization with an unvalidated response curve. "
+        "Enable atmosphere_enabled only when requested. This static screen uses fixed total cabin pressure and dry O2 percentage, and distinguishes dry ppO2 from humidified inspired PIO2. "
+        "Do not claim oxygen generation or stored inventory changes these fixed atmosphere settings. No leaks, pressure control or gas-tank depletion are modeled. "
+        "The selected nominal PIO2 target is not the complete NASA exposure envelope. "
         "Resource completion is not survival certification. You cannot apply changes; the user reviews them. "
         "If tools are disabled, summarize the existing evidence or ask a question; do not claim additional calculations.")
     body={"systemInstruction":{"parts":[{"text":instruction}]},"contents":contents,
@@ -107,7 +110,8 @@ def run_agent(request: AgentRequest):
         "proposed_scenario":None,"proposed_search":None,"simulation":None,"comparison":None,
         "limitations":["Resource checks do not certify safety or survival.",
             "Water yield, pressure, radiation and thermal behavior remain unresolved. CO2 is screened only when enabled and uses an unvalidated scrubber response curve.",
-            "At most three local tools and four Gemini requests per run; no other external API is used."]}
+            "At most three local tools and four Gemini requests per run; no other external API is used.",
+            "Optional atmosphere screening checks fixed settings only; it does not simulate pressure regulation or gas-tank depletion."]}
     key=os.environ.get("GEMINI_API_KEY","").strip()
     model=os.environ.get("GEMINI_MODEL","gemini-3.8-flash").strip()
     if not key:

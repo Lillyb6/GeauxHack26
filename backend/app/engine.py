@@ -1,3 +1,4 @@
+from .atmosphere import screen_atmosphere, atmosphere_evidence
 from .models import HabitatRequest, SimulationResult, Reading, Event
 from .environments import ENVIRONMENTS
 from .equipment import resolve_oxygen_equipment, resolve_water_equipment
@@ -61,7 +62,11 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         req.battery_kwh,
     )
     readings = [Reading(hour=0, oxygen_kg=oxygen, water_kg=water, battery_kwh=battery,co2_mmhg=co2_pressure,co2_removed_kg=0 if req.co2_enabled else None)]
+    atmosphere_summary=screen_atmosphere(req)
     events = []
+    if atmosphere_summary:
+        events.extend(Event(hour=0,resource=check["id"],message=check["message"])
+            for check in atmosphere_summary["checks"] if not check["passed"])
     hour=0
     if req.co2_enabled and co2_pressure>CO2_LIMIT_MMHG+1e-9:
         events.append(Event(hour=0,resource="co2",message="Initial cabin CO2 exceeds the 3 mmHg screening level; no mission hours evaluated."))
@@ -107,7 +112,13 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         evidence.update(co2_evidence(req,co2_summary))
     else:
         warnings.append("CO2 screening is disabled; cabin CO2 accumulation and scrubber power/mass are not evaluated.")
+    if atmosphere_summary:
+        evidence.update(atmosphere_evidence(req,atmosphere_summary))
+    else:
+        warnings.append("Cabin atmosphere screening is disabled; total pressure, inspired oxygen and inert diluent are not evaluated.")
     limitations = list(LIMITATIONS)
+    if atmosphere_summary:
+        limitations.extend(atmosphere_summary["limitations"])
     if co2_summary:
         limitations.extend(co2_summary["limitations"])
     if equipment_summary is not None:
@@ -129,7 +140,7 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         events=events, readings=readings, limitations=limitations,
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
         water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,
-        co2_equipment_summary=co2_summary,
+        atmosphere_summary=atmosphere_summary, co2_equipment_summary=co2_summary,
         co2_balance={"initial_kg":req.initial_co2_mmhg/alpha,"generated_kg":req.crew_size*CREW_CO2_KG_DAY*hour/24,
             "removed_kg":co2_removed,"end_kg":co2_pressure/alpha,"limit_mmhg":CO2_LIMIT_MMHG,
             "limit_basis":"one-hour average; initial state separately screened","response_curve":"unvalidated linear below 2 mmHg, capped above"} if req.co2_enabled else None)
