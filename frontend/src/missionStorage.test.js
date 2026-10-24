@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {STORAGE_KEY,MAX_MISSIONS,createMission,validateMission,parseMission,serializeMission,readLibrary,addMission,removeMission,filenameFor} from './missionStorage.js';
+import {STORAGE_KEY,MAX_MISSIONS,createMission,validateMission,parseMission,serializeMission,readLibrary,addMission,removeMission,filenameFor,saveMissionRun} from './missionStorage.js';
 const context=JSON.parse(readFileSync(new URL('../test-fixtures/mission-context.json',import.meta.url),'utf8'));
 const copy=value=>structuredClone(value);
 function document(){return createMission('Mars demo',copy(context.defaults),copy(context.searchDefaults),context,'2026-10-24T12:00:00.000Z');}
@@ -99,4 +99,28 @@ test('model 0.5 inputs migrate with thermal screening disabled and no altered su
  assert.throws(()=>validateMission(broken,next),/missing/);
  const forged=copy(old);forged.configuration.scenario.thermal_capacity_enabled=true;
  assert.throws(()=>validateMission(forged,next),/unexpected thermal/);
+});
+
+
+test('automatic save updates the same mission on reruns and preserves other missions',()=>{
+ const store=storage();
+ const first=saveMissionRun(store,document(),context);
+ const other=addMission(store,{...document(),name:'Other mission'},context);
+ const changed=createMission('Mars demo',{...context.defaults,crew_size:5},context.searchDefaults,context);
+ const again=saveMissionRun(store,changed,context,first.item.id);
+ assert.equal(again.item.id,first.item.id);
+ assert.equal(again.item.document.name,'Mars demo');
+ assert.equal(again.item.document.configuration.scenario.crew_size,5);
+ assert.equal(readLibrary(store).length,2);
+ assert.ok(readLibrary(store).some(item=>item.id===other.item.id));
+});
+test('automatic save preserves existing titles and reports storage failures',()=>{
+ const store=storage();
+ addMission(store,document(),context);
+ const saved=saveMissionRun(store,document(),context);
+ assert.equal(saved.item.document.name,'Mars demo (2)');
+ const before=store.getItem(STORAGE_KEY);
+ const blocked={getItem:store.getItem,setItem(){throw Error('quota');}};
+ assert.throws(()=>saveMissionRun(blocked,document(),context,saved.item.id),/Could not save/);
+ assert.equal(store.getItem(STORAGE_KEY),before);
 });

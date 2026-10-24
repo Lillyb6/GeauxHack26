@@ -22,7 +22,7 @@ export default function MissionLibrary({scenario,search,context,onLoad}){
  function attempt(action){setError('');setMessage('');try{action();}catch(err){setError(err.message);}}
  function store(document){const saved=addMission(browserStorage(),document,context);setMissions(saved.items);setSelected(saved.item.id);setName(saved.item.document.name);setConfirmDelete(null);return saved.item.document.name;}
  function save(){attempt(()=>{const document=createMission(name,scenario,search,context);const savedName=store(document);setMessage(`Saved “${savedName}” in this browser.`);});}
- function load(document){const validated=validateMission(document,context);onLoad(validated.configuration,validated.name);setName(validated.name);setConfirmDelete(null);setMessage(`Loaded inputs from “${validated.name}”. Previous results and agent proposals were cleared.`);}
+ function load(document,id=null){const validated=validateMission(document,context);onLoad(validated.configuration,validated.name,id);setName(validated.name);setConfirmDelete(null);setMessage(`Loaded inputs from “${validated.name}”. Previous results and agent proposals were cleared.`);}
  async function fileChanged(e){
   const file=e.target.files?.[0];e.target.value='';if(!file)return;
   const token=++importGeneration.current;setPreview(null);setImportText('');setError('');setMessage('');setReading(true);
@@ -38,7 +38,7 @@ export default function MissionLibrary({scenario,search,context,onLoad}){
   <label htmlFor="saved_mission">Saved missions · {missions.length}/{MAX_MISSIONS}<select id="saved_mission" value={selected} onChange={e=>{setSelected(e.target.value);setConfirmDelete(null);}}><option value="">Choose a saved mission</option>{missions.map(item=><option key={item.id} value={item.id}>{item.document.name} · {item.document.configuration.scenario?.environment_id || 'mission'}</option>)}</select></label>
   {current&&<p>{current.document.configuration.scenario?.crew_size} crew · {current.document.configuration.scenario?.duration_days} Earth days · model {current.document.model_version} · saved {new Date(current.document.saved_at).toLocaleString()}</p>}
   <div className="mission-actions">
-   <button type="button" disabled={!current} onClick={()=>attempt(()=>load(current.document))}>Load selected mission</button>
+   <button type="button" disabled={!current} onClick={()=>attempt(()=>load(current.document,current.id))}>Load selected mission</button>
    <button type="button" disabled={!current||!storageReady} onClick={()=>attempt(()=>{const document=validateMission(current.document,context);const savedName=store({...document,name:`${document.name.slice(0,73)} (copy)`,saved_at:new Date().toISOString()});setMessage(`Duplicated as “${savedName}”.`);})}>Duplicate selected</button>
    <button type="button" disabled={!current} onClick={()=>attempt(()=>{download(current.document,context);setMessage('Selected mission JSON download requested. It contains inputs only.');})}>Export selected</button>
    <button type="button" disabled={!current||!storageReady} onClick={()=>{setConfirmDelete(current.id);setMessage('');}}>Delete selected</button>

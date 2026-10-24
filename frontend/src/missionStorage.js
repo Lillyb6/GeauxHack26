@@ -120,4 +120,12 @@ export function addMission(storage,document,context,id=crypto.randomUUID()){
  const next=[item,...items];writeLibrary(storage,next);return {item,items:next};
 }
 export function removeMission(storage,id){const items=readLibrary(storage);const next=items.filter(item=>item.id!==id);writeLibrary(storage,next);return next;}
+export function saveMissionRun(storage,document,context,id=null){
+ const validated=validateMission(document,context);
+ const items=readLibrary(storage);
+ if(!id||!items.some(item=>item.id===id))return addMission(storage,validated,context);
+ const others=items.filter(item=>item.id!==id);
+ const item={id,document:{...validated,name:uniqueName(validated.name,others)}};
+ const next=[item,...others];writeLibrary(storage,next);return {item,items:next};
+}
 export function filenameFor(name){return `${missionName(name).toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'mission'}.json`;}

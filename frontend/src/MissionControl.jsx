@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-export default function MissionControl({ form, setForm, env, result, stale }) {
+export default function MissionControl({ form, setForm, env, result, stale, sceneOnly = false }) {
  const [selectedCrew, setSelectedCrew] = useState(null);
  const [channel, setChannel] = useState('environment');
  const count = Math.max(0, Math.min(12, Math.floor(Number(form.crew_size) || 0)));
  const currentResult = result && !stale;
- return <section className="mission-control" aria-label="Mission control monitors">
+ return <section className={sceneOnly ? "mission-control surface-only" : "mission-control"} aria-label="Mission control monitors">
   <aside className="console-monitor operations-monitor">
    <div className="monitor-bar"><span>01 / FLIGHT OPERATIONS</span><i aria-hidden="true"/></div>
    <p className="eyebrow">MISSION CONFIGURATION</p><h2>{env.name} expedition</h2>
