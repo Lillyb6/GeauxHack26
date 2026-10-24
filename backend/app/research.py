@@ -103,7 +103,7 @@ PARAMETERS = {'oxygen_consumption_kg_person_day': {'value': 0.895,
                                 'water. ISS evidence does not validate this simplified boundary or '
                                 'other environments.'}}
 
-def evidence_for(request):
+def evidence_for(request, equipment_summary=None):
     values = request.model_dump()
     evidence = {}
     for name, entry in PARAMETERS.items():
@@ -116,4 +116,37 @@ def evidence_for(request):
         evidence[name] = item
     for name in ("crew_size", "duration_days", "oxygen_kg", "water_kg", "battery_kwh", "generation_kw", "oxygen_capacity_kg_day"):
         evidence[name] = {"value":values[name], "classification":"scenario_input", "source_ids":[], "note":"User-selected mission design, not a scientific observation."}
+    if equipment_summary is not None:
+        evidence.pop("oxygen_capacity_kg_day", None)
+        evidence.pop("electrolyzer_kwh_kg_oxygen", None)
+        source_id = "equipment:" + equipment_summary["equipment_id"]
+        for name, field, unit in (
+            ("equipment_oxygen_output", "oxygen_output_kg_day", "kg O2/day"),
+            ("equipment_power", "electrical_power_kw", "kW"),
+            ("equipment_hardware_mass", "known_hardware_mass_kg", "kg"),
+        ):
+            evidence[name] = {
+                "value": equipment_summary[field], "unit": unit,
+                "classification": equipment_summary["evidence_status"],
+                "source_ids": [source_id],
+                "note": "Published per-unit design value multiplied by selected quantity. Mass is equipment hardware only; planetary operating envelope is unknown.",
+            }
+        evidence["oxygen_equipment_quantity"] = {
+            "value": request.oxygen_equipment_quantity, "unit": "units",
+            "classification": "scenario_input", "source_ids": [],
+            "note": "User-selected count of identical units at the published design point.",
+        }
     return evidence
+
+
+def sources_for(evidence, environment_id, equipment_summary=None):
+    sources = dict(SOURCES)
+    if equipment_summary is not None:
+        source = equipment_summary["source"]
+        sources["equipment:" + equipment_summary["equipment_id"]] = {
+            "title": source["title"], "url": source["url"],
+            "context": source["location"] + "; " + "; ".join(equipment_summary["limitations"]),
+        }
+    used_ids = {source for item in evidence.values() for source in item["source_ids"]}
+    used_ids.add(environment_id)
+    return {key: value for key, value in sources.items() if key in used_ids}

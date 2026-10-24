@@ -34,3 +34,7 @@ Mars: -59 C -> 3.2 kW assumed thermal load. Total demand about 8.073 kW. Initial
 
 ## Not evaluated
 Pressure vessel and atmosphere regulation; CO2 scrubbing; radiation; food; reliability; equipment mass; medical effects; resource extraction; power plant fuel and temperature operating envelopes. Pressure and gravity are reference context only. All three environments remain exploratory even if resource balances complete.
+
+
+## Catalog mode extension — 2026-10-24
+When an oxygen equipment ID is selected, q = catalog output * unit count and oxygen electrical demand = catalog power * count. This directly replaces the custom q*specific_energy/24 term. Feedwater uses q*1.125 as before. Published hardware mass is reported separately; it is not total mission mass. Unknown mass remains null; missing required output/power causes an error. Zero installed units has zero oxygen-system output/power. Multiple units are independent copies running at the published design point; no turndown, outages or redundancy benefit is simulated. Source values do not establish planetary compatibility.

@@ -1,4 +1,14 @@
-# Current validation — model 0.2.0, 2026-10-23
+# Current validation — equipment extension, 2026-10-24
+
+- Backend: **39 tests passed**, including 13 equipment tests for quantity balances, custom/catalog separation, evidence/source consistency, unknown mass, missing specifications and invalid IDs/counts.
+- Frontend: `npm run build` passed. Existing chart bundle-size advisory remains.
+- Browser: catalog loaded; selecting equipment disabled custom oxygen/energy fields; one-unit run completed 720 hours with 8.027 kW demand; two-unit preview showed 8.4 kg/day, 2.2 kW and 150 kg. A one-day two-unit run completed with 9.127 kW total demand.
+- Changing quantity retained the previous result and displayed the stale-input warning. Switching to custom mode re-enabled custom controls. Exact-run evidence cited historical equipment and omitted the unused DOE oxygen-energy proxy.
+- Starlette/httpx TestClient deprecation warning remains; no failed tests.
+- Tests verify declared accounting, not scientific qualification. Equipment operating envelope and the general thermal/pressure/radiation gaps remain unresolved.
+
+## Previous research audit (0.2.0, 2026-10-23)
+
 
 - Backend: **26 tests passed**. Includes nominal crew balances, source-ID resolution, parameter override labeling, environment unit conversions, model-default consistency and engineering input validation.
 - Frontend: production build passed. Existing bundle-size advisory remains.

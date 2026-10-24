@@ -5,6 +5,13 @@ from .research import PARAMETERS
 class HabitatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
     environment_id: Literal["mars", "venus", "titan"] = "mars"
+    oxygen_equipment_id: str | None = None
+
+    oxygen_equipment_quantity: int = Field(
+        default=1,
+        ge=0,
+        le=8,
+    )
     crew_size: int = Field(default=4, ge=1, le=12)
     duration_days: int = Field(default=30, ge=1, le=180)
     oxygen_kg: float = Field(default=30, ge=0, le=10000)
@@ -46,3 +53,4 @@ class SimulationResult(BaseModel):
     evidence: dict
     sources: dict
     environment_reference: dict
+    equipment_summary: dict | None = None

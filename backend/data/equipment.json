@@ -1,0 +1,30 @@
+[
+  {
+    "id": "static_feed_electrolyzer_1978",
+    "name": "Static-feed water electrolyzer — historical design",
+    "category": "oxygen_generation",
+    "oxygen_output_kg_day": 4.2,
+    "electrical_power_kw": 1.1,
+    "hardware_mass_kg": 75.0,
+    "volume_m3": 0.11,
+    "operating_temperature_min_c": null,
+    "operating_temperature_max_c": null,
+    "evidence_status": "published_historical_design",
+    "source": {
+      "title": "Water electrolysis system - H2 and O2 generation",
+      "organization": "NASA Technical Reports Server",
+      "document_id": "19790028539",
+      "report_number": "ASME PAPER 78-ENAS-3",
+      "publication_date": "1978-07-01",
+      "url": "https://ntrs.nasa.gov/citations/19790028539",
+      "location": "NTRS abstract, first two paragraphs"
+    },
+    "limitations": [
+      "Historical design figures; not a modern flight-qualified equipment specification.",
+      "Power and output are represented at the published design point.",
+      "Planetary operating conditions are not established.",
+      "Hardware mass excludes any additional installation, supplies, shielding or planetary support infrastructure.",
+      "Full paper is not downloadable from this NTRS record."
+    ]
+  }
+]

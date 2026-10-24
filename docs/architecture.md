@@ -22,3 +22,8 @@ The engine never calls an LLM. Environment reference data and scenario assumptio
 7. CI, accessibility checks, deployment and presentation rehearsal.
 
 Suggested ownership tomorrow: engine/catalog/tests; frontend/design; API/optimizer/scientific documentation. Work from shared contracts and review changes together.
+
+
+## Equipment integration
+`backend/data/equipment.json` -> `equipment.py` resolves ID + quantity -> engine derives output/power -> `research.py` packages actual-run evidence -> API returns `equipment_summary` and readings -> React displays immutable run summary.
+`GET /equipment` provides selection metadata. `oxygen_equipment_id=null` retains custom mode. Catalog mode ignores the custom oxygen-capacity and energy inputs while retaining them for switching back. Equipment errors return 422. Published design-point copies are summed; this is not a duty-cycle, reliability or environmental qualification model. Source revisions require catalog/documentation review and backend restart.

@@ -32,3 +32,10 @@ Continuous generation, ideal storage, instant recovery and linear equipment scal
 - Moved remaining hidden equipment/thermal constants into editable design controls with evidence classifications.
 
 NASA, DOE and ESA do not endorse this project. No generated images/video or agency branding assets are included.
+
+
+## Initial oxygen catalog entry — added 2026-10-24
+
+[NASA NTRS 19790028539](https://ntrs.nasa.gov/citations/19790028539), *Water electrolysis system - H2 and O2 generation*, ASME PAPER 78-ENAS-3, published July 1, 1978. Locator: abstract, first two paragraphs. Reported design values: 4.20 kg O2/day, 1.1 kW, 75 kg fixed hardware, 0.11 m3. Evidence classification: published historical design. Not a measured operating curve, current product, or validated planetary installation. Operating temperature limits remain null. No downloadable full paper is available in that record. Do not transfer limits from a different version of the equipment.
+
+In catalog mode, direct equipment power replaces the DOE energy proxy, and unused custom capacity/energy entries are omitted from result evidence. Sources are packaged with each result so a changed current selection cannot rewrite the previous run's provenance.
