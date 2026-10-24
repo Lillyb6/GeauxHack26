@@ -163,3 +163,68 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .station-setup:has(.monitor-edit-heading) .operator-screen{display:flex;flex-direction:column}
 .station-setup:has(.monitor-edit-heading) .mission-wizard{flex:1;min-height:0;height:auto}
 @media(max-width:800px){.station-setup:has(.monitor-edit-heading){height:780px}.monitor-edit-heading{padding:12px 18px 0}}
+
+/* Short tutorial: one example at a time; the full reference guide stays optional. */
+.animated-briefing{max-width:900px;margin:auto;padding:30px 0 0;min-height:0}
+.briefing-top,.briefing-progress,.briefing-controls,.briefing-controls>div,.briefing-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.animated-briefing .briefing-top h1{font-size:24px;letter-spacing:-.4px;margin:0}
+.briefing-lesson{margin-top:24px}
+.briefing-progress{font-size:13px;color:#afbdcc;margin-bottom:18px}
+.briefing-step-track{display:flex;gap:6px;width:150px}
+.briefing-step-track span{height:3px;background:#334253;flex:1}
+.briefing-step-track .is-filled{background:#ff9865}
+.animated-briefing #briefing-lesson-title{font-size:27px;margin:0 0 20px;line-height:1.25}
+.briefing-example{background:#101a25;border:1px solid #344253;border-radius:8px;padding:24px;min-height:350px}
+.briefing-scene-label{font-size:12px;color:#afbdcc;margin-bottom:18px}
+.briefing-worlds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.briefing-world{padding:13px;text-align:center;border:1px solid #344253;border-radius:5px;transition:border-color .25s,background .25s}
+.briefing-world.is-selected{border-color:#ff9865;background:#1d252e}
+.briefing-world strong{font-size:16px;font-weight:550;display:block}
+.briefing-world small{font-size:11px;color:#afbdcc;display:block;margin-top:3px}
+.briefing-world-dot{display:block;width:18px;height:18px;border-radius:50%;margin:0 auto 7px;background:#a9b5c4}
+.briefing-world-dot.mars{background:#d38c69}.briefing-world-dot.venus{background:#dbc08c}.briefing-world-dot.titan{background:#bda05e}
+.briefing-selection{display:block;min-height:18px;font-size:11px;color:#ffb18b;margin-top:5px}
+.briefing-setting{display:flex;justify-content:space-between;gap:14px;margin:18px 0 8px;font-size:14px;color:#afbdcc}
+.briefing-setting strong{font-weight:500;color:#e7edf4;font-variant-numeric:tabular-nums}
+.briefing-crew{display:flex;gap:12px}
+.briefing-person{display:block;position:relative;width:40px;height:55px;transition:opacity .35s,transform .35s}
+.briefing-person.is-waiting{opacity:0;transform:translateY(8px)}
+.briefing-duration{margin-top:13px}
+.briefing-duration-track{height:6px;overflow:hidden;background:#263443;border-radius:2px}
+.briefing-duration-track span{height:100%;display:block;background:#ff9865;transition:width .55s ease}
+.briefing-duration-ends{display:flex;justify-content:space-between;font-size:11px;color:#afbdcc;margin-top:6px}
+.briefing-run-example{display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:28px}
+.briefing-example-run{background:#ff9865;color:#211510;padding:15px;border-radius:5px;font-size:14px;text-align:center}
+.briefing-demo-monitor{border:5px solid #303b49;border-radius:9px;background:#0a111a}
+.briefing-demo-bezel{padding:12px 16px;border-bottom:1px solid #344253;display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#afbdcc}
+.briefing-led{width:5px;height:5px;border-radius:50%;background:#ff9865;align-self:center}
+.briefing-demo-screen{padding:23px 20px;transition:opacity .5s}
+.briefing-demo-monitor.is-off .briefing-demo-screen{opacity:0}
+.briefing-demo-monitor.is-off .briefing-led{background:#647182}
+.briefing-resource{margin-bottom:19px}
+.briefing-resource>span{font-size:13px;color:#afbdcc}
+.briefing-resource-track{height:8px;background:#23303e;margin-top:7px;overflow:hidden;border-radius:2px}
+.briefing-resource-track span{display:block;height:100%;width:100%;transform-origin:left;transition:transform 1.3s ease}
+.briefing-oxygen span{background:#8bdfc6}.briefing-water span{background:#90b7e6}.briefing-battery span{background:#ffb185}
+.briefing-demo-screen>p{font-size:11px;margin:0;color:#afbdcc}
+.briefing-outcomes{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
+.briefing-outcome{padding:24px 18px;border:1px solid #344253;border-radius:6px;transition:opacity .45s,transform .45s}
+.briefing-outcome.is-pending{opacity:.12;transform:translateY(10px)}
+.briefing-outcome>span{font-size:12px;color:#afbdcc}
+.briefing-outcome h2{font-size:28px;margin:20px 0 12px}.briefing-outcome.success h2{color:#8bdfc6}.briefing-outcome.failed h2{color:#f29ba4}
+.briefing-outcome>strong{font-size:21px;font-weight:500;color:#e7edf4;font-variant-numeric:tabular-nums}
+.briefing-outcome>p{font-size:13px;margin-bottom:0;color:#afbdcc}
+.animated-briefing .briefing-caption{font-size:15px;color:#e7edf4;margin:19px 0}
+.briefing-controls{padding-bottom:20px}.briefing-controls>div{gap:10px}
+.briefing-controls button{min-height:44px}.briefing-controls button:disabled{opacity:.45;cursor:default}
+.briefing-text-button{background:transparent;border:0;color:#b8c7d7;padding:10px 0;font-size:13px;min-height:44px;text-align:left}
+.briefing-text-button:hover{text-decoration:underline;text-underline-offset:4px}
+.briefing-bottom{border-top:1px solid #344253;padding-top:12px}.briefing-bottom>p{font-size:12px;margin:0;color:#afbdcc}
+@media(max-width:600px){.briefing-example{padding:20px 15px;min-height:350px}.briefing-world{padding:12px 5px}.briefing-world strong{font-size:14px}.briefing-crew{gap:5px}.briefing-person{width:35px}.briefing-run-example{grid-template-columns:1fr;gap:16px}.briefing-example-run{max-width:170px;padding:10px}.briefing-demo-screen{padding:18px}.briefing-outcomes{grid-template-columns:1fr;gap:12px;margin-top:12px}.briefing-outcome{padding:14px}.briefing-outcome h2{font-size:23px;margin:10px 0 8px}.briefing-outcome>strong{font-size:18px}.briefing-top{gap:12px}.briefing-top .welcome-secondary{padding:11px 12px}.briefing-controls{gap:10px}.briefing-controls .welcome-start,.briefing-controls .welcome-secondary{padding:12px}.briefing-bottom{gap:5px 18px}.briefing-bottom>p{width:100%}}
+@media(prefers-reduced-motion:reduce){.briefing-example *{transition:none!important}}
+
+.briefing-detailed-help{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:22px 24px;margin:8px 0 20px;background:#101a25;border:1px solid #455367;border-radius:6px}
+.briefing-detailed-help h2{font-size:19px;margin:0 0 5px;color:#e7edf4}
+.briefing-detailed-help p{font-size:14px;margin:0;color:#afbdcc}
+.briefing-detailed-help .welcome-secondary{font-size:16px;padding:14px 20px;min-height:48px;color:#e7edf4;border-color:#8290a1}
+@media(max-width:600px){.briefing-detailed-help{padding:18px;gap:14px}.briefing-detailed-help .welcome-secondary{width:100%;text-align:center}}
