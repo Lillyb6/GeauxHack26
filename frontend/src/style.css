@@ -109,3 +109,57 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .operator-toolbar .camera-status{font:9px ui-monospace,monospace;color:var(--accent);white-space:nowrap}.operator-viewport{height:calc(100dvh - 123px)}.operator-room{width:max(2520px,160vw);height:1720px}.room-wall-label{left:calc(50% - 510px)}.station-designer{left:calc(50% - 510px);width:1020px;height:min(580px,calc(100dvh - 160px));top:60px}.station-surface{left:calc(50% - 510px);width:1020px;height:min(760px,calc(100dvh - 160px));top:700px}.station-setup{left:calc(50% - 1110px);width:540px;top:420px;height:min(850px,calc(100dvh - 160px))}.station-systems{left:calc(50% + 570px);width:540px;top:420px;height:850px}.operator-desk{top:1545px}.station-surface .operator-screen{display:flex;flex-direction:column;overflow:hidden}.operator-shell .surface-only{flex:1;min-height:0;display:flex;flex-direction:column}.operator-shell .surface-only .center-monitor{display:flex;flex-direction:column;flex:1;min-height:0}.operator-shell .surface-only .planet-scene{flex:1;min-height:0;aspect-ratio:auto}.operator-shell .surface-only .planet-art{width:153.11%;height:155.17%;top:-46.77%;left:-28.95%}.operator-shell .surface-only .monitor-bar,.operator-shell .surface-only .scene-footer{flex-shrink:0}.station-designer .operator-screen{padding:22px}.station-designer .mission-agent>p{font-size:12px}.station-designer .mission-agent textarea{min-height:85px;height:85px}.station-designer .mission-agent .run{margin:13px 0}.station-setup .operator-screen{overflow:hidden;padding:0}.mission-wizard{height:100%;display:flex;flex-direction:column;min-height:0;padding:22px}.mission-wizard.config{margin:0!important}.mission-launcher{justify-content:center;padding:38px}.mission-launcher h2{font-size:34px;line-height:1.2;margin:18px 0}.mission-launcher>p{font-size:14px}.mission-launcher .muted{font-size:11px;margin-top:30px}.wizard-heading{flex-shrink:0}.wizard-heading h2{font-size:25px}.wizard-step-label{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--accent);font:10px ui-monospace,monospace;letter-spacing:1px}.wizard-back{background:transparent;border:1px solid #414b59;border-radius:4px;color:#b8c8d5;padding:10px 13px;font-size:11px;cursor:pointer}.wizard-back:disabled{opacity:.4;cursor:default}.wizard-progress{display:flex;gap:5px;margin:17px 0}.wizard-progress>span{height:3px;flex:1;background:#303a48}.wizard-progress>span.filled{background:var(--accent)}.wizard-mission-name{margin:0 0 12px;font-size:11px;color:var(--accent);overflow-wrap:anywhere}.wizard-body{min-height:0;flex:1;overflow:auto;padding:0 5px 15px 0;scrollbar-width:thin;scrollbar-color:#424752 #10141b}.wizard-body .control-group{padding:12px 0}.wizard-body .control-group>summary{font-size:13px}.wizard-body>p{font-size:12px}.wizard-footer{flex-shrink:0;border-top:1px solid #33404e;padding-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.wizard-footer>.run{margin:0;width:auto;min-width:170px}.wizard-footer>div{display:flex;flex-direction:column;gap:9px}.wizard-footer>div>.run{margin:0;padding:12px 22px}.launch-summary{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}.launch-summary dt{font-size:10px;color:#8ea1b3}.launch-summary dd{font-size:18px;color:var(--accent);margin:5px 0}.library-view>.wizard-heading{display:flex;gap:10px;margin-bottom:15px}.library-view .mission-library{border:0!important;padding:0!important}.mission-wizard label{display:block;font-size:12px;color:#bdcbd7;margin:13px 0}.mission-wizard :is(input:not([type="checkbox"]),select){display:block;width:100%;background:#0a141e;border:1px solid #34485b;border-radius:4px;color:#e6edf4;padding:10px;margin-top:6px;font:inherit}.mission-wizard input:disabled{opacity:.45}.mission-wizard .checkbox-label{display:flex;align-items:flex-start;gap:9px}.mission-wizard .checkbox-label input{width:auto}
 @media(max-width:800px){.operator-viewport{height:auto}.operator-room{width:100%;height:auto;padding-bottom:30px}.operator-monitor{left:auto;top:auto;width:100%}.station-surface{height:500px}.station-designer{height:580px}.station-setup{height:690px}.station-systems{height:auto}.operator-monitor .operator-screen{max-height:none}.station-systems .operator-screen{max-height:75dvh}.operator-toolbar .camera-status{display:none}.operator-toolbar small:after{content:'Tap a monitor to work. Scroll the page to reach your other screens.'}.station-surface .operator-screen{min-height:0}.operator-shell .station-surface .scene-footer{font-size:7px}.mission-wizard{padding:18px}.mission-launcher{padding:25px}.mission-launcher h2{font-size:30px}.operator-desk{display:none}.station-designer .operator-screen{padding:16px}.wizard-footer>.run{min-width:0}.wizard-footer{gap:8px}.operator-shell .station-surface .planet small{display:none}.operator-shell .station-surface .planets{flex-shrink:0}}
 .wizard-run-status{flex-shrink:0;padding:8px 0}.wizard-run-status:empty{display:none}.wizard-run-status .note,.wizard-run-status .alert{margin:6px 0;font-size:11px;padding:9px}.wizard-run-status .result-jump{font-size:11px;padding:8px}.mission-wizard .launch-summary{margin:12px 0;gap:12px}.mission-wizard .wizard-body>p.eyebrow{margin:8px 0}.mission-wizard .wizard-body>h3{font-size:17px}
+
+/* Mission preparation lives outside the monitor room. */
+.mission-preparation{max-width:850px;margin:0 auto;padding:40px 24px 65px}
+.mission-preparation[hidden]{display:none}
+.preparation-intro h1{font-size:clamp(30px,4vw,44px);line-height:1.15;margin:15px 0}
+.preparation-intro>p{max-width:640px}
+.preparation-card{background:#0c141f;border:1px solid #344353;border-radius:9px;margin:28px 0 20px}
+.preparation-card .mission-wizard{height:auto;min-height:380px;padding:30px}
+.preparation-card .wizard-body{overflow:visible;padding-bottom:24px}
+.preparation-card .mission-launcher{min-height:380px}
+.preparation-card .mission-launcher .run{max-width:330px}
+.preparation-card .wizard-heading h2{font-size:30px}
+.preparation-ai{padding:22px;border:1px solid #344353;border-radius:8px;background:#0c141f}
+.preparation-ai summary{cursor:pointer;font-size:15px}
+.preparation-ai .mission-agent{margin-top:18px}
+.mission-brief{padding:25px;height:100%;overflow:auto}
+.mission-brief h2{overflow-wrap:anywhere}
+.mission-brief .run{width:100%}
+.station-navigation{display:flex;flex-wrap:wrap;gap:8px;padding:10px 28px;background:#10151d;border-bottom:1px solid #303b49}
+.station-navigation button{padding:10px 15px;color:#d4dce7;background:#18222e;border:1px solid #405066;border-radius:4px;font:12px Inter,system-ui,sans-serif;cursor:pointer;min-height:40px}
+.station-navigation button:hover{border-color:var(--accent)}
+.station-motion{display:flex;align-items:center;gap:8px;font:12px Inter,system-ui,sans-serif;color:#c5d0dc;white-space:nowrap}
+.station-motion input{width:auto;accent-color:var(--accent)}
+.operator-toolbar{height:auto;min-height:55px;flex-wrap:wrap}
+.operator-viewport{height:calc(100dvh - 185px)}
+.station-booting .operator-screen{animation:mission-screen-on .8s both}
+.station-booting .station-setup .operator-screen{animation-delay:.08s}
+.station-booting .station-designer .operator-screen{animation-delay:.16s}
+.station-booting .station-systems .operator-screen{animation-delay:.24s}
+.station-booting .operator-led{animation:mission-screen-on .8s both}
+@keyframes mission-screen-on{0%,15%{opacity:0;filter:brightness(0)}35%{opacity:.4;filter:brightness(.4)}100%{opacity:1;filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.station-booting .operator-screen,.station-booting .operator-led{animation:none}}
+@media(max-width:800px){.operator-viewport{height:auto}.mission-preparation{padding:25px 16px 45px}.preparation-card .mission-wizard{padding:22px}.wizard-footer{flex-wrap:wrap}.wizard-footer>.run{min-width:0;white-space:normal}.station-navigation{padding:10px 16px}.station-navigation button{min-height:44px}.operator-toolbar small:after{content:'Use the buttons below to choose a monitor, or scroll through your station.'}}
+
+/* Keep the surface central, with AI on the left and systems on the right. */
+@media(min-width:801px){
+ .station-designer{left:calc(50% - 1110px);top:420px;width:540px;height:min(850px,calc(100dvh - 220px));transform:perspective(2000px) rotateY(5deg)}
+ .station-setup{left:calc(50% - 510px);top:60px;width:1020px;height:min(580px,calc(100dvh - 220px));transform:none}
+ .station-designer .mission-agent>h2{font-size:23px}
+ .station-designer .mission-agent textarea{height:auto;min-height:110px}
+}
+
+.mission-outcome{margin-bottom:20px;border-left:4px solid #899bad}
+.mission-outcome h2{font-size:32px;margin:10px 0}
+.mission-outcome.outcome-success{border-left-color:#88dfcc}
+.mission-outcome.outcome-success h2{color:#88dfcc}
+.mission-outcome.outcome-failed{border-left-color:#f38b91}
+.mission-outcome.outcome-failed h2{color:#f38b91}
+.mission-outcome .outcome-duration{font-size:16px;color:#e6edf4;line-height:1.6}
+
+.monitor-edit-heading{padding:14px 22px 0;flex-shrink:0}
+.station-setup:has(.monitor-edit-heading) .operator-screen{display:flex;flex-direction:column}
+.station-setup:has(.monitor-edit-heading) .mission-wizard{flex:1;min-height:0;height:auto}
+@media(max-width:800px){.station-setup:has(.monitor-edit-heading){height:780px}.monitor-edit-heading{padding:12px 18px 0}}
