@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from .models import HabitatRequest, SimulationResult
+from .models import HabitatRequest, SimulationResult, OptimizationRequest, OptimizationResult
 from .engine import simulate
 from .equipment import EQUIPMENT
 from .environments import ENVIRONMENTS
@@ -34,3 +34,21 @@ def model_reference():
     from .research import SOURCES, PARAMETERS
     return {"version":"0.3.0", "sources":SOURCES, "parameters":PARAMETERS,
             "default_request":HabitatRequest().model_dump()}
+
+
+@app.post("/optimize", response_model=OptimizationResult)
+def optimize_habitat(request: OptimizationRequest):
+    from .optimizer import optimize
+    try:
+        return optimize(request)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/explain")
+def explain_design(request: OptimizationRequest):
+    from .advisor import explain
+    try:
+        return explain(request)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error

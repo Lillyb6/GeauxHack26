@@ -1,3 +1,23 @@
+# Current validation — Gemini advisor, 2026-10-24
+
+- Backend: **93 tests passed**, including 14 advisor cases for unconfigured fallback, recomputed evidence packet, provider failure redaction, unknown citations, malformed/truncated/blocked responses, model validation and rejecting browser-forged outcomes.
+- Frontend production build passed; existing bundle-size advisory remains. Existing Starlette/httpx deprecation warning remains.
+- Browser: advisor button rendered in the comparison; /explain returned labeled computed fallback because Gemini was not configured. The computed recommendation and limitations displayed correctly.
+- No live Gemini request was verified without a supplied key. Mock transport validates the outgoing request and response parsing, not current provider availability or generated factual accuracy.
+- Planned follow-up: custom Gemini-powered mission-design agent with bounded, validated simulator/optimizer tools. See gemini-advisor.md.
+
+## Previous optimizer validation
+
+# Current validation — optimizer extension, 2026-10-24
+
+- Backend: **79 tests passed**, including 18 optimizer cases for complete enumeration, minimum selection, fixed inputs, determinism, mass eligibility, zero units, backlog constraints, invalid requests and API/evidence behavior.
+- Frontend production build passed. Existing chart bundle-size advisory remains.
+- Browser: two-plus-two manual catalog units versus one-plus-one recommendation at default Mars inputs except 10 kW generation: 636 versus 318 kg, 300 versus 720 hours, 81 evaluated / 3 feasible candidates. Stale comparison warning verified after input changes.
+- Browser: zero generation and zero battery returned no recommendation and 81 observed power constraints; recommendation chart/equipment were omitted.
+- Existing Starlette/httpx deprecation warning remains. Checks verify implementation under declared assumptions, not scientific qualification. Water yield and physical-model gaps remain explicit.
+
+## Previous water equipment validation
+
 # Current validation — water equipment, model 0.3.0, 2026-10-24
 
 - Backend: **61 tests passed** (22 new water cases). Checks include per-hour water conservation within the declared boundary, backlog, overload warnings, unit scaling, missing specs/unknown mass, source attribution, invalid selections, zero equipment and resource failures.

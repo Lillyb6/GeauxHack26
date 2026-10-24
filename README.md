@@ -31,7 +31,7 @@ macOS/Linux: use `python3 -m venv .venv`, `.venv/bin/python` (or `../.venv/bin/p
 3. Restore power to 8 kW and select Venus or Titan. The simplified thermal load changes and the same design fails earlier.
 4. Change supplies or power and run again. Charts retain their last result until rerun; changed inputs are flagged.
 
-**Scope:** this is a resource-balance prototype, not proof of human survival. Pressure, radiation, CO2 scrubbing, food, structural protection and realistic HVAC are not yet evaluated. Scientific reference values are marked separately from assumed equipment parameters. Model 0.2 adds an in-app evidence register, NASA crew baselines and environmental references, a DOE electrolysis proxy, and explicit editable unvalidated engineering inputs. This remains research-informed rather than scientifically validated. There is no live telemetry, optimizer, Gemini integration, database, or deployment yet.
+**Scope:** this is a resource-balance prototype, not proof of human survival. Pressure, radiation, CO2 scrubbing, food, structural protection and realistic HVAC are not yet evaluated. Scientific reference values are marked separately from assumed equipment parameters. Model 0.2 adds an in-app evidence register, NASA crew baselines and environmental references, a DOE electrolysis proxy, and explicit editable unvalidated engineering inputs. This remains research-informed rather than scientifically validated. A bounded deterministic equipment-count optimizer is available. A Gemini explanation advisor is integrated and requires backend configuration. There is no live telemetry, database, or deployment yet.
 
 ## Checks
 ```powershell
@@ -52,7 +52,7 @@ Backend tests cover balances, conservation of electrolysis feedwater, empty reso
 - [Research audit and remaining validation gaps](docs/research-audit.md)
 - [Equipment implementation walkthrough](docs/equipment-walkthrough.md)
 
-Next: review scientific assumptions, expand and validate the initial oxygen equipment catalog, then add constraints and a deterministic optimizer before Gemini explanations. See the architecture document for suggested ownership. No secret keys are needed for this milestone; keep future Gemini keys server-side and outside Git.
+Next: review scientific assumptions, validate the equipment catalog and expand physical constraints before Gemini explanations. See the architecture document for suggested ownership. No secret keys are needed for this milestone; keep future Gemini keys server-side and outside Git.
 
 ## AI usage disclosure
 Update this log with every substantial AI contribution. Team review remains pending; generated code is not represented as independently validated science.
@@ -87,3 +87,23 @@ The initial water entry uses a [historical NASA contractor report](https://ntrs.
 
 ### AI assistance update — water recovery, 2026-10-24
 Codex researched primary NASA references; implemented the water equipment resolver, capacity-limited queue and mass accounting, selection UI, provenance, regression tests and documentation. Source review excluded internal monitor recirculation from the external-feed budget and rejected an unsupported efficiency inference. The unresolved recovery yield remains clearly labeled. Team scientific review is pending; see docs/validation.md.
+
+
+## Deterministic optimization and comparison
+Select equipment designs and click **Optimize and compare**. The search evaluates up to 81 oxygen/water count combinations using the same simulation engine, keeping supplies, crew, duration, power generation and thermal inputs fixed. It minimizes known hardware mass within that bounded set and returns no recommendation when no eligible configuration works. Optional ending-wastewater constraints, candidate audit, evidence and inventory comparison charts are included.
+
+Try Mars / 4 crew / 30 days / 10 kW generation with two units of each catalog design and other defaults. Manual hardware is 636 kg and reaches a power constraint at hour 300; the selected one-plus-one configuration is 318 kg and completes 720 modeled hours. This is resource feasibility under assumptions, not mission certification. See [the optimizer walkthrough](docs/optimizer-walkthrough.md) for implementation and interpretation.
+
+### AI assistance update — optimizer, 2026-10-24
+Codex implemented deterministic bounded enumeration, API contracts/endpoint, manual-versus-optimized UI, 18 regression cases and documentation. No LLM produces simulation metrics. Existing NASA-attributed catalog evidence and explicitly unvalidated water yield are retained. All 79 backend tests and the frontend build pass; browser checks are recorded in docs/validation.md. Team scientific review remains pending.
+
+
+## Gemini mission advisor
+After optimizing, click **Explain this comparison with Gemini**. The backend recomputes outcomes, sends compact results and source evidence to Gemini, and validates the structured explanation. Without configuration or on failure, the UI labels computed fallback guidance honestly. Keep GEMINI_API_KEY server-side. See [setup and implementation](docs/gemini-advisor.md). AI prose requires review against authoritative calculated results and source documents.
+
+**Planned next milestone:** a custom Gemini-powered tool-using mission-design agent with bounded calls to simulate/optimize, validated inputs and reviewable proposed configuration changes. This is planned, not implemented.
+
+### AI assistance update — Gemini advisor, 2026-10-24
+Codex implemented the backend explanation endpoint, compact evidence payload, structured provider response validation, redacted fallback handling, advisor UI, mocked regression tests and setup documentation. The integration uses Google's documented generateContent API; no live Gemini response has been verified without a supplied API key. The simulator remains authoritative. Team review is pending.
+
+Advisor diagnostics follow-up: Codex added static HTTP-status, timeout and connection hints without returning provider bodies or credentials; regression tests cover redaction.

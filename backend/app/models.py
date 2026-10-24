@@ -62,3 +62,44 @@ class SimulationResult(BaseModel):
     water_equipment_summary: dict | None = None
     water_balance: dict
     warnings: list[str] = Field(default_factory=list)
+
+
+class OptimizationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    scenario: HabitatRequest
+    oxygen_equipment_id: str
+    water_equipment_id: str
+    max_oxygen_units: int = Field(default=8, ge=0, le=8)
+    max_water_units: int = Field(default=8, ge=0, le=8)
+    require_no_wastewater_backlog: bool = False
+
+
+class CandidateSummary(BaseModel):
+    oxygen_units: int
+    water_units: int
+    eligible: bool
+    feasible: bool
+    known_hardware_mass_kg: float | None = None
+    demand_kw: float | None = None
+    evaluated_hours: int | None = None
+    constraints_failed: list[str] = Field(default_factory=list)
+    exclusion_reason: str | None = None
+
+
+class OptimizationResult(BaseModel):
+    status: Literal["feasible", "no_feasible_candidate", "insufficient_catalog_data"]
+    search_request: OptimizationRequest
+    manual: SimulationResult
+    optimized: SimulationResult | None
+    manual_known_hardware_mass_kg: float | None
+    optimized_known_hardware_mass_kg: float | None
+    known_hardware_mass_saving_kg: float | None
+    candidate_count: int
+    evaluated_count: int
+    feasible_count: int
+    excluded_count: int
+    constraint_failure_counts: dict[str, int]
+    candidates: list[CandidateSummary]
+    explanation: str
+    objective: str = "Minimum known oxygen + water equipment hardware mass within the enumerated design/count bounds; not total mission mass"
+    limitations: list[str]

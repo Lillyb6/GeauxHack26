@@ -42,3 +42,7 @@ When an oxygen equipment ID is selected, q = catalog output * unit count and oxy
 
 ## Water equipment extension — 0.3.0
 Catalog water mode limits processed feed to a historical external-feed design budget times unit count. It stores excess in an ideal unbounded queue, returns processed*assumed_yield to usable water, and records the remainder as brine/losses. All modeled potable crew use becomes immediate feed as a boundary simplification; it is not a physiological wastewater model or demonstrated feed compatibility. Initial queue is zero, with no overflow/storage model. Recovery yield 0.90 is explicitly unvalidated. Installed historical mechanical/control power is constant, not duty-cycle optimized. Zero units recover nothing. Custom mode keeps its old effective unbounded-throughput recovery. See water-recovery-walkthrough.md for equations and unresolved research.
+
+
+## Optimizer boundary
+The count optimizer changes only the two selected catalog systems and their counts, and evaluates each through the same engine. Fixed supplies are not optimized; the objective excludes unknown/supporting hardware and total mission mass. A zero-unit solution may be sufficient for modeled consumables over a short mission. End wastewater storage remains ideal unless the optional no-ending-backlog constraint is selected. The 90% recovery yield is still unvalidated. Bounded resource feasibility is not survival certification; see optimizer-walkthrough.md.
