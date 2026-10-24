@@ -27,7 +27,7 @@ const controls = [
 function Trend({result, field, label, color}) {
  return <section className="panel chart"><h3>{label}</h3><p>Simulated inventory · end of each hour</p><div role="img" aria-label={`${label} across ${result.evaluated_hours} simulated hours`} style={{height:200}}><ResponsiveContainer width="100%" height="100%"><LineChart data={result.readings}><CartesianGrid stroke="#233445" strokeDasharray="3 5"/><XAxis dataKey="hour" stroke="#99aabd" tickLine={false} minTickGap={40} label={{value:'Hours',position:'insideBottomRight',offset:-2}}/><YAxis stroke="#99aabd" width={48}/><Tooltip contentStyle={{background:'#12202d',border:'1px solid #375166',borderRadius:8}} formatter={v=>Number(v).toFixed(2)} labelFormatter={h=>`Hour ${h}`}/>{field==='co2_hour_average_mmhg'&&<ReferenceLine y={3} stroke="#f38b91" strokeDasharray="4 4" label={{value:'3 mmHg screening',fill:'#f38b91',position:'insideTopRight'}}/>}<Line dataKey={field} name={label} stroke={color} strokeWidth={2} dot={false} isAnimationActive={false}/></LineChart></ResponsiveContainer></div></section>
 }
-export default function App() {
+export default function App({ onHome }) {
  const runGeneration=useRef(0);
  const [missionEpoch,setMissionEpoch]=useState(0),[loadedName,setLoadedName]=useState(''),[schemas,setSchemas]=useState(null);
  const [comparison,setComparison]=useState(null), [search,setSearch]=useState({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});
@@ -83,7 +83,7 @@ export default function App() {
  }
  if (!form) return <main className="shell"><h1>Beyond Earth</h1><p role="status">{error || 'Loading research references…'}</p></main>;
  return <div className="shell" data-planet={form.environment_id}>
-  <header><a className="brand" href="#main"><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
+  <header><a className="brand" href="/" onClick={onHome ? e=>{e.preventDefault();onHome();} : undefined}><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
   <main id="main"><div className="intro"><div><p className="eyebrow">GEAUXHACK 2026 / MISSION DESIGN LAB</p><h1>Mission control</h1><p className="subtitle">Configure. Simulate. Compare.</p></div><div className="mission-tag">01—03<br/><span>ENVIRONMENTS ONLINE</span></div></div>
   <nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className={`orb ${p.id}`} aria-hidden="true"/><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>
   {env && <MissionControl form={form} setForm={setForm} env={env} result={result} stale={stale}/>}
