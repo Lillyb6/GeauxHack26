@@ -151,3 +151,5 @@ AI assistance: Codex integrated the team-authored thermal helper into the simula
 The optional /tutorial guide explains configuration fields, results, optimization, AI proposals and saved missions. Open it from the home page or Mission Lab's top Help link; skip or finish to enter Mission Lab. Opening help preserves the current mission within the same session. The tutorial contains no illustrations or image assets. See docs/tutorial-code-walkthrough.md for the implementation and handoff.
 
 AI assistance update: Codex helped adapt the approved tutorial prototype into the existing React tutorial placeholder, implement Help navigation with retained mission state, and document the changes. Tutorial copy and scientific scope remain available for team review. No generated image assets were added.
+
+Codex assisted with explicit progress/completion feedback and result-navigation buttons for simulation, optimization and AI goal testing.
