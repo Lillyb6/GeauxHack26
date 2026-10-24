@@ -1,6 +1,6 @@
 from .thermal import check_thermal_capacity
 from .atmosphere import screen_atmosphere, atmosphere_evidence
-from .models import HabitatRequest, SimulationResult, Reading, Event
+from .models import HabitatRequest, SimulationResult, Reading, Event, PowerDemandBreakdown
 from .environments import ENVIRONMENTS
 from .equipment import resolve_oxygen_equipment, resolve_water_equipment
 from .research import PARAMETERS, evidence_for, sources_for
@@ -74,7 +74,17 @@ def simulate(req: HabitatRequest) -> SimulationResult:
     alpha=pressure_per_kg(req.habitat_volume_m3,req.interior_temperature_c) if req.co2_enabled else None
     co2_pressure=req.initial_co2_mmhg if req.co2_enabled else None
     co2_removed=0.0
-    demand = (req.other_load_kw + recycler + thermal + oxygen_power + (co2_summary["electrical_power_kw"] if co2_summary else 0))
+    # Use the same selected loads for reporting and the hourly energy balance.
+    # Catalog/custom replacement was resolved above, so no equipment is counted twice.
+    power_components = {
+        "other_habitat_kw": req.other_load_kw,
+        "water_recycling_kw": recycler,
+        "thermal_control_kw": thermal,
+        "oxygen_generation_kw": oxygen_power,
+        "co2_removal_kw": co2_summary["electrical_power_kw"] if co2_summary else 0,
+    }
+    demand = sum(power_components.values())
+    power_breakdown = PowerDemandBreakdown(**power_components, total_kw=demand)
     oxygen, water, battery = (
         req.oxygen_kg,
         req.water_kg,
@@ -102,17 +112,20 @@ def simulate(req: HabitatRequest) -> SimulationResult:
     for hour in range(1, (0 if events else req.duration_days * 24) + 1):
         # Oxygen capacity represents water electrolysis, not free atmospheric extraction.
         produced = oxygen_rate / 24
+        crew_oxygen_required = req.crew_size * PARAMETERS["oxygen_consumption_kg_person_day"]["value"] / 24
+        crew_water_used = crew_water_day / 24
+        electrolysis_feedwater = produced * PARAMETERS["electrolysis_water_ratio"]["value"]
         # Simplified accounting boundary: potable crew use becomes available feed immediately.
         # Food/metabolic water and true wastewater composition/delays remain outside this model.
-        wastewater += crew_water_day / 24
+        wastewater += crew_water_used
         processed = wastewater if feed_budget_day is None else min(wastewater, feed_budget_day / 24)
         recovered = processed * recovery_fraction
         wastewater -= processed
         recovered_total += recovered
         brine_total += processed - recovered
-        water_used = crew_water_day / 24 - recovered + produced * PARAMETERS["electrolysis_water_ratio"]["value"]
+        water_used = crew_water_used - recovered + electrolysis_feedwater
         next_values = {
-            "oxygen": oxygen + produced - req.crew_size * PARAMETERS["oxygen_consumption_kg_person_day"]["value"] / 24,
+            "oxygen": oxygen + produced - crew_oxygen_required,
             "water": water - water_used,
             "power": battery + req.generation_kw - demand,
         }
@@ -126,6 +139,26 @@ def simulate(req: HabitatRequest) -> SimulationResult:
                          f"{battery:.3f} kWh available in the battery "
                          f"at the start of the hour; "
                          f"{-value:.3f} kWh shortfall."
+                    )
+                elif resource == "oxygen":
+                    message = (
+                        f"Oxygen shortage during hour {hour}: "
+                        f"{crew_oxygen_required:.6f} kg required by the crew; "
+                        f"{produced:.6f} kg modeled production; "
+                        f"{oxygen:.6f} kg stored oxygen available at the start of the hour; "
+                        f"{-value:.6f} kg shortfall. "
+                        "Failed-hour balances do not establish successful equipment operation."
+                    )
+                elif resource == "water":
+                    message = (
+                        f"Water shortage during hour {hour}: "
+                        f"{crew_water_used:.6f} kg crew use; "
+                        f"{recovered:.6f} kg modeled recovery; "
+                        f"{electrolysis_feedwater:.6f} kg electrolysis feedwater required; "
+                        f"{water:.6f} kg usable water available at the start of the hour; "
+                        f"{-value:.6f} kg shortfall. "
+                        "Wastewater waiting for processing is not usable water. "
+                        "Failed-hour balances do not establish successful equipment operation."
                     )
                 else:
                     message = (
@@ -185,7 +218,7 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         "effective_recovery_fraction":recovered_total / (crew_water_day * hour / 24) if hour else 0,
     }
     return SimulationResult(equipment_summary=equipment_summary,request=req, resource_balance_complete=not events,
-        evaluated_hours=hour, demand_kw=round(demand,3), thermal_load_kw=round(thermal,3), thermal_summary=thermal_summary,
+        evaluated_hours=hour, demand_kw=round(demand,3), power_breakdown=power_breakdown, thermal_load_kw=round(thermal,3), thermal_summary=thermal_summary,
         events=events, readings=readings, limitations=limitations,
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
         water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,

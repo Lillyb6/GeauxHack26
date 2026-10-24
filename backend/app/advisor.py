@@ -21,6 +21,7 @@ def compact_run(run):
         return None
     return {"request": run.request.model_dump(), "resource_balance_complete": run.resource_balance_complete,
             "evaluated_hours": run.evaluated_hours, "demand_kw": run.demand_kw,
+            "power_breakdown": run.power_breakdown.model_dump(),
             "end_inventory": run.readings[-1].model_dump(),
             "events": [e.model_dump() for e in run.events], "warnings": run.warnings,
             "evidence": run.evidence, "equipment_summary": run.equipment_summary,

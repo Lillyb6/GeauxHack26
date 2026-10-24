@@ -60,12 +60,24 @@ class Event(BaseModel):
     resource: str
     message: str
 
+class PowerDemandBreakdown(BaseModel):
+    """Constant modeled electrical requirements; not metered energy consumption."""
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    other_habitat_kw: float = Field(ge=0, description="Other habitat electrical demand in kW.")
+    water_recycling_kw: float = Field(ge=0, description="Selected custom or catalog recycler electrical demand in kW.")
+    thermal_control_kw: float = Field(ge=0, description="Electrical power required to maintain the target temperature, in kW electrical; not thermal output.")
+    oxygen_generation_kw: float = Field(ge=0, description="Selected custom or catalog oxygen-system electrical demand in kW.")
+    co2_removal_kw: float = Field(ge=0, description="Installed scrubber electrical demand in kW; zero when CO2 screening is disabled.")
+    total_kw: float = Field(ge=0, description="Unrounded sum of all modeled electrical requirements in kW; not generated power or actual energy consumed.")
+
+
 class SimulationResult(BaseModel):
     assumptions_version: str = "0.6.0"
     request: HabitatRequest
     resource_balance_complete: bool
     evaluated_hours: int
     demand_kw: float
+    power_breakdown: PowerDemandBreakdown = Field(description="Required electrical demand by subsystem, including on hour-zero failures. These are power requirements, not energy delivered or used.")
     thermal_load_kw: float
     thermal_summary: dict
     events: list[Event]

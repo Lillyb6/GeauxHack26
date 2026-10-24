@@ -1,3 +1,23 @@
+# Current validation — combined backend reporting improvements
+
+- Integrated the separate power-demand-breakdown and oxygen-water-diagnostics branches with the latest team main changes. Both documentation additions were preserved when resolving append-only documentation conflicts.
+- Full backend suite: 235 passed. Frontend suite: 28 passed. Production frontend build passed. Existing Starlette/httpx deprecation and chart-bundle-size advisories remain.
+- API checks confirm typed subsystem power requirements and detailed oxygen/water failure messages coexist. No new frontend display for power_breakdown is included; the existing event display can show the shortage messages.
+- Frontend package-lock.json remains a separate local modification and is excluded from these merges. No collaborator or co-author attribution was added.
+
+# Current validation — backend power-demand breakdown
+
+- 18 new focused cases passed; the complete backend suite passed all 224 cases. Existing Starlette/httpx deprecation warning remains.
+- Checked custom/catalog replacement, zero/multiple units, enabled CO2 loads, all three environments, component sums, COP behavior, unchanged default battery balance and hour-zero failure semantics.
+- API returned HTTP 200 with the typed power_breakdown; browser-forged input breakdown is rejected. Optimizer results and compact advisor/agent evidence carry the evaluated breakdown. No live Gemini request was made.
+- This is additive backend reporting of existing electrical requirements, not actual metered use. No frontend, scientific constants, saved-mission inputs or oxygen/water failure messages were changed.
+
+# Current validation — oxygen and water diagnostics
+
+- 11 new focused diagnostic tests passed; all 217 backend tests passed on oxygen-water-diagnostics, independently based on origin/main. The 18 separate power-breakdown tests are not on this branch.
+- Numerical checks cover empty and partially depleted supplies, later failed hours, selected catalog output and throughput-limited recovery, unchanged custom/catalog precedence, zero electrolysis feedwater, simultaneous deficits and exact-zero balances.
+- API and compact evidence preserve the detailed events. No frontend, event schema, scientific constants or stopping rules changed. Existing Starlette/httpx warning remains; no live Gemini call was made.
+
 # Current validation — optional Mission Lab tutorial
 
 - Frontend production build passed; all 28 existing frontend tests passed. No backend logic was changed.

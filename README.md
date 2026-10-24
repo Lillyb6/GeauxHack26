@@ -159,3 +159,13 @@ Codex assisted with revealing custom oxygen/water inputs directly beneath their 
 Codex assisted with inline Reference equipment / Custom design guidance, selector descriptions and explanation of how these modes participate in simulation and comparison.
 
 Codex assisted with plain-language equipment explanations and source disclosures. Specific catalog equipment names remain visible in selectors and summaries, with citations in equipment details.
+
+## Backend power-demand breakdown
+Simulation results include a typed power_breakdown with electrical requirements for other habitat equipment, water recycling, thermal control, oxygen generation and enabled CO2 removal, plus the unrounded total in kW. The same total drives resource accounting; existing demand_kw remains rounded for display. It is a requirement, not measured consumption, including when an initial check stops a run. No frontend changes are included. See docs/power-demand-breakdown.md for code explanations, tests and the display handoff.
+
+AI assistance: Codex helped implement and test this additive backend reporting field and document its existing model assumptions. No new scientific constants, runtime providers, or visual assets were introduced.
+
+## Oxygen and water shortage diagnostics
+Resource events now explain oxygen crew demand, modeled production and starting stock, and water crew use, modeled recovery, electrolysis feedwater and starting usable stock, with the hourly shortfall. These are diagnostic failed-hour balances, not proof of operation with missing inputs. The existing event interface and equations are unchanged. See docs/oxygen-water-diagnostics.md for code explanations and tests.
+
+AI assistance: Codex helped add the backend diagnostic messages, numerical regression tests and explanation documentation. No frontend, new scientific constants, image assets or external API integrations were added.
