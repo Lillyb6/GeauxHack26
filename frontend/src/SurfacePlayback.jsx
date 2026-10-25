@@ -8,6 +8,7 @@ function Gauge({label,value,max,unit,note,failed=false,tone}){
 export default function SurfacePlayback({result,children}){
  const frames=useMemo(()=>playbackFrames(result),[result]);
  const [index,setIndex]=useState(0),[playing,setPlaying]=useState(()=>!matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const [replayKey,setReplayKey]=useState(0);
  useEffect(()=>{setIndex(0);setPlaying(!matchMedia('(prefers-reduced-motion: reduce)').matches)},[result]);
  const done=index>=frames.length-1;
  useEffect(()=>{
@@ -25,9 +26,9 @@ export default function SurfacePlayback({result,children}){
  const first=events.length?Math.min(...events.map(e=>e.hour)):null;
  const failures=[...new Map(events.filter(e=>e.hour===first).map(e=>[e.resource,e])).values()];
  const thermal=result.thermal_summary,air=result.atmosphere_summary;
- const restart=()=>{setIndex(0);setPlaying(true)};
+ const restart=()=>{setIndex(0);setPlaying(true);setReplayKey(key=>key+1)};
  return <>
-  <div className={`surface-playback-scene${finished?success?' playback-success':' playback-failed':''}`}>
+  <div key={replayKey} style={{'--ending-delay':`${1.8+Math.max(0,Math.min(12,req.crew_size)-1)*.4}s`}} className={`surface-playback-scene${finished?success?' playback-success':' playback-failed':''}`}>
    {children}
    {!finished&&<aside className="surface-day-counter"><span>MISSION PLAYBACK</span><h3>{current.day===0?'Before launch':`Day ${current.day}`}<small> / {req.duration_days}</small></h3><div><button type="button" onClick={()=>setPlaying(!playing)}>{playing?'Pause':'Resume'}</button><button type="button" onClick={restart}>Replay</button></div></aside>}
    {finished&&<div className="surface-ending" role="status"><div><h2>{success?'Success':'Failed'}</h2><p className="playback-ending-time">{first===0?'Before launch':success?`${req.duration_days} days completed`:`Day ${Math.ceil(first/24)} · hour ${first}`}</p>{success?<p>Your build completed the planned mission.</p>:failures.map(event=><div className="ending-reason" key={event.resource}><p>{endings[event.resource]?.[0]??event.message}</p><small>{endings[event.resource]?.[1]}</small></div>)}<p className="playback-fiction">{success?'Modeled checks only.':'Fictional ending. Deaths are not simulated.'}</p><button type="button" onClick={restart}>Replay mission</button></div></div>}

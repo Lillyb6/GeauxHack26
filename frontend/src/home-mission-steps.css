@@ -1,0 +1,20 @@
+/* Confined to the steps: the header, hero, button and mission intro keep their existing layout. */
+.home-mission-steps{--steps-ink:#e6edf4;--steps-accent:#77d9b0;--steps-ground:#101b25;margin:15px 0 0}
+.home-mission-steps ol{list-style:none;padding:0;margin:0}
+.home-mission-steps li{display:grid;grid-template-columns:80px minmax(0,1fr) 140px;gap:36px;align-items:center;padding:48px 40px;min-height:240px;background:var(--steps-ground)}
+.home-mission-steps li:nth-child(2){--steps-ground:#14222c}
+.home-mission-steps li:nth-child(3){--steps-ground:#192b33}
+.home-mission-steps .mission-step-number{font:400 72px/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;color:var(--steps-accent)}
+.home-mission-steps h3{font:500 30px/1.15 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:var(--steps-ink);margin:0}
+.home-mission-steps p{font-size:17px;line-height:1.6;color:var(--steps-ink);max-width:56ch;margin:18px 0 0}
+.home-mission-steps .mission-step-world{display:block;position:relative;width:140px;aspect-ratio:1;border-radius:50%;overflow:hidden}
+.home-mission-steps .mission-step-world img{position:absolute;width:135.14%;height:130.43%;max-width:none;left:-19.82%;top:-13.04%}
+/* Reversible reveals use browser intersection events, with no scroll loop or animation library. */
+@media(prefers-reduced-motion:no-preference){
+ .home-mission-steps.has-scroll-reveal li>:is(span,div){opacity:0;transform:translateY(22px);transition:opacity .45s ease,transform .55s cubic-bezier(.2,.7,.2,1)}
+ .home-mission-steps.has-scroll-reveal li.is-in-view>:is(span,div){opacity:1;transform:translateY(0)}
+ .home-mission-steps.has-scroll-reveal li.is-in-view .mission-step-text{transition-delay:.06s}
+ .home-mission-steps.has-scroll-reveal li.is-in-view .mission-step-world{transition-delay:.12s}
+}
+@media(max-width:900px){.home-mission-steps li{grid-template-columns:55px minmax(0,1fr) 100px;gap:24px;padding:36px 28px;min-height:220px}.home-mission-steps .mission-step-number{font-size:60px}.home-mission-steps .mission-step-world{width:100px}.home-mission-steps h3{font-size:26px}}
+@media(max-width:500px){.home-mission-steps li{grid-template-columns:36px minmax(0,1fr) 62px;gap:14px;padding:30px 16px;min-height:240px}.home-mission-steps .mission-step-number{font-size:44px;align-self:start}.home-mission-steps .mission-step-world{width:62px;align-self:start}.home-mission-steps h3{font-size:22px}.home-mission-steps p{font-size:16px;margin-top:16px}.home-mission-steps .mission-step-text{grid-column:2;grid-row:1}.home-mission-steps .mission-step-world{grid-column:3;grid-row:1}}

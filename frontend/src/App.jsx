@@ -41,6 +41,12 @@ function referenceDefaults(defaults,catalog) {
   water_equipment_id:catalog.find(item=>item.category==='water_recovery')?.id??defaults.water_equipment_id,
  };
 }
+function ResourceGraphs({ result, active }) {
+ const [metric,setMetric]=useState('');
+ const choices=[['oxygen_kg','Oxygen · kg','#73d9c5'],['water_kg','Water · kg','#74aaff'],['battery_kwh','Battery · kWh','#eab676'],...(result.request.co2_enabled?[['co2_hour_average_mmhg','Cabin CO₂ · one-hour average mmHg','#f38b91']]:[]),...(result.water_equipment_summary?[['wastewater_kg','Unprocessed wastewater · kg','#d2a6ee']]:[])];
+ const selected=choices.find(([field])=>field===metric);
+ return <section className="panel resource-graphs" aria-label="Simulation graphs"><label className="chart-selector" htmlFor="resource_graph">Graphs<select id="resource_graph" value={selected?metric:''} onChange={e=>setMetric(e.target.value)}><option value="">Choose a graph</option>{choices.map(([field,label])=><option key={field} value={field}>{label}</option>)}</select></label>{selected&&<Trend active={active} result={result} field={selected[0]} label={selected[1]} color={selected[2]}/>}</section>;
+}
 export default function App({ onHome, onHelp, active = true, onConfiguredChange }) {
  const runGeneration=useRef(0);
  const [stationReady,setStationReady]=useState(false),[hasPoweredOn,setHasPoweredOn]=useState(false),[booting,setBooting]=useState(false);
@@ -130,7 +136,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
     <OptimizationWorkflow comparison={comparison} stale={comparisonStale} applied={optimizedApplied} busy={loading} disabled={booting} error={error} onOptimize={()=>run('optimize')} onCompare={()=>showResult(comparisonTarget)} onApply={applyOptimized} onViewSimulation={()=>showResult(simulationTarget)}/>
     <details className="optional-prompt"><summary>Optional: create from a prompt</summary><p>Describe a mission to generate a tested design.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={(scenario,nextSearch,evaluated)=>{runGeneration.current++;setLoading(false);setActionState(null);setLoadedName('');setForm(scenario);setSearch(nextSearch);setResult(evaluated);setComparison(null);}}/></details>
    </>:null}
-   surface={<><nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><img className="planet-art-thumbnail" src={`/mission/${p.id}-icon.png`} alt="" aria-hidden="true"/><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>{env && <MissionControl sceneOnly form={form} setForm={setForm} env={env} result={result} stale={stale}/>}</>}
+   surface={<><nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className="orb planet-art-icon" aria-hidden="true"><img src={`/mission/${p.id}-icon.${p.id==='mars'?'webp':'png'}`} alt="" width="300" height="300"/></span><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>{env && <MissionControl sceneOnly form={form} setForm={setForm} env={env} result={result} stale={stale}/>}</>}
    systems={<>
     <MissionOutcome outcomeRef={simulationTarget} result={result} loading={loading} error={error} stale={stale} optimized={optimizedApplied} optimizing={loading&&actionState?.action==='optimize'} disabled={booting} onOptimize={()=>run('optimize')}/>
     {comparison&&<div ref={comparisonTarget} tabIndex={-1} className="result-target" aria-label="Optimization comparison"><DesignComparison active={labActive} comparison={comparison} stale={comparisonStale} applied={optimizedApplied} onApply={applyOptimized} applyingDisabled={loading} onViewSimulation={()=>showResult(simulationTarget)}/></div>}
@@ -142,6 +148,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
   </details>{result.warnings.map(warning=><p key={warning} className="alert">{warning}</p>)}<details><summary>Simulation evidence</summary><p>This record belongs to the last run, even when current inputs change.</p><EvidenceList evidence={result.evidence} sources={result.sources}/></details><p className="note">Completion means only that the modeled resources covered this scenario. Pressure regulation and radiation remain unevaluated; optional atmosphere screening checks fixed settings only.</p></section><details className="panel"><summary>Inspect hourly data and limitations</summary><ul>{result.limitations.map(l=><li key={l}>{l}</li>)}</ul><div className="table-wrap"><table><caption>Hourly resource inventories (model {result.assumptions_version})</caption><thead><tr><th>Hour</th><th>O₂ kg</th><th>Water kg</th><th>Battery kWh</th><th>Waiting water kg</th><th>Recovered kg</th><th>Brine/loss kg</th></tr></thead><tbody>{result.readings.map(p=><tr key={p.hour}><td>{p.hour}</td><td>{p.oxygen_kg.toFixed(2)}</td><td>{p.water_kg.toFixed(2)}</td><td>{p.battery_kwh.toFixed(2)}</td><td>{p.wastewater_kg.toFixed(2)}</td><td>{p.recovered_water_kg.toFixed(2)}</td><td>{p.brine_water_kg.toFixed(2)}</td></tr>)}</tbody></table></div></details></>}
     </details>
    </>}
+
   /></div>}
   </main></div>;
 }
