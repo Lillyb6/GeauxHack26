@@ -88,7 +88,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
    <div className="operator-room" inert={booting}>
     <div className="room-wall-label">BEYOND EARTH / HABITAT OPERATIONS DIVISION</div>
     <Monitor id="setup" title="01 / Mission brief">{setup}</Monitor>
-    <Monitor id="designer" title="02 / AI assistance">{designer}</Monitor>
+    <Monitor id="designer" title="02 / Resource graphs">{designer}</Monitor>
     <Monitor id="surface" title="03 / Surface observation & view">{surface}</Monitor>
     <Monitor id="systems" title="04 / Systems & results">{systems}</Monitor>
     <div className="operator-desk" aria-hidden="true"><div className="desk-plaque">BEYOND EARTH &nbsp; / &nbsp; FLIGHT DIRECTOR</div></div>
