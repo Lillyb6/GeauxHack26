@@ -142,13 +142,14 @@ def test_late_provider_error_keeps_tool_evidence(monkeypatch):
     assert "private-secret" not in json.dumps(result)
 
 
-def test_no_backlog_constraint_applies_to_simulation_proposal(monkeypatch):
+def test_backlog_failure_remains_reviewable_simulation_proposal(monkeypatch):
     req=request();req.baseline.require_no_wastewater_backlog=True
     sequence(monkeypatch,[call("simulate_habitat",{"scenario_changes":{"duration_days":1,
         "water_equipment_id":"vcds_1979_reference","water_equipment_quantity":0}}),answer()])
     result=agent.run_agent(req)
     assert result["simulation"]["resource_balance_complete"]
-    assert result["proposed_scenario"] is None
+    assert result["audit"][0]["summary"]["outcome"] == "constraint reached"
+    assert result["proposed_scenario"] == result["simulation"]["request"]
 
 
 def test_transport_only_google_and_preserves_tool_declarations(monkeypatch):
@@ -218,3 +219,21 @@ def test_agent_constraint_proposal_matches_request_and_runs_again(monkeypatch, p
     assert rerun.status_code == 200
     assert rerun.json()['resource_balance_complete']
     assert rerun.json()['evaluated_hours'] == 720
+
+
+@pytest.mark.parametrize("planet", ["mars", "venus", "titan"])
+def test_requested_water_failure_can_be_applied_and_reproduced(monkeypatch, planet):
+    req = request()
+    req.goal = "Create and evaluate a mission where water fails first."
+    sequence(monkeypatch, [call("simulate_habitat", {"scenario_changes": {
+        "environment_id": planet, "water_kg": 1, "recycling_fraction": 0,
+        "oxygen_kg": 100, "generation_kw": 100, "duration_days": 1
+    }}), answer("Water is depleted. This is an intentional failure example.")])
+    result = agent.run_agent(req)
+    assert result["audit"][0]["status"] == "evaluated"
+    assert result["proposed_scenario"] == result["simulation"]["request"]
+    assert not result["simulation"]["resource_balance_complete"]
+    assert result["simulation"]["events"][0]["resource"] == "water"
+    rerun = TestClient(app).post("/simulate", json=result["proposed_scenario"])
+    assert rerun.status_code == 200
+    assert rerun.json()["events"] == result["simulation"]["events"]

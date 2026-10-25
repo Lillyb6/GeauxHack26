@@ -1,3 +1,6 @@
+import AccountControls,{AUTH_DRAFT_KEY,useAuth} from './AuthContext';
+import {canSaveEvaluatedMission,saveCloudMission} from './cloudMissions';
+import {downloadMission} from './MissionLibrary';
 import ComparisonGraphs from './ComparisonGraphs';
 import {prepareAgentProposal} from './agentProposal';
 import {co2ChartState} from './simulationDisplay';
@@ -10,7 +13,7 @@ import MissionControl from './MissionControl';
 import MissionOutcome from './MissionOutcome';
 import OperatorStation from './OperatorStation';
 import MissionSetup from './MissionSetup';
-import { createMission, saveMissionRun } from './missionStorage';
+import { createMission, parseMission } from './missionStorage';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { api } from './api';
 import EquipmentSummary from './EquipmentSummary';
@@ -55,6 +58,9 @@ function ResourceGraphs({ result, active }) {
  return <section className="panel resource-graphs" aria-label="Simulation graphs"><label className="chart-selector" htmlFor="resource_graph">Graphs<select id="resource_graph" value={selected?metric:''} onChange={e=>setMetric(e.target.value)}><option value="">Choose a graph</option>{choices.map(([field,label])=><option key={field} value={field}>{label}</option>)}</select></label>{selected&&<Trend active={active} result={result} field={selected[0]} label={selected[1]} color={selected[2]}/>}</section>;
 }
 export default function App({ onHome, onHelp, active = true, onConfiguredChange }) {
+ const auth=useAuth();
+ const cloudSaveGeneration=useRef(0),restoredDraft=useRef(false);
+ const [savingCloud,setSavingCloud]=useState(false);
  const runGeneration=useRef(0);
  const [stationReady,setStationReady]=useState(false),[hasPoweredOn,setHasPoweredOn]=useState(false),[booting,setBooting]=useState(false);
  const preparationHeading=useRef(null);
@@ -97,6 +103,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
  },[comparison]);
  function applyOptimized(){
   if(!comparison?.optimized||comparisonStale||loading)return;
+  cloudSaveGeneration.current++;setSavingCloud(false);
   runGeneration.current++;setLoading(false);setError('');setLoadedName('');setSaveState(null);
   setForm({...comparison.optimized.request});setResult(comparison.optimized);setMissionEpoch(value=>value+1);
   setActionState({action:'simulate',status:'done'});
@@ -105,26 +112,60 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
  function applyAgentProposal(scenario,nextSearch,evaluated){
   // Validate before changing any live controls. Use the exact tested request,
   // rather than calling run() while React still holds the previous form state.
+  cloudSaveGeneration.current++;setSavingCloud(false);
   const proposal=prepareAgentProposal(scenario,nextSearch,evaluated,missionContext(),missionName);
   runGeneration.current++;setLoading(false);setError('');setLoadedName('');setComparison(null);
   setForm(proposal.scenario);setSearch(proposal.search);setResult(proposal.result);
   setEditingMission(false);setStationReady(true);setBooting(!hasPoweredOn);setHasPoweredOn(true);
   onConfiguredChange?.(true);setMissionEpoch(value=>value+1);
   setActionState({action:'simulate',status:'done'});setSaveState(null);
-  try {
-   const saved=saveMissionRun(window.localStorage,proposal.document,missionContext(),savedMissionId);
-   setSavedMissionId(saved.item.id);setMissionName(saved.item.document.name);
-   setSaveState({message:`Saved “${saved.item.document.name}” in this browser.`,error:false});
-  }catch(saveError){setSaveState({message:`Simulation completed, but the mission could not be saved: ${saveError.message}`,error:true});}
+  if(!missionName.trim())setMissionName(proposal.document.name);
   window.scrollTo(0,0);
  }
  function missionContext(){return {defaults:reference.default_request,searchDefaults:{max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false},schemas,equipment,modelVersion:reference.version};}
+ // Account changes invalidate pending save UI and cloud record ownership.
+ useEffect(()=>{cloudSaveGeneration.current++;setSavedMissionId(null);setSaveState(null);setSavingCloud(false);},[auth.user?.id]);
+ useEffect(()=>{
+  if(!form||!reference||!schemas)return;
+  return auth.registerBeforeSignIn(()=>{
+   const document=createMission(missionName.trim()||'Your mission',form,search,missionContext());
+   window.sessionStorage.setItem(AUTH_DRAFT_KEY,JSON.stringify({document,expiresAt:Date.now()+15*60*1000}));
+  });
+ },[form,search,missionName,reference,schemas,equipment,auth.registerBeforeSignIn]);
+ useEffect(()=>{
+  if(!auth.user||!form||!reference||!schemas||restoredDraft.current)return;
+  restoredDraft.current=true;
+  try{
+   const raw=window.sessionStorage.getItem(AUTH_DRAFT_KEY);if(!raw)return;
+   window.sessionStorage.removeItem(AUTH_DRAFT_KEY);
+   const draft=JSON.parse(raw);if(draft.expiresAt<Date.now())return;
+   const document=parseMission(JSON.stringify(draft.document),missionContext());
+   loadMission(document.configuration,document.name);
+   setSaveState({message:'Your settings were restored after sign-in. Run, then Save to keep them in your account.',error:false});
+  }catch{setSaveState({message:'The pre-sign-in draft could not be restored. Import a JSON backup or configure your mission again.',error:true});}
+ },[auth.user,form,reference,schemas,equipment]);
+ const canCloudSave=Boolean(auth.user&&!loading&&canSaveEvaluatedMission(form,result));
+ async function saveToAccount(){
+  if(!canCloudSave||savingCloud)return;
+  const token=++cloudSaveGeneration.current;
+  setSavingCloud(true);setSaveState(null);
+  try{
+   const document=createMission(missionName,form,search,missionContext());
+   const saved=await saveCloudMission(auth.client,auth.user,document,missionContext(),savedMissionId);
+   if(token!==cloudSaveGeneration.current)return;
+   setSavedMissionId(saved.id);setSaveState({message:`Saved “${saved.document.name}” to your private account.`,error:false});
+  }catch(err){if(token===cloudSaveGeneration.current)setSaveState({message:err.message,error:true});}
+  finally{if(token===cloudSaveGeneration.current)setSavingCloud(false);}
+ }
+ function exportCurrent(){try{downloadMission(createMission(missionName||'Your mission',form,search,missionContext()),missionContext());setSaveState({message:'Mission JSON download requested.',error:false});}catch(err){setSaveState({message:err.message,error:true});}}
  function newMission(){
+  cloudSaveGeneration.current++;setSavingCloud(false);
   setEditingMission(false);setEditVersion(0);
   setStationReady(false);setHasPoweredOn(false);setBooting(false);onConfiguredChange?.(false);
   runGeneration.current++;setLoading(false);setForm(referenceDefaults(reference.default_request,equipment));setSearch({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});setMissionName('');setSavedMissionId(null);setSaveState(null);setResult(null);setComparison(null);setLoadedName('');setActionState(null);setError('');setMissionEpoch(value=>value+1);
  }
  function loadMission(configuration,name,id=null) {
+   cloudSaveGeneration.current++;setSavingCloud(false);
    runGeneration.current++;setMissionName(name);setSavedMissionId(id);setSaveState(null);
    setForm(configuration.scenario);setSearch(configuration.search);setResult(null);setComparison(null);
    setError('');setLoading(false);setActionState(null);setLoadedName(name);setMissionEpoch(value=>value+1);
@@ -132,25 +173,24 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
  function submitRun(e){e.preventDefault();void run(e.nativeEvent.submitter?.value || 'simulate');}
  async function run(action = 'simulate') {
    if(loading)return;
+   cloudSaveGeneration.current++;setSavingCloud(false);
    const token=++runGeneration.current;
    setLoading(true);setError('');setSaveState(null);setActionState({action:action==='optimize'?'optimize':'simulate',status:'running'});
    try {
-     const snapshot=createMission(missionName,form,search,missionContext());
+     createMission(missionName,form,search,missionContext());
      const response=await api(action==='optimize'?'/improve':'/simulate',action==='optimize'?optimizationRequest():form);
      if(token!==runGeneration.current)return;
      if(action==='optimize'){setComparison(response);setResult(response.manual);setActionState({action:'optimize',status:'done',eligible:Boolean(response.optimized)});}
      else {setResult(response);setActionState({action:'simulate',status:'done'});}
-     try {
-      const saved=saveMissionRun(window.localStorage,snapshot,missionContext(),savedMissionId);
-      setSavedMissionId(saved.item.id);setMissionName(saved.item.document.name);setSaveState({message:`Saved “${saved.item.document.name}” in this browser.`,error:false});
-     } catch(saveError){setSaveState({message:`Simulation completed, but the mission could not be saved: ${saveError.message}`,error:true});}
+
    } catch(err) {if(token===runGeneration.current){setError(action==='optimize'&&err.message.includes('(404)')?'Restart the backend to load the new optimization improvement endpoint, then try again.':err.message);setActionState({action:action==='optimize'?'optimize':'simulate',status:'error'});}}
    finally {if(token===runGeneration.current)setLoading(false);}
  }
  if (!form) return <main className="shell"><h1>Beyond Earth</h1><p role="status">{error || 'Loading research references…'}</p><a href="/help" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help: how to use Mission Lab</a></main>;
- const setupWizard=<MissionSetup form={form} setForm={setForm} search={search} setSearch={setSearch} equipment={equipment} environments={environments} controls={controls} name={missionName} setName={setMissionName} onNew={newMission} loading={loading} editVersion={editVersion} onLaunch={launchMission} onClose={hasPoweredOn?()=>setEditingMission(false):onHome} closeLabel={hasPoweredOn?'Close editor':'Home'} library={<MissionLibrary scenario={form} search={search} context={missionContext()} onLoad={loadMission}/>}/>;
+ const missionSaveActions=<div className="mission-save-actions">{auth.user?<button type="button" className="wizard-back" onClick={saveToAccount} disabled={!canCloudSave||savingCloud}>{savingCloud?'Saving…':'Save mission'}</button>:<small>Guest mission · export JSON to keep it</small>}<button type="button" className="wizard-back" onClick={exportCurrent}>Export JSON</button></div>;
+ const setupWizard=<MissionSetup form={form} setForm={setForm} search={search} setSearch={setSearch} equipment={equipment} environments={environments} controls={controls} name={missionName} setName={setMissionName} onNew={newMission} loading={loading} editVersion={editVersion} onLaunch={launchMission} onClose={hasPoweredOn?()=>setEditingMission(false):onHome} closeLabel={hasPoweredOn?'Close editor':'Home'} library={<MissionLibrary scenario={form} search={search} context={missionContext()} onLoad={loadMission} name={missionName} result={result} canSave={canCloudSave} onSave={saveToAccount} saving={savingCloud} saveMessage={saveState?.message}/>}/>;
  return <div className="shell operator-shell" data-planet={form.environment_id}>
-  <header><a className="brand" href="/" onClick={onHome ? e=>{e.preventDefault();onHome();} : undefined}><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><nav className="mission-page-nav" aria-label="Mission Lab navigation"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome();}:undefined}>Home</a>{hasPoweredOn&&<a href="/help" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help</a>}</nav><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
+  <header><a className="brand" href="/" onClick={onHome ? e=>{e.preventDefault();onHome();} : undefined}><span className="mark">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><nav className="mission-page-nav" aria-label="Mission Lab navigation"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome();}:undefined}>Home</a>{hasPoweredOn&&<a href="/help" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help</a>}</nav><AccountControls/><span className="badge">EXPLORATORY MODEL / {reference.version}</span></header>
   <main id="main" aria-label="Mission control">
   <section className="mission-preparation" hidden={stationReady} aria-labelledby="preparation-title">
    <div className="preparation-intro"><p className="eyebrow">MISSION PREPARATION</p><h1 id="preparation-title" ref={preparationHeading} tabIndex={-1}>Build your mission</h1><p>Configure your habitat, then Run mission to power on the monitors and evaluate your build.</p></div>
@@ -159,11 +199,11 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
   </section>
   {hasPoweredOn&&<div hidden={!stationReady}>
   <OperatorStation active={labActive} booting={booting} editingSetup={editingMission}
-   setup={editingMission?setupWizard:<section className="mission-brief"><header className="brief-header"><div><p className="eyebrow">MISSION CONFIGURED</p><h2>{missionName || 'Your mission'}</h2></div><button type="button" className="wizard-back" onClick={editMission}>Edit configuration</button></header><MissionBuildSummary form={form} name={missionName} destination={env?.name} equipment={equipment}/><form className="brief-actions" onSubmit={submitRun}><button className="run" type="submit" name="action" value="simulate" disabled={loading||booting}>{loading?'Evaluating…':result&&!stale?'Run again →':'Run simulation →'}</button><div className="brief-secondary-actions"><button className="wizard-back" type="button" onClick={()=>void run('optimize')} disabled={loading||booting}>Optimize & compare</button><button className="wizard-back" type="button" onClick={applyOptimized} disabled={loading||booting||!canApplyOptimization}>{optimizedApplied?'✓ Results applied':'Apply results →'}</button><button type="button" className="result-jump" disabled={!result && actionState?.status!=='done'} onClick={()=>showResult(actionState?.action==='optimize'?comparisonTarget:simulationTarget)}>{canApplyOptimization?'Review optimized design →':'View results →'}</button></div></form><div className="brief-status" role="status">{canApplyOptimization&&<p>Passing design ready. Review it, then Apply optimized design.</p>}{optimizedApplied&&<p>Optimized design active. Settings and surface playback updated.</p>}{actionState?.action==='optimize'&&actionState.status==='done'&&!comparison?.optimized&&<p>No passing design found. Review the comparison for fixed limits.</p>}{actionState?.status==='running'&&<p>Evaluating your mission…</p>}{actionState?.status==='error'&&<p className="alert">The run failed. Check Systems & results for details.</p>}{saveState?.message&&<p className={saveState.error?'alert':'note'}>{saveState.message}</p>}</div></section>}
+   setup={editingMission?setupWizard:<section className="mission-brief"><header className="brief-header"><div><p className="eyebrow">MISSION CONFIGURED</p><h2>{missionName || 'Your mission'}</h2></div><button type="button" className="wizard-back" onClick={editMission}>Edit configuration</button></header><MissionBuildSummary form={form} name={missionName} destination={env?.name} equipment={equipment}/><form className="brief-actions" onSubmit={submitRun}><button className="run" type="submit" name="action" value="simulate" disabled={loading||booting}>{loading?'Evaluating…':result&&!stale?'Run again →':'Run simulation →'}</button><div className="brief-secondary-actions"><button className="wizard-back" type="button" onClick={()=>void run('optimize')} disabled={loading||booting}>Optimize & compare</button><button className="wizard-back" type="button" onClick={applyOptimized} disabled={loading||booting||!canApplyOptimization}>{optimizedApplied?'✓ Results applied':'Apply results →'}</button><button type="button" className="result-jump" disabled={!result && actionState?.status!=='done'} onClick={()=>showResult(actionState?.action==='optimize'?comparisonTarget:simulationTarget)}>{canApplyOptimization?'Review optimized design →':'View results →'}</button></div></form>{missionSaveActions}<div className="brief-status" role="status">{canApplyOptimization&&<p>Passing design ready. Review it, then Apply optimized design.</p>}{optimizedApplied&&<p>Optimized design active. Settings and surface playback updated.</p>}{actionState?.action==='optimize'&&actionState.status==='done'&&!comparison?.optimized&&<p>No passing design found. Review the comparison for fixed limits.</p>}{actionState?.status==='running'&&<p>Evaluating your mission…</p>}{actionState?.status==='error'&&<p className="alert">The run failed. Check Systems & results for details.</p>}{saveState?.message&&<p className={saveState.error?'alert':'note'}>{saveState.message}</p>}</div></section>}
    designer={<section aria-label="Mission graphs"><p className="eyebrow">RESOURCE GRAPHS</p>{stale&&<p className="alert">Previous run · inputs changed.</p>}{result?<ResourceGraphs result={result} active={labActive}/>:<p>Run a mission to see graphs.</p>}{comparison?.optimized&&<><p className="model-scope">Comparison: {comparison.manual.request.environment_id}{comparisonStale?' · previous settings':''}</p><ComparisonGraphs comparison={comparison} active={labActive}/></>}</section>}
 
    surface={<><nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className="orb planet-art-icon" aria-hidden="true"><img src={`/mission/${p.id}-icon.${p.id==='mars'?'webp':'png'}`} alt="" width="300" height="300"/></span><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>{env && <MissionControl sceneOnly form={form} setForm={setForm} env={env} result={result} stale={stale}/>}</>}
-   systems={<>
+   systems={<>{missionSaveActions}{saveState?.message&&<p role="status" className={saveState.error?'alert':'note'}>{saveState.message}</p>}
     <MissionOutcome outcomeRef={simulationTarget} result={result} loading={loading} error={error} stale={stale} optimized={optimizedApplied} optimizing={loading&&actionState?.action==='optimize'} disabled={booting} onOptimize={()=>run('optimize')}/>
     {comparison&&<div ref={comparisonTarget} tabIndex={-1} className="result-target" aria-label="Optimization comparison"><DesignComparison active={labActive} comparison={comparison} stale={comparisonStale} applied={optimizedApplied} onApply={applyOptimized} applyingDisabled={loading} onViewSimulation={()=>showResult(simulationTarget)}/></div>}
     <details className="panel relocated-ai"><summary>AI tools & prompt assistant</summary><OptimizationWorkflow comparison={comparison} stale={comparisonStale} applied={optimizedApplied} busy={loading} disabled={booting} error={error} onOptimize={()=>run('optimize')} onCompare={()=>showResult(comparisonTarget)} onApply={applyOptimized} onViewSimulation={()=>showResult(simulationTarget)}/>

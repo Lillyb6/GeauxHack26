@@ -1,3 +1,4 @@
+import AccountControls from './AuthContext';
 import { useEffect, useRef, useState } from 'react';
 import App from './App';
 import TutorialPage from './TutorialPage';
@@ -32,7 +33,7 @@ export default function Experience() {
  const helpReturn=['/simulation','/tutorial','/'].includes(window.history.state?.helpReturn)?window.history.state.helpReturn:'/tutorial';
  const tutorialReturn=window.history.state?.tutorialReturn==='/simulation'?'/simulation':'/';
  return <>{hasVisitedSimulation&&<div hidden={route!=='/simulation'}><App onConfiguredChange={setConfigured} active={route==='/simulation'} onHome={()=>navigate('/')} onHelp={()=>navigate('/help')}/></div>}{route!=='/simulation'&&<div className={`welcome-shell${route==='/'?' original-home':''}`}>
-  <header className="welcome-header"><a className="brand" href="/" onClick={e=>{e.preventDefault();navigate('/');}}><span className="mark" aria-hidden="true">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><span className="welcome-coordinate">GEAUXHACK 2026 / MISSION DESIGN LAB</span></header>
+  <header className="welcome-header"><a className="brand" href="/" onClick={e=>{e.preventDefault();navigate('/');}}><span className="mark" aria-hidden="true">✦</span> BEYOND EARTH <small>HABITAT INTELLIGENCE</small></a><AccountControls/></header>
   {route==='/help'?<DetailedMissionGuide headingRef={heading} onComplete={()=>navigate('/simulation')} onSkip={()=>navigate('/simulation')} onBack={()=>navigate(helpReturn)} backLabel={helpReturn==='/simulation'?'Back to Mission Lab':helpReturn==='/tutorial'?'Back to quick tutorial':'Back to home'}/>:route==='/tutorial'?<TutorialPage onDetails={()=>navigate('/help')} headingRef={heading} onComplete={()=>navigate('/simulation')} onSkip={()=>navigate('/simulation')} onBack={()=>navigate(tutorialReturn)} backLabel={tutorialReturn==='/simulation'?'Back to Mission Lab':'Back to home'}/>:<main className="welcome-main">
    <section className="welcome-hero">
     <div className="welcome-copy"><p className="eyebrow">HUMAN EXPLORATION STARTS WITH A PLAN</p><h1 ref={heading} tabIndex={-1}>A foothold<br/>beyond Earth<span>.</span></h1><p className="welcome-lead">What does a crew need to live on another world?</p><p>Choose Mars, Venus, or Titan. Build your mission and see how long your supplies last.</p><a className="welcome-start" href={configured?'/simulation':'/tutorial'} onClick={e=>{e.preventDefault();navigate(configured?'/simulation':'/tutorial');}}>Start simulation <span aria-hidden="true">↗</span></a><p className="welcome-hint">First, a quick introduction. Then, mission control.</p></div>

@@ -59,7 +59,7 @@ export default function MissionAgent({baseline,onApply}) {
      <h3>Review proposed changes</h3>
      {changes.length?<div className="table-wrap"><table><caption>All changes from your original settings</caption><thead><tr><th>Input</th><th>Current at request</th><th>Proposed</th></tr></thead><tbody>{changes.map(([key,before,after])=><tr key={key}><th scope="row">{key}</th><td>{format(before)}</td><td>{format(after)}</td></tr>)}</tbody></table></div>:<p>The evaluated proposal matches your current settings.</p>}
     </>}
-    {!response.proposed_scenario&&response.audit.length>0&&<p>No passing design to apply.</p>}
+    {!response.proposed_scenario&&response.audit.length>0&&<p>No evaluated configuration to apply.</p>}
     {applied&&<p role="status">Applied. Controls and charts updated.</p>}
     {run&&<details><summary>Evidence from the calculated design</summary><EvidenceList evidence={run.evidence} sources={run.sources}/></details>}
     <details><summary>AI limitations</summary><ul>{response.limitations.map(note=><li key={note}>{note}</li>)}</ul></details>
