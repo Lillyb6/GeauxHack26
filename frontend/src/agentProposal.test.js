@@ -24,9 +24,18 @@ test('rejects a mismatched tested request before applying',()=>{
  const {scenario,search,run}=proposal('venus');run.request.cooling_capacity_kw=0;
  assert.throws(()=>prepareAgentProposal(scenario,search,run,context),/do not match/);
 });
-test('rejects failed, missing or malformed proposals',()=>{
+test('rejects missing or malformed proposals',()=>{
  const {scenario,search,run}=proposal('titan');
- for(const result of [null,{...run,resource_balance_complete:false},{...run,events:[{resource:'power'}]}])assert.throws(()=>prepareAgentProposal(scenario,search,result,context),/passing/);
+ for(const result of [null,{...run,resource_balance_complete:false}, {...run,resource_balance_complete:undefined}])assert.throws(()=>prepareAgentProposal(scenario,search,result,context),/evaluated/);
  assert.throws(()=>prepareAgentProposal({...scenario,co2_enabled:'true'},search,run,context));
  assert.throws(()=>prepareAgentProposal(scenario,{},run,context));
+});
+
+test('allows a tested failure without changing its outcome',()=>{
+ const {scenario,search,run}=proposal('mars');
+ run.resource_balance_complete=false;run.events=[{hour:2,resource:'water',message:'Water depleted'}];
+ const applied=prepareAgentProposal(scenario,search,run,context);
+ assert.equal(applied.result.resource_balance_complete,false);
+ assert.deepEqual(applied.result.events,run.events);
+ assert.deepEqual(applied.scenario,run.request);
 });

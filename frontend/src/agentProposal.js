@@ -3,7 +3,7 @@ import {createMission} from './missionStorage.js';
 // Agent search proposals also contain catalog IDs. Those belong to the scenario,
 // not the four search controls accepted by mission storage and the next Run.
 export function prepareAgentProposal(scenario, proposedSearch, evaluated, context, name) {
- if(!evaluated?.resource_balance_complete || evaluated.events?.length)throw new Error('The AI proposal has no passing evaluated simulation. Test the goal again.');
+ if(typeof evaluated?.resource_balance_complete !== 'boolean' || !Array.isArray(evaluated.events) || (!evaluated.resource_balance_complete && !evaluated.events.length))throw new Error('The AI proposal has no evaluated simulation outcome. Test the goal again.');
  const search=Object.fromEntries(Object.keys(context.searchDefaults).map(key=>[key,proposedSearch?.[key]]));
  const document=createMission(name?.trim() || 'AI mission',scenario,search,context);
  const normalized=document.configuration.scenario;

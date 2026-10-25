@@ -174,7 +174,7 @@ def run_agent(request: AgentRequest):
                             "evaluated_hours":result.evaluated_hours,"demand_kw":result.demand_kw,
                             "events":[e.model_dump() for e in result.events],"warnings":result.warnings}
                         response.update(simulation=result.model_dump(),comparison=None,
-                            proposed_scenario=result.request.model_dump() if result.resource_balance_complete and backlog_ok else None)
+                            proposed_scenario=result.request.model_dump())
                     else:
                         result=improve(inputs) if name=="improve_habitat" else optimize(inputs)
                         payload=evidence_packet(result)
