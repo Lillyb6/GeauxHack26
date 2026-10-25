@@ -1,3 +1,5 @@
+import ResultNotices from './ResultNotices';
+import {comparisonState} from './comparisonState';
 import { useEffect, useRef, useState } from 'react';
 import MissionControl from './MissionControl';
 import MissionOutcome from './MissionOutcome';
@@ -31,6 +33,12 @@ function Trend({result, field, label, color, active = true}) {
  if (!active) return null;
  return <section className="panel chart"><h3>{label}</h3><p>Simulated inventory · end of each hour</p><div role="img" aria-label={`${label} across ${result.evaluated_hours} simulated hours`} style={{height:200}}><ResponsiveContainer width="100%" height="100%"><LineChart data={result.readings}><CartesianGrid stroke="#233445" strokeDasharray="3 5"/><XAxis dataKey="hour" stroke="#99aabd" tickLine={false} minTickGap={40} label={{value:'Hours',position:'insideBottomRight',offset:-2}}/><YAxis stroke="#99aabd" width={48}/><Tooltip contentStyle={{background:'#12202d',border:'1px solid #375166',borderRadius:8}} formatter={v=>Number(v).toFixed(2)} labelFormatter={h=>`Hour ${h}`}/>{field==='co2_hour_average_mmhg'&&<ReferenceLine y={3} stroke="#f38b91" strokeDasharray="4 4" label={{value:'3 mmHg screening',fill:'#f38b91',position:'insideTopRight'}}/>}<Line dataKey={field} name={label} stroke={color} strokeWidth={2} dot={false} isAnimationActive={false}/></LineChart></ResponsiveContainer></div></section>
 }
+function referenceDefaults(defaults,catalog) {
+ return {...defaults,
+  oxygen_equipment_id:catalog.find(item=>item.category==='oxygen_generation')?.id??defaults.oxygen_equipment_id,
+  water_equipment_id:catalog.find(item=>item.category==='water_recovery')?.id??defaults.water_equipment_id,
+ };
+}
 export default function App({ onHome, onHelp, active = true, onConfiguredChange }) {
  const runGeneration=useRef(0);
  const [stationReady,setStationReady]=useState(false),[hasPoweredOn,setHasPoweredOn]=useState(false),[booting,setBooting]=useState(false);
@@ -48,7 +56,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
  const [missionEpoch,setMissionEpoch]=useState(0),[loadedName,setLoadedName]=useState(''),[schemas,setSchemas]=useState(null);
  const [comparison,setComparison]=useState(null), [search,setSearch]=useState({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});
  const [equipment,setEquipment]=useState([]), [environments,setEnvironments]=useState([]), [form,setForm]=useState(null), [result,setResult]=useState(null), [reference,setReference]=useState(null), [error,setError]=useState(''), [loading,setLoading]=useState(false);
- useEffect(()=>{Promise.all([api('/environments'),api('/model-reference'),api('/equipment'),api('/openapi.json')]).then(([envs,ref,catalog,contract])=>{if(typeof ref?.default_request?.thermal_capacity_enabled!=='boolean'||typeof ref?.default_request?.atmosphere_enabled!=='boolean'||typeof ref?.default_request?.co2_enabled!=='boolean'||!catalog.some(item=>item.category==='co2_removal')) {const mismatch=new Error(`Your backend is running model ${ref?.version || 'unknown'} without the required thermal and cabin screening fields. Restart the backend in the VS Code terminal containing your Gemini key, then refresh this page.`);mismatch.name='BackendCompatibilityError';throw mismatch;}setSchemas(contract.components.schemas);setEquipment(catalog);setEnvironments(envs);setReference(ref);setForm(ref.default_request);}).catch(err=>setError(err.name==='BackendCompatibilityError'?err.message:'Cannot reach the updated API. Start or restart the FastAPI backend on port 8000, then refresh.'));},[]);
+ useEffect(()=>{Promise.all([api('/environments'),api('/model-reference'),api('/equipment'),api('/openapi.json')]).then(([envs,ref,catalog,contract])=>{if(typeof ref?.default_request?.thermal_capacity_enabled!=='boolean'||typeof ref?.default_request?.atmosphere_enabled!=='boolean'||typeof ref?.default_request?.co2_enabled!=='boolean'||!catalog.some(item=>item.category==='co2_removal')) {const mismatch=new Error(`Your backend is running model ${ref?.version || 'unknown'} without the required thermal and cabin screening fields. Restart the backend in the VS Code terminal containing your Gemini key, then refresh this page.`);mismatch.name='BackendCompatibilityError';throw mismatch;}setSchemas(contract.components.schemas);setEquipment(catalog);setEnvironments(envs);setReference(ref);setForm(referenceDefaults(ref.default_request,catalog));}).catch(err=>setError(err.name==='BackendCompatibilityError'?err.message:'Cannot reach the updated API. Start or restart the FastAPI backend on port 8000, then refresh.'));},[]);
  const env = environments.find(e=>e.id===form?.environment_id);
  const stale = result && JSON.stringify(result.request)!==JSON.stringify(form);
  const catalogMode = Boolean(form?.oxygen_equipment_id);
@@ -59,17 +67,25 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
       classification:form?.[key] !== undefined && form[key] !== p.value ? 'user_override' : p.classification}])) : {};
 
  function optimizationRequest() {
+   if(!form)return {scenario:null,...search};
    return {scenario:form,
      oxygen_equipment_id:form.oxygen_equipment_id || equipment.find(item=>item.category==='oxygen_generation')?.id,
      water_equipment_id:form.water_equipment_id || equipment.find(item=>item.category==='water_recovery')?.id,
      ...search};
  }
- const comparisonStale = comparison && JSON.stringify(comparison.search_request)!==JSON.stringify(optimizationRequest());
+ const {stale:comparisonStale,applied:optimizedApplied}=comparisonState(comparison,optimizationRequest(),result);
+ function applyOptimized(){
+  if(!comparison?.optimized||comparisonStale||loading)return;
+  runGeneration.current++;setLoading(false);setError('');setLoadedName('');setSaveState(null);
+  setForm({...comparison.optimized.request});setResult(comparison.optimized);setMissionEpoch(value=>value+1);
+  setActionState({action:'simulate',status:'done'});
+ }
+
  function missionContext(){return {defaults:reference.default_request,searchDefaults:{max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false},schemas,equipment,modelVersion:reference.version};}
  function newMission(){
   setEditingMission(false);setEditVersion(0);
   setStationReady(false);setHasPoweredOn(false);setBooting(false);onConfiguredChange?.(false);
-  runGeneration.current++;setLoading(false);setForm({...reference.default_request});setSearch({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});setMissionName('');setSavedMissionId(null);setSaveState(null);setResult(null);setComparison(null);setLoadedName('');setActionState(null);setError('');setMissionEpoch(value=>value+1);
+  runGeneration.current++;setLoading(false);setForm(referenceDefaults(reference.default_request,equipment));setSearch({max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false});setMissionName('');setSavedMissionId(null);setSaveState(null);setResult(null);setComparison(null);setLoadedName('');setActionState(null);setError('');setMissionEpoch(value=>value+1);
  }
  function loadMission(configuration,name,id=null) {
    runGeneration.current++;setMissionName(name);setSavedMissionId(id);setSaveState(null);
@@ -83,7 +99,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
    setLoading(true);setError('');setSaveState(null);setActionState({action:action==='optimize'?'optimize':'simulate',status:'running'});
    try {
      const snapshot=createMission(missionName,form,search,missionContext());
-     const response=await api(action==='optimize'?'/optimize':'/simulate',action==='optimize'?optimizationRequest():form);
+     const response=await api(action==='optimize'?'/improve':'/simulate',action==='optimize'?optimizationRequest():form);
      if(token!==runGeneration.current)return;
      if(action==='optimize'){setComparison(response);setResult(response.manual);setActionState({action:'optimize',status:'done',eligible:Boolean(response.optimized)});}
      else {setResult(response);setActionState({action:'simulate',status:'done'});}
@@ -91,7 +107,7 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
       const saved=saveMissionRun(window.localStorage,snapshot,missionContext(),savedMissionId);
       setSavedMissionId(saved.item.id);setMissionName(saved.item.document.name);setSaveState({message:`Saved “${saved.item.document.name}” in this browser.`,error:false});
      } catch(saveError){setSaveState({message:`Simulation completed, but the mission could not be saved: ${saveError.message}`,error:true});}
-   } catch(err) {if(token===runGeneration.current){setError(err.message);setActionState({action:action==='optimize'?'optimize':'simulate',status:'error'});}}
+   } catch(err) {if(token===runGeneration.current){setError(action==='optimize'&&err.message.includes('(404)')?'Restart the backend to load the new optimization improvement endpoint, then try again.':err.message);setActionState({action:action==='optimize'?'optimize':'simulate',status:'error'});}}
    finally {if(token===runGeneration.current)setLoading(false);}
  }
  if (!form) return <main className="shell"><h1>Beyond Earth</h1><p role="status">{error || 'Loading research references…'}</p><a href="/help" onClick={onHelp?e=>{e.preventDefault();onHelp();}:undefined}>Help: how to use Mission Lab</a></main>;

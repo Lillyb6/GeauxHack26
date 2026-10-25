@@ -121,6 +121,12 @@ class CandidateSummary(BaseModel):
 
 
 class OptimizationResult(BaseModel):
+    recovery_attempted: bool = False
+    suggested_generation_kw: float | None = None
+    suggested_water_kg: float | None = None
+    recovery_search_water_kg: float | None = None
+    fixed_constraint_counts: dict[str, int] = Field(default_factory=dict)
+    recovery_search_generation_kw: float | None = None
     status: Literal["feasible", "no_feasible_candidate", "insufficient_catalog_data"]
     search_request: OptimizationRequest
     manual: SimulationResult
