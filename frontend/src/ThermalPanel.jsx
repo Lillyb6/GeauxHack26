@@ -1,10 +1,11 @@
+import {rangePlaceholder} from './inputRange';
 export function ThermalControls({form,setForm}) {
  return <details className="control-group"><summary>Heating & cooling capacity</summary>
   <label className="checkbox-label"><input type="checkbox" checked={form.thermal_capacity_enabled ?? false} onChange={e=>setForm({...form,thermal_capacity_enabled:e.target.checked})}/><span>Check if the system is powerful enough<small className="field-technical">Thermal-capacity screening</small></span></label>
   <p className="note">Enable to check equipment capacity. Electricity demand is always estimated.</p>
   {form.thermal_capacity_enabled && <>
-   {[['heating_capacity_kw','Heating available','Total installed heating capacity · kW thermal'],['cooling_capacity_kw','Cooling available','Total installed cooling capacity · kW thermal']].map(([key,label,technical])=><label key={key} htmlFor={key}>{label}<small className="field-technical">{technical}</small><input id={key} type="number" required min="0" max="1000" step="0.1" value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value===''?'':Number(e.target.value)})}/></label>)}
-   <p className="note">Enter total output, not electricity consumption. Capacities are your design assumptions, not verified planetary equipment ratings. The equipment search keeps them fixed and excludes thermal hardware mass.</p>
+   {[['heating_capacity_kw','Heating available','Total installed heating capacity · kW thermal'],['cooling_capacity_kw','Cooling available','Total installed cooling capacity · kW thermal']].map(([key,label,technical])=><label key={key} htmlFor={key}>{label}<small className="field-technical">{technical}</small><input id={key} type="number" required min="0" max="1000" step="any" value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value===''?'':Number(e.target.value)})} placeholder={rangePlaceholder(0,1000,'kW thermal')} title={rangePlaceholder(0,1000,'kW thermal')}/></label>)}
+   <p className="note">Enter total output, not electricity consumption. Capacities are your design assumptions, not verified planetary equipment ratings. Optimize can propose more capacity when needed. Thermal hardware mass is excluded.</p>
   </>}
  </details>;
 }

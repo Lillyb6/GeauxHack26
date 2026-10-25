@@ -553,3 +553,8 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 
 /* The room uses the static star texture only. */
 .operator-room::before{display:none;animation:none}
+
+/* Keep the next action visible beside optimization, before explanations. */
+.optimization-primary-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.optimization-primary-actions>button{flex:1 1 170px}
+.mission-agent .action-feedback>.run,.mission-agent .action-feedback>p+.run{margin:8px 12px 8px 0}

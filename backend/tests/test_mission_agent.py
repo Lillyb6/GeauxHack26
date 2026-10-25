@@ -198,3 +198,23 @@ def test_agent_repair_tool_cannot_bypass_disabled_adjustments(monkeypatch):
     result=agent.run_agent(request())
     assert result["proposed_scenario"] is None
     assert result["audit"][0]["status"]=="rejected"
+
+
+@pytest.mark.parametrize("planet", ["mars", "venus", "titan"])
+def test_agent_constraint_proposal_matches_request_and_runs_again(monkeypatch, planet):
+    patch = dict(environment_id=planet, generation_kw=30,
+        thermal_capacity_enabled=True, heating_capacity_kw=10, cooling_capacity_kw=20,
+        atmosphere_enabled=True, cabin_pressure_kpa=101.325, cabin_oxygen_percent=20.9,
+        co2_enabled=True, co2_equipment_quantity=2, habitat_volume_m3=150, initial_co2_mmhg=0.5)
+    sequence(monkeypatch, [call("simulate_habitat", {"scenario_changes":patch}), answer()])
+    response = TestClient(app).post('/agent', json=request().model_dump())
+    assert response.status_code == 200
+    data = response.json()
+    assert data['proposed_scenario'] is not None
+    assert data['simulation']['request'] == data['proposed_scenario']
+    for key, value in patch.items():
+        assert data['proposed_scenario'][key] == value
+    rerun = TestClient(app).post('/simulate', json=data['proposed_scenario'])
+    assert rerun.status_code == 200
+    assert rerun.json()['resource_balance_complete']
+    assert rerun.json()['evaluated_hours'] == 720

@@ -1,3 +1,4 @@
+import {prepareAgentProposal} from './agentProposal';
 import {availableResultMetric,co2ChartState} from './simulationDisplay';
 import MissionBuildSummary from './MissionBuildSummary';
 import OptimizationWorkflow from './OptimizationWorkflow';
@@ -102,6 +103,22 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
   setActionState({action:'simulate',status:'done'});
  }
 
+ function applyAgentProposal(scenario,nextSearch,evaluated){
+  // Validate before changing any live controls. Use the exact tested request,
+  // rather than calling run() while React still holds the previous form state.
+  const proposal=prepareAgentProposal(scenario,nextSearch,evaluated,missionContext(),missionName);
+  runGeneration.current++;setLoading(false);setError('');setLoadedName('');setComparison(null);
+  setForm(proposal.scenario);setSearch(proposal.search);setResult(proposal.result);
+  setEditingMission(false);setStationReady(true);setBooting(!hasPoweredOn);setHasPoweredOn(true);
+  onConfiguredChange?.(true);setMissionEpoch(value=>value+1);
+  setActionState({action:'simulate',status:'done'});setSaveState(null);
+  try {
+   const saved=saveMissionRun(window.localStorage,proposal.document,missionContext(),savedMissionId);
+   setSavedMissionId(saved.item.id);setMissionName(saved.item.document.name);
+   setSaveState({message:`Saved “${saved.item.document.name}” in this browser.`,error:false});
+  }catch(saveError){setSaveState({message:`Simulation completed, but the mission could not be saved: ${saveError.message}`,error:true});}
+  window.scrollTo(0,0);
+ }
  function missionContext(){return {defaults:reference.default_request,searchDefaults:{max_oxygen_units:8,max_water_units:8,max_co2_units:4,require_no_wastewater_backlog:false},schemas,equipment,modelVersion:reference.version};}
  function newMission(){
   setEditingMission(false);setEditVersion(0);
@@ -139,14 +156,14 @@ export default function App({ onHome, onHelp, active = true, onConfiguredChange 
   <section className="mission-preparation" hidden={stationReady} aria-labelledby="preparation-title">
    <div className="preparation-intro"><p className="eyebrow">MISSION PREPARATION</p><h1 id="preparation-title" ref={preparationHeading} tabIndex={-1}>Build your mission</h1><p>Configure your habitat, then Run mission to power on the monitors and evaluate your build.</p></div>
    <div className="preparation-card">{!hasPoweredOn&&setupWizard}</div>
-   {!stationReady&&<details className="preparation-ai"><summary>Optional: ask the AI mission designer for help</summary><p>Review a suggestion, then Apply it to these settings. Run mission opens mission control and evaluates the build.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={(scenario,nextSearch,evaluated)=>{runGeneration.current++;setLoading(false);setActionState(null);setLoadedName('');setForm(scenario);setSearch(nextSearch);setResult(evaluated);setComparison(null);}}/></details>}
+   {!stationReady&&<details className="preparation-ai"><summary>Optional: ask the AI mission designer for help</summary><p>Review a tested suggestion, then Apply & run to open mission control.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={applyAgentProposal}/></details>}
   </section>
   {hasPoweredOn&&<div hidden={!stationReady}>
   <OperatorStation active={labActive} booting={booting} editingSetup={editingMission}
-   setup={editingMission?setupWizard:<section className="mission-brief"><header className="brief-header"><div><p className="eyebrow">MISSION CONFIGURED</p><h2>{missionName || 'Your mission'}</h2></div><button type="button" className="wizard-back" onClick={editMission}>Edit configuration</button></header><MissionBuildSummary form={form} name={missionName} destination={env?.name} equipment={equipment}/><form className="brief-actions" onSubmit={submitRun}><button className="run" type="submit" name="action" value="simulate" disabled={loading||booting}>{loading?'Evaluating…':result&&!stale?'Run again →':'Run simulation →'}</button><div className="brief-secondary-actions"><button className="wizard-back" type="button" onClick={e=>{e.preventDefault();if(canApplyOptimization)applyOptimized();else void run('optimize');}} disabled={loading||booting}>{canApplyOptimization?'Apply optimized design →':'Optimize & compare'}</button><button type="button" className="result-jump" disabled={!result && actionState?.status!=='done'} onClick={()=>showResult(actionState?.action==='optimize'?comparisonTarget:simulationTarget)}>{canApplyOptimization?'Review optimized design →':'View results →'}</button></div></form><div className="brief-status" role="status">{canApplyOptimization&&<p>Passing design ready. Review it, then Apply optimized design.</p>}{optimizedApplied&&<p>Optimized design active. Settings and surface playback updated.</p>}{actionState?.action==='optimize'&&actionState.status==='done'&&!comparison?.optimized&&<p>No passing design found. Review the comparison for fixed limits.</p>}{actionState?.status==='running'&&<p>Evaluating your mission…</p>}{actionState?.status==='error'&&<p className="alert">The run failed. Check Systems & results for details.</p>}{saveState?.message&&<p className={saveState.error?'alert':'note'}>{saveState.message}</p>}</div></section>}
+   setup={editingMission?setupWizard:<section className="mission-brief"><header className="brief-header"><div><p className="eyebrow">MISSION CONFIGURED</p><h2>{missionName || 'Your mission'}</h2></div><button type="button" className="wizard-back" onClick={editMission}>Edit configuration</button></header><MissionBuildSummary form={form} name={missionName} destination={env?.name} equipment={equipment}/><form className="brief-actions" onSubmit={submitRun}><button className="run" type="submit" name="action" value="simulate" disabled={loading||booting}>{loading?'Evaluating…':result&&!stale?'Run again →':'Run simulation →'}</button><div className="brief-secondary-actions"><button className="wizard-back" type="button" onClick={()=>void run('optimize')} disabled={loading||booting}>Optimize & compare</button><button className="wizard-back" type="button" onClick={applyOptimized} disabled={loading||booting||!canApplyOptimization}>{optimizedApplied?'✓ Results applied':'Apply results →'}</button><button type="button" className="result-jump" disabled={!result && actionState?.status!=='done'} onClick={()=>showResult(actionState?.action==='optimize'?comparisonTarget:simulationTarget)}>{canApplyOptimization?'Review optimized design →':'View results →'}</button></div></form><div className="brief-status" role="status">{canApplyOptimization&&<p>Passing design ready. Review it, then Apply optimized design.</p>}{optimizedApplied&&<p>Optimized design active. Settings and surface playback updated.</p>}{actionState?.action==='optimize'&&actionState.status==='done'&&!comparison?.optimized&&<p>No passing design found. Review the comparison for fixed limits.</p>}{actionState?.status==='running'&&<p>Evaluating your mission…</p>}{actionState?.status==='error'&&<p className="alert">The run failed. Check Systems & results for details.</p>}{saveState?.message&&<p className={saveState.error?'alert':'note'}>{saveState.message}</p>}</div></section>}
    designer={stationReady?<>
     <OptimizationWorkflow comparison={comparison} stale={comparisonStale} applied={optimizedApplied} busy={loading} disabled={booting} error={error} onOptimize={()=>run('optimize')} onCompare={()=>showResult(comparisonTarget)} onApply={applyOptimized} onViewSimulation={()=>showResult(simulationTarget)}/>
-    <details className="optional-prompt"><summary>Optional: create from a prompt</summary><p>Describe a mission to generate a tested design.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={(scenario,nextSearch,evaluated)=>{runGeneration.current++;setLoading(false);setActionState(null);setLoadedName('');setForm(scenario);setSearch(nextSearch);setResult(evaluated);setComparison(null);}}/></details>
+    <details className="optional-prompt"><summary>Optional: create from a prompt</summary><p>Describe a mission to generate a tested design.</p><MissionAgent key={missionEpoch} baseline={optimizationRequest()} onApply={applyAgentProposal}/></details>
    </>:null}
    surface={<><nav aria-label="Select environment" className="planets">{environments.map((p,i)=><button key={p.id} aria-pressed={form.environment_id===p.id} onClick={()=>setForm({...form,environment_id:p.id})} className={form.environment_id===p.id?'planet active':'planet'}><span className="orb planet-art-icon" aria-hidden="true"><img src={`/mission/${p.id}-icon.${p.id==='mars'?'webp':'png'}`} alt="" width="300" height="300"/></span><span><small>0{i+1} / {p.kind}</small><strong>{p.name}</strong></span><span className="arrow" aria-hidden="true">↗</span></button>)}</nav>{env && <MissionControl sceneOnly form={form} setForm={setForm} env={env} result={result} stale={stale}/>}</>}
    systems={<>
