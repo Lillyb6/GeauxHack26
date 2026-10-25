@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SurfacePlayback from './SurfacePlayback';
 
 export default function MissionControl({ form, setForm, env, result, stale, sceneOnly = false }) {
  const [selectedCrew, setSelectedCrew] = useState(null);
@@ -15,6 +16,8 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
   </aside>
   <section className="console-monitor center-monitor">
    <div className="monitor-bar"><span>02 / {env.name.toUpperCase()} SURFACE VIEW</span><span>CONFIGURATION PREVIEW</span></div>
+   {currentResult&&<p className="surface-playback-label">Recorded mission playback</p>}
+   <PlaybackScene result={currentResult?result:null}>
    <div className="planet-scene">
     <img className="planet-art" src={`/mission/${form.environment_id}.webp`} alt={`${env.name} surface artwork`} />
     <div className="scene-label"><span className="signal-dot"/> {env.name.toUpperCase()} / CREW {count.toString().padStart(2,'0')}</div>
@@ -25,6 +28,7 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
      return <button key={i} className={`crew-sprite ${selectedCrew===i?'selected':''}`} style={{left:`${left}%`,top:`${top}%`}} aria-label={`Inspect crew member ${i+1}`} aria-pressed={selectedCrew===i} onClick={()=>setSelectedCrew(selectedCrew===i?null:i)}><span className="crew-art" aria-hidden="true"/><span className="crew-id">{String(i+1).padStart(2,'0')}</span></button>;
     })}
    </div>
+   </PlaybackScene>
    <div className="scene-footer" role="status"><span>{selectedCrew!==null&&selectedCrew<count?`CREW ${String(selectedCrew+1).padStart(2,'0')} / assigned to ${env.name}`:'Select a crew member to inspect'}</span><span>Visual preview · no surface activity model</span></div>
   </section>
   <aside className="console-monitor telemetry-monitor">
@@ -35,3 +39,5 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
   </aside>
  </section>;
 }
+
+function PlaybackScene({result,children}){return result?<SurfacePlayback result={result}>{children}</SurfacePlayback>:children;}
