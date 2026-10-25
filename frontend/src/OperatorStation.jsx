@@ -60,7 +60,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
   }
  }
  useEffect(()=>{if(!active)return;const release=e=>{if(e.key==='Escape'){pointer.current=null;setLocked(null);document.activeElement?.blur();}};window.addEventListener('keydown',release);return()=>window.removeEventListener('keydown',release);},[active]);
- return <div className={`operator-experience ${booting?'station-booting':''}`}>
+ return <div data-active={active} data-star-motion={active && !locked && !booting} className={`operator-experience ${booting?'station-booting':''}`}>
   <div ref={viewport} className="operator-viewport" onPointerMove={e=>{if(e.pointerType==='mouse'){const rect=e.currentTarget.getBoundingClientRect();pointer.current={x:e.clientX-rect.left,y:e.clientY-rect.top};wake.current();}}} onPointerLeave={()=>{pointer.current=null;wake.current();}} onPointerDown={e=>{pointer.current=null;const monitor=e.target.closest('[data-station]');if(monitor)setLocked(monitor.dataset.station);else{setLocked(null);document.activeElement?.blur();}}} onClick={e=>{const monitor=e.target.closest('[data-station]');if(monitor&&!e.target.closest('.result-jump')&&!window.matchMedia('(max-width: 800px)').matches)lookAt(monitor.dataset.station);}} onFocusCapture={onFocus}>
    <div className="operator-room" inert={booting}>
     <div className="room-wall-label">BEYOND EARTH / HABITAT OPERATIONS DIVISION</div>
@@ -68,7 +68,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
     <Monitor id="designer" title="02 / AI assistance">{designer}</Monitor>
     <Monitor id="surface" title="03 / Surface observation & view">{surface}</Monitor>
     <Monitor id="systems" title="04 / Systems & results">{systems}</Monitor>
-    <div className="operator-desk" aria-hidden="true"><div className="desk-keyboard"/><div className="desk-plaque">BEYOND EARTH &nbsp; / &nbsp; FLIGHT DIRECTOR</div></div>
+    <div className="operator-desk" aria-hidden="true"><div className="desk-plaque">BEYOND EARTH &nbsp; / &nbsp; FLIGHT DIRECTOR</div></div>
    </div>
   </div>
  </div>;

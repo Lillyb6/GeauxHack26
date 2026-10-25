@@ -11,27 +11,30 @@ export default function MissionAdvisor({ comparison, stale }) {
   const token=++generation.current;
   setBusy(true);setError('');setAdvice(null);
   try {
-   const response=await api('/explain',comparison.search_request);
+   const response=await api(comparison.recovery_attempted?'/explain-improvement':'/explain',comparison.search_request);
    if(token===generation.current) setAdvice(response);
   } catch {if(token===generation.current)setError('The advisor could not connect. Your computed comparison remains available.');}
   finally {if(token===generation.current)setBusy(false);}
  }
  return <section className="advisor" aria-label="Mission advisor">
-  <p className="eyebrow">MISSION ADVISOR / GEMINI</p><h3>Understand your design</h3>
-  <p>AI explains calculated results.</p>
-  <button className="run" type="button" onClick={explain} disabled={busy||stale}>{busy?'Preparing explanation…':'Explain comparison'}</button>
+  <p className="eyebrow">MISSION ADVISOR / GEMINI</p><h3>Why the optimized design works</h3>
+
+  <button className="run" type="button" onClick={explain} disabled={busy||stale}>{busy?'Preparing explanation…':'Explain my results'}</button>
   <p className="muted">Sends mission settings, results and evidence to Google Gemini.</p>
   {stale&&<p className="alert">Optimize again before requesting advice for changed inputs.</p>}
   <div aria-live="polite" aria-busy={busy}>
    {error&&<p className="alert">{error}</p>}
    {advice&&<>
-    <p className="note">{advice.status==='generated'?`AI-generated explanation · ${advice.model}`:'Computed fallback · Gemini unavailable'} — {advice.message}</p>
-    <p>{advice.advice.summary}</p>
-    <h4>Tradeoffs</h4><ul>{advice.advice.tradeoffs.map((t,i)=><li key={i}>{t}</li>)}</ul>
-    <h4>Suggested next steps</h4><ul>{advice.advice.next_steps.map((t,i)=><li key={i}>{t}</li>)}</ul>
+    <p className="model-scope">{advice.status==='generated'?'AI explanation':'Calculated guidance · AI unavailable'}</p>
+    <details><summary>Overview & AI status</summary><p>{advice.advice.summary}</p><p>{advice.message}</p></details>
+    <h4>Why your manual design stopped</h4><p>{advice.advice.why_manual_failed || (comparison.manual.resource_balance_complete?'Your manual design completed the selected resource checks.':`Your manual run stopped at hour ${comparison.manual.evaluated_hours}. See its stopping events in the comparison.`)}</p>
+    {!!advice.resource_comparison?.length&&<details><summary>Resource-by-resource comparison</summary><div className="table-wrap"><table><caption>Your resources before and after optimization</caption><thead><tr><th>Resource</th><th>Your design</th><th>Optimized</th></tr></thead><tbody>{advice.resource_comparison.map(row=><tr key={row.resource}><th scope="row">{row.resource}</th><td>{row.manual}</td><td>{row.optimized}</td></tr>)}</tbody></table></div></details>}
+    <h4>Why the proposed design works</h4><p>{advice.advice.why_optimized_worked || (comparison.optimized?`The proposed settings were tested and completed ${comparison.optimized.evaluated_hours} hours. The resource changes are shown above.`:'No proposed design has passed the selected checks yet.')}</p>
+    <details><summary>Tradeoffs & next steps</summary><h4>What you need to add</h4><ul>{advice.advice.tradeoffs.map((t,i)=><li key={i}>{t}</li>)}</ul>
+    <h4>What to do next</h4><ul>{advice.advice.next_steps.map((t,i)=><li key={i}>{t}</li>)}</ul></details>
     {!!advice.advice.source_ids.length&&<><h4>Referenced evidence</h4><ul>{advice.advice.source_ids.map(id=><li key={id}><a href={advice.sources[id].url} target="_blank" rel="noreferrer">{advice.sources[id].title}</a></li>)}</ul></>}
     <details><summary>Authoritative computed summary and limitations</summary><p>{advice.computed_explanation}</p><ul>{advice.limitations.map(t=><li key={t}>{t}</li>)}</ul></details>
-    <p>AI explanations may contain mistakes. Use the calculated comparison and original evidence to verify claims. Resource completion does not certify survival.</p>
+    <p>AI text requires review against calculated results.</p>
    </>}
   </div>
  </section>;

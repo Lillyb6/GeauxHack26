@@ -186,8 +186,8 @@ export const tutorialChapters = [
             "type": "fields",
             "entries": [
               {
-                "term": "Share of water reused",
-                "description": "In custom mode, enter 0.93 for 93%. This simplified recovery has no processing-capacity limit."
+                "term": "Water recovered · %",
+                "description": "In custom mode, enter 93 for 93%. The engine stores this as 0.93. This simplified recovery has no processing-capacity limit."
               },
               {
                 "term": "Water recycler power · kW",

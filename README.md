@@ -169,3 +169,15 @@ AI assistance: Codex helped implement and test this additive backend reporting f
 Resource events now explain oxygen crew demand, modeled production and starting stock, and water crew use, modeled recovery, electrolysis feedwater and starting usable stock, with the hourly shortfall. These are diagnostic failed-hour balances, not proof of operation with missing inputs. The existing event interface and equations are unchanged. See docs/oxygen-water-diagnostics.md for code explanations and tests.
 
 AI assistance: Codex helped add the backend diagnostic messages, numerical regression tests and explanation documentation. No frontend, new scientific constants, image assets or external API integrations were added.
+
+Codex assisted with compact manual/optimized comparison cards, applying the tested optimized design to mission controls and simulation charts, and stale-comparison guards.
+
+Codex assisted with a bounded, verified power-adjustment proposal workflow and direct manual-versus-optimized explanations. See [optimization improvements](docs/optimization-improvements.md). Original fixed-constraint optimization remains available.
+
+Codex extended verified repair proposals to initial-water shortages, added seven-crew regression coverage, and simplified shortage explanations while retaining exact diagnostics in details.
+
+Codex assisted with a permission-gated Gemini improvement tool and structured resource-by-resource manual/optimized explanations. Calculated comparison rows remain authoritative; AI prose is reviewable.
+
+Codex assisted with concise result notices, a combined unchecked-systems status, expandable diagnostics and shorter AI comparison text. Full scientific warnings remain available.
+
+Codex assisted with reference-equipment defaults for new missions and an advanced custom-assumptions section. Loaded custom missions retain their saved values and expose their custom controls.

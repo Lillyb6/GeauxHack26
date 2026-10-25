@@ -19,9 +19,9 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
     <img className="planet-art" src={`/mission/${form.environment_id}.webp`} alt={`${env.name} surface artwork`} />
     <div className="scene-label"><span className="signal-dot"/> {env.name.toUpperCase()} / CREW {count.toString().padStart(2,'0')}</div>
     {Array.from({length:count},(_,i)=>{
-     const row=Math.floor(i/6), col=i%6;
-     const left=14+col*14+(row?5:0);
-     const top=69+Math.pow((left-50)/42,2)*14+row*9;
+     const row=Math.floor(i/4), col=i%4;
+     const left=12+col*8+row*2;
+     const top=69+Math.pow((left-50)/42,2)*14+row*6.5;
      return <button key={i} className={`crew-sprite ${selectedCrew===i?'selected':''}`} style={{left:`${left}%`,top:`${top}%`}} aria-label={`Inspect crew member ${i+1}`} aria-pressed={selectedCrew===i} onClick={()=>setSelectedCrew(selectedCrew===i?null:i)}><span className="crew-art" aria-hidden="true"/><span className="crew-id">{String(i+1).padStart(2,'0')}</span></button>;
     })}
    </div>
