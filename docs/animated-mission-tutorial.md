@@ -49,3 +49,25 @@ The production build passed after the navigation changes. In the browser, I veri
 
 ## Final checks before merge
 I pulled origin/main before committing; Git reported it was already up to date. All 30 existing frontend tests and the production build passed again. I committed only the animated tutorial, its detailed guide and navigation changes, styles, and this explanation. The unrelated package-lock.json modification was left out.
+
+
+## Tutorial content and typography refresh
+I updated animated-mission-tutorial with the latest main branch before editing. I kept the three animated examples and manual Next controls, but added short explanations beside them. The tutorial now explains destination conditions, crew and duration, stored supplies versus equipment, generation versus batteries, optional checks, and how to interpret a recorded failure. It explains that before-launch checks differ from hourly resource failures.
+
+I restored the mission-control monospace lettering for headings and retained the existing regular body font for explanations. I replaced placeholder planet dots with the supplied Mars, Venus, and Titan icons. I reduced decorative cards and used a single illustrated example beside a short explanation. Narrow screens stack the illustration and text. Skip, Replay, Back, Next, and the detailed guide keep their existing behavior. No generated images were added.
+
+
+## Tutorial heading and label cleanup
+I renamed the first lesson Choose your planet and removed the repeated Mission setup label inside its illustration. I moved the explanatory sentence below the animated example and standardized Crew size and Mission length labels and values at 14px with the same line height. The sentence is interface copy I added to explain the controls, not a scientific claim or sourced research.
+
+
+## Tutorial title and first-step copy
+I changed Quick tutorial to Tutorial, increased its size, and made it white while keeping the mission-control heading font. I removed the Destination matters and Plan for your crew explanation blocks from the first step and expanded its animation across the available width. I restored the replay arrow beside Replay example. Later steps retain their short explanations.
+
+
+## Short explanation below the example
+I added one short caption beneath the first animation explaining that a larger crew or longer mission needs more supplies and life support. I kept the longer explanation blocks removed.
+
+
+## Shorter result instructions
+I shortened the final tutorial step to two brief instructions: follow the mission playback, then read the outcome and edit the build if needed. I kept a short note that some checks fail before launch and only enabled systems are evaluated. Detailed model limitations remain in the guide and results.
