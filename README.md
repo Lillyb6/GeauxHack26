@@ -51,6 +51,10 @@ Our custom AI agent uses the **Google Gemini API** to interpret natural-language
 
 The Python backend performs engineering calculations, while Gemini explains the results and recommends potential changes. Users review proposed changes before applying them.
 
+### AI Usage & Development Disclosure
+
+Our team used AI to help with the basic setup of our frontend and backend, which we continued to build upon and improve throughout the project. We mainly used AI to help resolve Git merge conflicts, troubleshoot errors, debug code, and assist with testing to make sure everything worked properly. 
+
 ### Tech Stack & Development
 
 | Category | Technologies |
