@@ -22,3 +22,31 @@ MissionControl.jsx wraps the existing scene in SurfacePlayback.jsx. SurfacePlayb
 I added tests for exact partial-day failure timing, before-launch failure, long-mission duration, and empty results. The feature remains on mission-day-playback for testing and is not merged into main.
 
 I verified a real backend water-shortage run in the browser: playback stopped at day 1, hour 1, showed the red ending, and displayed zero clean water with the recorded battery and oxygen values. All 41 frontend tests and the production build passed.
+
+
+## Surface layout and resource colors
+I moved the resource meters into a two-column rail beside the planet scene on desktop so all enabled systems fit without scrolling inside the monitor. On narrow screens, the scene and resources stack and the monitor grows with its content rather than creating an inner scrollbar. I removed the redundant recorded-playback heading and standardized labels, values, and supporting text into fewer font sizes. Oxygen bars are mint, clean water bars are blue, and battery bars are gold. Labels and units still identify each resource, and failed values stay red.
+
+
+## Original artwork and lighter ending tint
+I replaced the CSS sphere icons in the surface planet selector with thumbnails from the existing Mars, Venus, and Titan artwork. I added object-fit: cover so the surface image keeps its proportions inside the available area rather than stretching. The scene may crop at the edges as its container changes shape. I lowered the final red and green overlay opacity from 87% to 62%, including the fade keyframes, so the planet and crew remain easier to see. No new images were generated.
+
+
+## Supplied planet icons
+I replaced the selector thumbnails with the exact supplied images: IMG_0326.png for Mars, IMG_0325.png for Venus, and IMG_0324.png for Titan. I copied them into public/mission as mars-icon.png, venus-icon.png, and titan-icon.png. I display them without distortion and crop the white outer canvas around each circular planet. The full surface backgrounds and crew artwork remain unchanged.
+
+
+## Full-width planet background
+I extended the existing planet scene across the entire desktop monitor instead of limiting it to the left column. The resource meters now overlay the right side on a 72% opaque dark panel so the artwork remains visible behind them. I kept the result text and playback controls in the clear left area. The scene preserves its image proportions, and the existing narrow-screen stacking remains available.
+
+
+## Compact resource overlay
+I changed the translucent resource overlay into a box that fits its content, with an inset margin and a subtle border. It no longer fills the entire right side of the surface view, leaving the planet visible below and around the panel.
+
+
+## Clear ending screen
+I hide the resource box when the final Success or Failed overlay appears and center the ending across the full planet scene. Replay brings the resource box back while the recorded mission plays. During playback, the box background is 50% opaque so more artwork shows through; the text and bars remain fully opaque.
+
+
+## Playback controls on the left
+I moved the day counter and Pause/Replay controls to the upper left of the planet scene, below the planet and crew label. This separates them from the resource box on the right.

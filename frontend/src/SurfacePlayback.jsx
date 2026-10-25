@@ -1,9 +1,9 @@
 import {useEffect,useMemo,useState} from 'react';
 import {playbackFrames,playbackDelay,endings} from './missionPlayback';
 const number=value=>Number.isFinite(value)?Number(value.toFixed(2)).toLocaleString():'Not evaluated';
-function Gauge({label,value,max,unit,note,failed=false}){
+function Gauge({label,value,max,unit,note,failed=false,tone}){
  const known=Number.isFinite(value),scale=Math.max(1,max||0,known?value:0);
- return <div className={`playback-gauge${failed?' gauge-failed':''}`}><label>{label}<span>{number(value)}{known?` ${unit}`:''}</span></label><meter aria-label={`${label}${note?`. ${note}`:''}`} min="0" max={scale} value={known?Math.max(0,value):0}/>{note&&<small>{note}</small>}</div>;
+ return <div className={`playback-gauge${failed?' gauge-failed':''}${tone?` gauge-${tone}`:''}`}><label>{label}<span>{number(value)}{known?` ${unit}`:''}</span></label><meter aria-label={`${label}${note?`. ${note}`:''}`} min="0" max={scale} value={known?Math.max(0,value):0}/>{note&&<small>{note}</small>}</div>;
 }
 export default function SurfacePlayback({result,children}){
  const frames=useMemo(()=>playbackFrames(result),[result]);
@@ -33,9 +33,9 @@ export default function SurfacePlayback({result,children}){
    {finished&&<div className="surface-ending" role="status"><div><h2>{success?'Success':'Failed'}</h2><p className="playback-ending-time">{first===0?'Before launch':success?`${req.duration_days} days completed`:`Day ${Math.ceil(first/24)} · hour ${first}`}</p>{success?<p>Your build completed the planned mission.</p>:failures.map(event=><div className="ending-reason" key={event.resource}><p>{endings[event.resource]?.[0]??event.message}</p><small>{endings[event.resource]?.[1]}</small></div>)}<p className="playback-fiction">{success?'Modeled checks only.':'Fictional ending. Deaths are not simulated.'}</p><button type="button" onClick={restart}>Replay mission</button></div></div>}
   </div>
   <section className="surface-resources" aria-label="Playback resources and systems"><div className="playback-gauges">
-   <Gauge label="Oxygen" value={reading.oxygen_kg} max={Math.max(...result.readings.map(r=>r.oxygen_kg))} unit="kg" failed={finished&&failures.some(e=>e.resource==='oxygen')}/>
-   <Gauge label="Clean water" value={reading.water_kg} max={Math.max(...result.readings.map(r=>r.water_kg))} unit="kg" failed={finished&&failures.some(e=>e.resource==='water')}/>
-   <Gauge label="Battery" value={reading.battery_kwh} max={req.battery_kwh} unit="kWh" failed={finished&&failures.some(e=>e.resource==='power')}/>
+   <Gauge tone="oxygen" label="Oxygen" value={reading.oxygen_kg} max={Math.max(...result.readings.map(r=>r.oxygen_kg))} unit="kg" failed={finished&&failures.some(e=>e.resource==='oxygen')}/>
+   <Gauge tone="water" label="Clean water" value={reading.water_kg} max={Math.max(...result.readings.map(r=>r.water_kg))} unit="kg" failed={finished&&failures.some(e=>e.resource==='water')}/>
+   <Gauge tone="battery" label="Battery" value={reading.battery_kwh} max={req.battery_kwh} unit="kWh" failed={finished&&failures.some(e=>e.resource==='power')}/>
    <Gauge label="Power generation" value={req.generation_kw} max={Math.max(req.generation_kw,result.demand_kw)} unit="kW" note={`Demand ${number(result.demand_kw)} kW`} failed={req.generation_kw<result.demand_kw}/>
    <Gauge label="Wastewater backlog" value={reading.wastewater_kg} max={Math.max(...result.readings.map(r=>r.wastewater_kg))} unit="kg" note="Relative to peak backlog, not a failure limit"/>
    {req.thermal_capacity_enabled&&<Gauge label={`${thermal.mode==='cooling'?'Cooling':'Heating'} demand`} value={thermal.required_thermal_kw} max={Math.max(thermal.required_thermal_kw,thermal.available_thermal_kw)} unit="kW" note={`Capacity ${number(thermal.available_thermal_kw)} kW · Target ${req.interior_temperature_c} °C`} failed={!thermal.capacity_sufficient}/>}

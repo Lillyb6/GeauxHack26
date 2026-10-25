@@ -321,20 +321,20 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .surface-day-counter h3{font-size:25px;margin:8px 0 12px}.surface-day-counter h3 small{font-size:13px;color:#b7c6d3}
 .surface-day-counter>div{display:flex;gap:12px}
 .surface-playback-scene button:not(.crew-sprite){padding:9px 14px;min-height:44px;border:1px solid #46515f;border-radius:4px;background:#101925;color:var(--accent);font:13px Inter,system-ui,sans-serif;cursor:pointer}
-.surface-ending{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;background:rgba(35,5,12,.87);animation:surface-red-in .65s ease-out both;overflow:auto}
+.surface-ending{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;background:rgba(35,5,12,.62);animation:surface-red-in .65s ease-out both;overflow:auto}
 .surface-ending:before{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px 15px rgba(0,0,0,.28)}
 .surface-ending>div{position:relative;max-width:560px;animation:surface-text-in .3s .2s both}
 .surface-ending h2{font-size:64px;line-height:1.1;margin:0 0 10px;color:#ff6478}
 .surface-ending p{font-size:16px;line-height:1.4;margin:8px 0}.surface-ending .playback-ending-time{font-size:12px;color:#c5cdd7}
 .ending-reason small{display:block;color:var(--accent);font-size:12px;line-height:1.5}.surface-ending .playback-fiction{font-size:11px;color:#bdc6d0;margin:10px 0}
-.playback-success .surface-ending{background:rgba(4,30,20,.87);animation-name:surface-green-in}.playback-success .surface-ending h2{color:#62e5a1}
+.playback-success .surface-ending{background:rgba(4,30,20,.62);animation-name:surface-green-in}.playback-success .surface-ending h2{color:#62e5a1}
 .surface-resources{padding:14px;background:#0c141f;flex-shrink:0}.playback-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px}
 .playback-gauge{min-width:0}.playback-gauge label{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 8px;margin:0 0 7px;color:var(--accent);font:12px Inter,system-ui,sans-serif}.playback-gauge label span{color:#e0e7ee;font-variant-numeric:tabular-nums}.playback-gauge small{display:block;color:#b2bfcd;font:11px/1.4 Inter,system-ui,sans-serif;margin-top:5px}
 .playback-gauge meter{display:block;width:100%;height:8px;appearance:none;background:#303944;border:0;border-radius:0}.playback-gauge meter::-webkit-meter-bar{background:#303944;border:0;border-radius:0}.playback-gauge meter::-webkit-meter-optimum-value{background:var(--accent)}.playback-gauge meter::-moz-meter-bar{background:var(--accent)}.gauge-failed label span{color:#ff8f99}.gauge-failed meter::-webkit-meter-optimum-value{background:#ff8f99}.gauge-failed meter::-moz-meter-bar{background:#ff8f99}
 .surface-resources .playback-scope{font:11px/1.4 Inter,system-ui,sans-serif;color:#b2bfcd;margin:12px 0 0}
 .operator-shell .surface-only .center-monitor:has(.surface-resources){overflow:auto}
-@keyframes surface-red-in{from{background:rgba(35,5,12,0)}to{background:rgba(35,5,12,.87)}}
-@keyframes surface-green-in{from{background:rgba(4,30,20,0)}to{background:rgba(4,30,20,.87)}}
+@keyframes surface-red-in{from{background:rgba(35,5,12,0)}to{background:rgba(35,5,12,.62)}}
+@keyframes surface-green-in{from{background:rgba(4,30,20,0)}to{background:rgba(4,30,20,.62)}}
 @keyframes surface-text-in{from{opacity:0}to{opacity:1}}
 @media(max-width:600px){.playback-gauges{grid-template-columns:1fr 1fr;gap:14px}.surface-ending h2{font-size:48px}.surface-day-counter{right:8px;top:36px;padding:10px}.surface-day-counter h3{font-size:20px}.surface-ending:before{box-shadow:inset 0 0 48px 8px rgba(0,0,0,.28)}}
 @media(prefers-reduced-motion:reduce){.surface-ending,.surface-ending>div{animation:none!important}}
@@ -343,3 +343,69 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 
 .operator-shell .mission-control .surface-ending h2{color:#ff6478}
 .operator-shell .mission-control .playback-success .surface-ending h2{color:#62e5a1}
+
+/* Surface playback uses a scene and a compact systems rail, with no nested scrolling. */
+@media(min-width:801px){
+ .operator-shell .surface-only .center-monitor:has(.surface-resources){display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;overflow:visible}
+ .center-monitor:has(.surface-resources)>.monitor-bar{grid-column:1/-1}
+ .center-monitor:has(.surface-resources)>.surface-playback-scene{grid-column:1;grid-row:2;min-height:0}
+ .operator-shell .surface-only .surface-playback-scene>.planet-scene{min-height:0}
+ .center-monitor:has(.surface-resources)>.surface-resources{grid-column:2;grid-row:2;min-height:0;padding:16px}
+ .center-monitor:has(.surface-resources)>.scene-footer{grid-column:1/-1}
+ .surface-resources .playback-gauges{grid-template-columns:1fr 1fr;gap:14px 16px}
+}
+.playback-gauge{--gauge-color:var(--accent)}
+.playback-gauge.gauge-oxygen{--gauge-color:#8cdbb5}
+.playback-gauge.gauge-water{--gauge-color:#70baff}
+.playback-gauge.gauge-battery{--gauge-color:#f4cc68}
+.playback-gauge meter::-webkit-meter-optimum-value{background:var(--gauge-color)}
+.playback-gauge meter::-moz-meter-bar{background:var(--gauge-color)}
+.playback-gauge label{font-size:13px;line-height:1.4}
+.playback-gauge small,.surface-resources .playback-scope{font-size:12px;line-height:1.4}
+.surface-day-counter>span,.surface-day-counter h3 small{font:13px/1.4 Inter,system-ui,sans-serif;letter-spacing:0}
+.surface-day-counter h3{font-size:26px}
+.surface-ending p{font-size:14px;line-height:1.4}
+.surface-ending .playback-ending-time,.surface-ending .playback-fiction,.ending-reason small{font-size:12px;line-height:1.4}
+.surface-ending{overflow:visible;padding:16px}
+.surface-ending h2{font-size:56px}
+.surface-day-counter{right:12px;top:12px;padding:12px}
+@media(max-width:800px){
+ .station-surface:has(.surface-resources){height:auto}
+ .operator-shell .surface-only .center-monitor:has(.surface-resources){overflow:visible;flex:none}
+ .surface-playback-scene{flex:none;height:340px}
+ .operator-shell .surface-only .surface-playback-scene>.planet-scene{min-height:0}
+ .surface-resources .playback-gauges{grid-template-columns:1fr 1fr}
+}
+
+/* Reuse the team's artwork and preserve image proportions. */
+.operator-shell .planet-art-thumbnail{display:block;width:40px;height:40px;object-fit:cover;flex-shrink:0;border-radius:4px}
+.operator-shell .surface-only .planet-art{object-fit:cover}
+@media(max-width:800px){.operator-shell .planet-art-thumbnail{width:28px;height:28px}}
+
+.operator-shell .planet-art-thumbnail{object-fit:contain;border-radius:0;clip-path:circle(36.5% at 51.5% 48.5%);transform:scale(1.25)}
+
+/* Full-width surface artwork with resources layered over the right edge. */
+@media(min-width:801px){
+ .center-monitor:has(.surface-resources)>.surface-playback-scene{grid-column:1/-1;grid-row:2}
+ .center-monitor:has(.surface-resources)>.surface-resources{position:relative;z-index:5;background:rgba(12,20,31,.72);grid-column:2;grid-row:2}
+ .surface-playback-scene>.surface-day-counter{right:calc(42.55% + 12px)}
+ .surface-playback-scene>.surface-ending{justify-content:flex-start;padding:20px}
+ .surface-ending>div{width:55%;max-width:none}
+}
+
+/* Resource overlay hugs its content rather than covering the full side. */
+@media(min-width:801px){
+ .center-monitor:has(.surface-resources)>.surface-resources{align-self:start;margin:16px 16px 0 0;padding:16px;border:1px solid rgba(140,158,178,.3);border-radius:6px;background:rgba(12,20,31,.72)}
+}
+
+/* Keep the final outcome clear; resources return when replay starts. */
+.center-monitor:has(.surface-ending)>.surface-resources{display:none}
+.surface-playback-scene:has(.surface-ending)>.surface-ending{justify-content:center}
+.surface-playback-scene:has(.surface-ending) .surface-ending>div{width:100%;max-width:560px}
+@media(min-width:801px){
+ .center-monitor:has(.surface-resources)>.surface-resources{background:rgba(12,20,31,.5)}
+}
+
+/* Playback controls stay opposite the resource box. */
+.surface-playback-scene>.surface-day-counter{left:12px;right:auto;top:42px}
+@media(max-width:600px){.surface-playback-scene>.surface-day-counter{left:8px;right:auto;top:36px}}

@@ -16,7 +16,6 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
   </aside>
   <section className="console-monitor center-monitor">
    <div className="monitor-bar"><span>02 / {env.name.toUpperCase()} SURFACE VIEW</span><span>CONFIGURATION PREVIEW</span></div>
-   {currentResult&&<p className="surface-playback-label">Recorded mission playback</p>}
    <PlaybackScene result={currentResult?result:null}>
    <div className="planet-scene">
     <img className="planet-art" src={`/mission/${form.environment_id}.webp`} alt={`${env.name} surface artwork`} />
