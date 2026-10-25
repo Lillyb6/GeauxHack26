@@ -187,3 +187,5 @@ Codex restored a prominent no-prompt optimize/compare/apply/AI-explain workflow 
 Codex shortened AI-panel labels, progress messages and guidance while retaining detailed audits and disclosures.
 
 Codex consolidated systems results into a compact outcome, one selectable resource chart and a collapsed Research & technical details section. Exact events, equations and scientific sources remain accessible.
+
+Codex moved simulation and comparison graphs to the left resource console and retained AI tools in Systems & results. Planet selection and simulation behavior were unchanged.
