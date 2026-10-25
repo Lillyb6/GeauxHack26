@@ -1,191 +1,228 @@
 # Beyond Earth
-Adaptive Planetary Habitat Intelligence System · GeauxHack26
+### AI-Powered Planetary Habitat Design & Optimization
 
-A functional first milestone for the team's hackathon project: configure a surface habitat on **Mars, Venus or Titan**, submit it to a Python simulator, and inspect hourly oxygen, water and electricity inventories and the first modeled shortage. Titan is a moon. All charts come from API calculations, not hardcoded outcome data.
+**Beyond Earth** is an AI-powered engineering platform that uses NASA research, scientific simulations, and artificial intelligence to help users design and optimize hypothetical human habitats on Mars, Venus, and Titan. By modeling critical life-support systems, our platform identifies resource shortages, evaluates equipment configurations, and provides AI-assisted recommendations for exploring more efficient and sustainable planetary habitat designs.
 
-## Run locally (two terminals)
-Requirements: Node.js 22.12+ (or a supported newer LTS), Python 3.11+ and npm. Commands below are for Windows PowerShell, from the repository root.
+---
 
-Terminal 1:
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r backend/requirements.lock.txt
-cd backend
-..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+## Team
+
+- **Chloe Phan** — Research & QA Owner
+- **Lillian Barker** — AI Integration Developer
+- **Serene Davis** — Backend Developer
+- **Emily Phan** — Frontend Developer
+- **Holly Lester** — Graphic Designer
+
+---
+
+## About
+
+### The Problem
+
+Designing sustainable human habitats beyond Earth requires balancing complex life-support systems under extreme environmental conditions. Oxygen, water, electricity, atmospheric pressure, and temperature regulation are interconnected, meaning improving one system can increase demands on another. Engineers must evaluate equipment capacity, resource consumption, and environmental constraints while minimizing unnecessary mass and energy usage.
+
+### Our Solution
+
+**Beyond Earth** combines NASA scientific research, engineering simulations, and Google Gemini to help users design and optimize habitats on Mars, Venus, and Titan. Our platform identifies potential resource shortages, compares equipment configurations, and provides AI-assisted recommendations to make early-stage planetary habitat design more efficient and accessible.
+
+### Key Features
+
+- **Planetary Environment Selection:** Explore environmental conditions on Mars, Venus, and Titan.
+- **Custom Habitat Configuration:** Adjust crew size, mission duration, oxygen, water, power, and equipment.
+- **Engineering Simulations:** Evaluate oxygen, water, electricity, CO₂, and selected cabin-atmosphere requirements.
+- **Equipment Optimization:** Compare supported configurations to minimize known equipment mass while satisfying modeled constraints.
+- **AI Mission-Design Agent:** Use Google Gemini to interpret mission goals, request Python calculations, and explain recommendations.
+- **Interactive Dashboard:** Visualize resource consumption, equipment performance, warnings, and simulation results.
+
+### The Science Behind Beyond Earth
+
+Beyond Earth uses published NASA research and engineering principles to model extraterrestrial habitat requirements.
+
+The Python backend calculates resource changes at hourly intervals using conservation equations for oxygen, water, and electricity. It also evaluates carbon dioxide accumulation, selected cabin-atmosphere conditions, and simplified thermal demand.
+
+Scientific reference values are distinguished from modeling assumptions and simulation results.
+
+### How Our AI Agent Works
+
+Our custom AI agent uses the **Google Gemini API** to interpret natural-language mission goals and interact with two backend tools:
+
+- `simulate_habitat` — Evaluates a habitat configuration.
+- `optimize_habitat` — Searches equipment combinations under mission constraints.
+
+The Python backend performs engineering calculations, while Gemini explains the results and recommends potential changes. Users review proposed changes before applying them.
+
+### Tech Stack & Development
+
+| Category | Technologies |
+|---|---|
+| Frontend | React, Vite, Tailwind CSS, Custom CSS |
+| Charts | Recharts |
+| Backend | Python, FastAPI |
+| Validation | Pydantic |
+| AI | Google Gemini API |
+| Simulation | Custom Python resource models and deterministic optimization |
+| Storage | Browser localStorage with JSON import/export, Supabase |
+| Hosting | Vercel |
+| Testing | Pytest, Node.js test runner |
+| Version Control | Git, GitHub |
+
+### External Tools, APIs, and AI-Assisted Development
+
+- **Google Gemini API:** Powers the custom AI mission-design agent.
+- **NASA Research:** Supplies planetary environmental data and life-support reference values.
+- **Supabase:** Included in the project's storage technology stack.
+- **Vercel:** Included in the project's hosting technology stack.
+- **Open-source dependencies:** React, Vite, Recharts, Tailwind CSS, FastAPI, Pydantic, and associated packages.
+
+**AI Development Disclosure:** AI-assisted development tools supported portions of implementation, debugging, testing, and documentation. The application's scientific calculations are performed by the custom Python backend.
+
+
+### Scientific Sources
+
+- NASA Life Support Baseline Values and Assumptions Document
+- NASA Mars and Venus Fact Sheets
+- NASA Titan environmental research
+- NASA historical oxygen-generation and water-recovery studies
+- NASA CO₂-removal research
+- NASA Passive Thermal Control Engineering Guidebook
+- U.S. Department of Energy electrolysis research
+
+Additional documentation:
+
+- `docs/sources.md`
+- `docs/assumptions.md`
+- `docs/research-audit.md`
+
+---
+
+## Prerequisites
+
+To build and run Beyond Earth locally, you will need:
+
+- Git
+- Python 3 and pip
+- Node.js and npm
+- Google Gemini API key for AI functionality
+- A modern web browser
+
+The application uses separate React frontend and FastAPI backend development processes.
+
+---
+
+## Build from Source
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Lillyb6/GeauxHack26.git
+cd GeauxHack26
 ```
-If `py` is unavailable, replace it with your Python 3 executable. Using the executable directly avoids PowerShell activation-policy issues.
 
-Terminal 2:
-```powershell
+### 2. Set Up the Backend
+
+Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.lock.txt
+```
+
+Start the FastAPI server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend URL:
+
+`http://localhost:8000`
+
+API documentation:
+
+`http://localhost:8000/docs`
+
+### 3. Set Up the Frontend
+
+Open a new terminal from the project root:
+
+```bash
 cd frontend
-npm.cmd ci
-npm.cmd run dev
 ```
-Open the localhost URL Vite prints (normally http://127.0.0.1:5173). API explorer: http://127.0.0.1:8000/docs. Keep both terminals running. Vite forwards /api to FastAPI; the backend stays on port 8000.
 
-macOS/Linux: use `python3 -m venv .venv`, `.venv/bin/python` (or `../.venv/bin/python` from backend) and `npm` instead of `npm.cmd`.
+Install frontend dependencies:
 
-## Demo
-1. Run the default Mars scenario: 4 crew, 30 Earth days. The modeled balances complete.
-2. Set continuous power to 0 kW. The battery depletes and the engine reports a deficient hour.
-3. Restore power to 8 kW and select Venus or Titan. The simplified thermal load changes and the same design fails earlier.
-4. Change supplies or power and run again. Charts retain their last result until rerun; changed inputs are flagged.
-
-**Scope:** this is a resource-balance prototype, not proof of human survival. Pressure, radiation, CO2 scrubbing, food, structural protection and realistic HVAC are not yet evaluated. Scientific reference values are marked separately from assumed equipment parameters. Model 0.2 adds an in-app evidence register, NASA crew baselines and environmental references, a DOE electrolysis proxy, and explicit editable unvalidated engineering inputs. This remains research-informed rather than scientifically validated. A bounded deterministic equipment-count optimizer is available. A Gemini explanation advisor is integrated and requires backend configuration. There is no live telemetry, database, or deployment yet.
-
-## Checks
-```powershell
-cd backend
-..\.venv\Scripts\python.exe -m pytest -q
-cd ../frontend
-npm.cmd run build
+```bash
+npm install
 ```
-Backend tests cover balances, conservation of electrolysis feedwater, empty resources, power failure, battery limits, deterministic behavior, all three environments and API validation. Production frontend deployment will need an /api reverse proxy; Vite's proxy is development-only.
 
-## Architecture and team handoff
-- `frontend/`: React, Vite, Tailwind CSS, Recharts; CSS-only placeholder planet circles for designer replacement.
-- `backend/app/`: FastAPI contracts, environment references, deterministic engine.
-- `backend/tests/`: engine and API tests.
-- [Architecture and next milestones](docs/architecture.md)
-- [Model equations and limitations](docs/assumptions.md)
-- [Scientific source attribution](docs/sources.md)
-- [Research audit and remaining validation gaps](docs/research-audit.md)
-- [Equipment implementation walkthrough](docs/equipment-walkthrough.md)
+Run the frontend:
 
-Next: review scientific assumptions, validate the equipment catalog and expand physical constraints before Gemini explanations. See the architecture document for suggested ownership. No secret keys are needed for this milestone; keep future Gemini keys server-side and outside Git.
+```bash
+npm run dev
+```
 
-## AI usage disclosure
-Update this log with every substantial AI contribution. Team review remains pending; generated code is not represented as independently validated science.
+Open the local URL displayed in the terminal.
 
-| Date | Tool/model | Contribution | Files | Validation |
-|---|---|---|---|---|
-| 2026-10-23 | OpenAI Codex (GPT-6 family assistant) | Proposed architecture; generated starter API, simulator, UI, tests, and documentation | frontend/, backend/, docs/, README.md, .gitignore | Automated test/build results recorded in docs/validation.md; team scientific and visual review pending |
+### 4. Configure the Gemini API
 
-Original visual direction and final artwork will be supplied by the team. No generative image/video assets are included. Scientific references are attributed above. Add team names and the final demo/deployment links before submission; confirm all event-specific README requirements against the official rubric.
+Configure the following environment variables for the backend:
 
+```text
+GEMINI_API_KEY=<YOUR_API_KEY>
+GEMINI_MODEL=<SUPPORTED_MODEL_NAME>
+```
 
-### AI assistance update — 2026-10-23
-Codex researched primary NASA/DOE sources, revised constants and provenance, exposed unsupported design assumptions, updated the evidence UI/docs, and added research regression tests. Changes are AI-assisted; team scientific review is pending. Sources support individual inputs in their stated contexts, not full mission feasibility. See docs/validation.md for verification.
+Keep API keys private and never commit them to GitHub.
 
+The simulator and optimizer can operate independently of Gemini. AI-agent features require a working Gemini API connection.
 
-## Oxygen equipment catalog
+---
 
-Choose **Oxygen system** in Manual Configuration. Custom mode retains the existing capacity/DOE energy proxy. Catalog mode uses the selected published historical design and unit count instead; unused custom controls are disabled. Its source, totals, unknown planetary operating envelope and hardware-only mass are visible before and after a run.
+## Extras
 
-The initial entry uses [NASA NTRS record 19790028539](https://ntrs.nasa.gov/citations/19790028539), *Water electrolysis system - H2 and O2 generation* (1978), abstract: a historical design with 4.2 kg O2/day output, 1.1 kW power, 75 kg fixed hardware mass and 0.11 m3 volume. It is not a claim of current flight qualification or planetary suitability. Ideal electrolysis feedwater remains a separate chemistry-derived assumption. No new water/power/thermal equipment catalog entries have been invented.
+### Example Simulation Results
 
-Example: one unit on default Mars inputs uses 8.027 kW total modeled demand. For a one-day mission, oxygen ends at 30.62 kg, water at 294.37424 kg, and battery at 99.352 kWh. Two units double equipment output/power/hardware mass, not human consumption. The response includes `equipment_summary`, exact-run evidence and only the source records used by that evidence/environment. The current-input preview and previous result remain separate when inputs change.
+One documented simulation evaluated a four-person Mars mission lasting 30 days with 10 kW continuous electrical generation.
 
-### AI assistance update — 2026-10-24
-The user implemented the initial catalog, loader, API/model additions and simulation integration, including restoring initial inventories. Codex completed equipment-aware evidence reporting, React selection/quantity/summary controls, source display, regression tests and documentation. Added backend tests cover known/unknown specifications, quantity scaling, custom-mode separation, error responses and provenance. Full validation is recorded in docs/validation.md; independent scientific/hardware review remains pending.
+| Metric | Manual | Optimized |
+|---|---|---|
+| Oxygen equipment units | 2 | 1 |
+| Water equipment units | 2 | 1 |
+| Known equipment mass | 636 kg | 318 kg |
+| Electrical demand | 10.334 kW | 8.367 kW |
+| Hours evaluated | 300 / 720 | 720 / 720 |
+| Result | Power shortage | Modeled resource checks completed |
 
+The optimized configuration reduced equipment mass and power demand while satisfying the selected modeled resource constraints.
 
-## Capacity-limited water recovery (model 0.3.0)
-Select **Water recovery system → VCDS water recovery — 1979 reference case** and choose a unit count. Catalog mode disables custom recovery/recycler-power fields, tracks wastewater waiting for processing, and displays effective recovery, brine/losses and overload warnings. Custom mode retains the previous unbounded-throughput assumption. Oxygen and water units can be selected together.
+### Testing and Quality Assurance
 
-The initial water entry uses a [historical NASA contractor report](https://ntrs.nasa.gov/api/citations/19800002556/downloads/19800002556.pdf) for a derived external-feed design budget and combined mechanical/instrumentation mass and power. **The 90% processed-feed recovery yield is an explicit unvalidated assumption, not a NASA measurement.** This case is a planning proxy, not qualified planetary equipment. See [the water-recovery walkthrough](docs/water-recovery-walkthrough.md) for derivations, equations, scope and a 12-person overload demo.
+Beyond Earth uses automated tests and scientific research reviews to evaluate resource calculations, equipment processing, input validation, atmospheric screening, optimization, and AI-agent integration.
 
-### AI assistance update — water recovery, 2026-10-24
-Codex researched primary NASA references; implemented the water equipment resolver, capacity-limited queue and mass accounting, selection UI, provenance, regression tests and documentation. Source review excluded internal monitor recirculation from the external-feed budget and rejected an unsupported efficiency inference. The unresolved recovery yield remains clearly labeled. Team scientific review is pending; see docs/validation.md.
+The project documentation reported 176 passing backend tests following the atmosphere-screening implementation.
 
+### Limitations and Future Development
 
-## Deterministic optimization and comparison
-Select equipment designs and click **Optimize and compare**. The search evaluates up to 81 oxygen/water count combinations using the same simulation engine, keeping supplies, crew, duration, power generation and thermal inputs fixed. It minimizes known hardware mass within that bounded set and returns no recommendation when no eligible configuration works. Optional ending-wastewater constraints, candidate audit, evidence and inventory comparison charts are included.
+Beyond Earth is a conceptual engineering tool, not certified habitat-design software.
 
-Try Mars / 4 crew / 30 days / 10 kW generation with two units of each catalog design and other defaults. Manual hardware is 636 kg and reaches a power constraint at hour 300; the selected one-plus-one configuration is 318 kg and completes 720 modeled hours. This is resource feasibility under assumptions, not mission certification. See [the optimizer walkthrough](docs/optimizer-walkthrough.md) for implementation and interpretation.
+Future improvements include:
 
-### AI assistance update — optimizer, 2026-10-24
-Codex implemented deterministic bounded enumeration, API contracts/endpoint, manual-versus-optimized UI, 18 regression cases and documentation. No LLM produces simulation metrics. Existing NASA-attributed catalog evidence and explicitly unvalidated water yield are retained. All 79 backend tests and the frontend build pass; browser checks are recorded in docs/validation.md. Team scientific review remains pending.
+- Radiation shielding
+- Realistic thermal-control modeling
+- Structural pressure protection
+- Equipment reliability and redundancy
+- Dynamic atmosphere regulation
+- Additional validated equipment specifications
 
+Passing modeled resource checks does not establish that a habitat is safe for human occupancy.
 
-## Gemini mission advisor
-After optimizing, click **Explain this comparison with Gemini**. The backend recomputes outcomes, sends compact results and source evidence to Gemini, and validates the structured explanation. Without configuration or on failure, the UI labels computed fallback guidance honestly. Keep GEMINI_API_KEY server-side. See [setup and implementation](docs/gemini-advisor.md). AI prose requires review against authoritative calculated results and source documents.
+### Our Vision
 
-**Mission-design agent:** a custom Gemini-powered agent with bounded calls to local simulate/optimize tools, validated inputs and explicit proposal review/apply. See docs/mission-agent.md.
+Beyond Earth combines scientific research, engineering simulation, and artificial intelligence to make planetary habitat design more accessible, interactive, and understandable.
 
-### AI assistance update — Gemini advisor, 2026-10-24
-Codex implemented the backend explanation endpoint, compact evidence payload, structured provider response validation, redacted fallback handling, advisor UI, mocked regression tests and setup documentation. The integration uses Google's documented generateContent API; no live Gemini response has been verified without a supplied API key. The simulator remains authoritative. Team review is pending.
-
-Advisor diagnostics follow-up: Codex added static HTTP-status, timeout and connection hints without returning provider bodies or credentials; regression tests cover redaction.
-
-
-## Mission-design agent and external API budget
-Use **Ask your mission designer** to describe a goal. The agent can call local simulation and optimization tools, show an audit and present all proposed changes for explicit application to Manual Mode. It uses the existing Gemini integration only: one runtime external API provider, within the stated two-integration limit. NASA references are bundled and attributed; there are no runtime NASA API requests. A run may make multiple Gemini requests. See [the agent guide](docs/mission-agent.md).
-
-### AI assistance update — mission agent, 2026-10-24
-Codex implemented the bounded Gemini function-calling loop, canonical input validation, local tool audit, proposal review/apply UI, regression tests and documentation. Default model updated to gemini-3.8-flash after the user's successful advisor test. All 119 backend tests and frontend production build pass. Browser checks used clearly labeled mocked Gemini decisions with the real optimizer; live agent function-calling verification remains pending. No additional external provider or generative visual assets were added. Scientific assumptions remain unvalidated; team review is pending.
-
-
-## Cabin CO2 screening — model 0.4.0
-Enable **Evaluate cabin CO2 and scrubber load** to model a well-mixed interior cabin, NASA BVAD crew CO2 generation, historical CDRA units, power and hardware mass, and a NASA-referenced 3 mmHg one-hour-average design screen. Screening is off for existing scenarios and explicitly labeled not evaluated. Enabled optimization includes scrubber quantities (up to 405 candidates); the agent has a CO2 goal example. Historical operating-point data is distinguished from the unvalidated response curve and cabin assumptions. [Full sources, equations and demo](docs/co2-walkthrough.md). No additional external API is introduced.
-
-### AI assistance update — CO2 extension, 2026-10-24
-Codex researched NASA/NIST primary references, excluded technology targets from equipment-performance claims, implemented analytical CO2 balances, explicit opt-in controls, source-attributed equipment, optimizer/agent integration, charts, 25 regression cases and documentation. All 144 backend tests and frontend build pass; browser simulation and optimization checks passed. Live CO2 agent verification and team scientific review remain pending. The existing agent checkpoint was already committed as e9674b0 before this extension.
-
-Compatibility follow-up: Codex added a startup capability check that identifies an older running backend missing CO2 fields/catalog support and displays restart instructions, preventing the updated frontend from silently using an incomplete contract. Frontend production build verified.
-
-Live integration follow-up — 2026-10-24: Codex verified the real Gemini CO2 mission goal and explicit Apply workflow after the user restarted backend 0.4.0. The live agent made one optimizer call and returned the expected 405-candidate, two-plus-two-plus-two result. Validation evidence is recorded in docs/validation.md; no credential was read or added to Git. Scientific qualification remains pending.
-
-
-## Fixed cabin atmosphere screening — model 0.5.0
-Enable **Screen pressure and inspired oxygen** to evaluate static interior pressure and dry oxygen percentage, distinguish dry oxygen partial pressure from inspired oxygen, and check the selected NASA-referenced nominal criteria. The feature does not model leaks, regulators, gas replenishment, pressure-vessel protection or a dynamically coupled gas mixture. CO2 screening remains separate and opt-in. Invalid atmosphere settings stop at hour zero, and optimization cannot fix them by adding equipment. Try the new agent atmosphere goal, inspect the audit and Apply. [Sources, equations, interpretation and demo](docs/atmosphere-walkthrough.md). No additional external API.
-
-### AI assistance update — atmosphere screening, 2026-10-24
-Codex researched pinned NASA-STD-3001 Vol 2 Rev E and OCHMO-TB-003 references; implemented the static screen, explicit dry/inspired oxygen distinction, source evidence, UI, optimizer/agent integration and 32 regression cases. All 176 tests and frontend build pass. Manual browser checks and a live gemini-3.8-flash simulation/Apply run passed; no credential was read or stored. Scientific and standards-compliance qualification remain outside the prototype.
-
-
-## Save, load and share missions
-The mission library stores named input snapshots in browser local storage, with load, duplicate, confirmed deletion and JSON export/import. Loading clears old results and proposals and requires a fresh run. Files include all mission/screening/equipment/search settings and model version, not results or credentials. Browser storage is specific to the site origin/profile; export JSON to share with teammates or back up data. No new external API or cloud service. [Usage, format and frontend handoff](docs/mission-save-load.md).
-
-Frontend persistence checks: run `npm.cmd test` from frontend, then `npm.cmd run build`. Backend checks include a fixture-contract test to keep frontend validation tests aligned with the canonical models.
-
-### AI assistance update — mission save/load, 2026-10-24
-Codex implemented the standalone local mission library, versioned input-only files, schema/catalog validation, import preview, safe storage failures and stale-result invalidation; added 27 frontend tests and a backend contract-fixture test, and documented the handoff for the console redesign. Browser save/refresh/load/duplicate/delete/import/rerun workflows were verified. No new dependency, scientific model or external API integration was added.
-
-## Thermal capacity integration — model 0.6.0
-Optional heating/cooling screening now compares fixed design capacities against a steady conduction requirement, shared by simulation, optimizer and agent tools. Insufficient capacity stops before resource consumption. The controls use plain-language labels with technical terms underneath. See docs/thermal-integration.md and docs/assumptions.md for contracts, units and limitations. Existing 0.5.0 saved input snapshots migrate with this screen disabled.
-
-AI assistance: Codex integrated the team-authored thermal helper into the simulator, evidence and compact AI results; added focused integration tests, capacity UI, plain-language labels and a frontend handoff. Removed duplicate JSX that prevented the existing App from building. Research assumptions and hardware suitability still require team review.
-
-## Mission Lab guide
-The optional /tutorial guide explains configuration fields, results, optimization, AI proposals and saved missions. Open it from the home page or Mission Lab's top Help link; skip or finish to enter Mission Lab. Opening help preserves the current mission within the same session. The tutorial contains no illustrations or image assets. See docs/tutorial-code-walkthrough.md for the implementation and handoff.
-
-AI assistance update: Codex helped adapt the approved tutorial prototype into the existing React tutorial placeholder, implement Help navigation with retained mission state, and document the changes. Tutorial copy and scientific scope remain available for team review. No generated image assets were added.
-
-Codex assisted with explicit progress/completion feedback and result-navigation buttons for simulation, optimization and AI goal testing.
-
-Codex assisted with revealing custom oxygen/water inputs directly beneath their equipment selectors and clarifying the historical static-feed design label.
-
-Codex assisted with inline Reference equipment / Custom design guidance, selector descriptions and explanation of how these modes participate in simulation and comparison.
-
-Codex assisted with plain-language equipment explanations and source disclosures. Specific catalog equipment names remain visible in selectors and summaries, with citations in equipment details.
-
-## Backend power-demand breakdown
-Simulation results include a typed power_breakdown with electrical requirements for other habitat equipment, water recycling, thermal control, oxygen generation and enabled CO2 removal, plus the unrounded total in kW. The same total drives resource accounting; existing demand_kw remains rounded for display. It is a requirement, not measured consumption, including when an initial check stops a run. No frontend changes are included. See docs/power-demand-breakdown.md for code explanations, tests and the display handoff.
-
-AI assistance: Codex helped implement and test this additive backend reporting field and document its existing model assumptions. No new scientific constants, runtime providers, or visual assets were introduced.
-
-## Oxygen and water shortage diagnostics
-Resource events now explain oxygen crew demand, modeled production and starting stock, and water crew use, modeled recovery, electrolysis feedwater and starting usable stock, with the hourly shortfall. These are diagnostic failed-hour balances, not proof of operation with missing inputs. The existing event interface and equations are unchanged. See docs/oxygen-water-diagnostics.md for code explanations and tests.
-
-AI assistance: Codex helped add the backend diagnostic messages, numerical regression tests and explanation documentation. No frontend, new scientific constants, image assets or external API integrations were added.
-
-Codex assisted with compact manual/optimized comparison cards, applying the tested optimized design to mission controls and simulation charts, and stale-comparison guards.
-
-Codex assisted with a bounded, verified power-adjustment proposal workflow and direct manual-versus-optimized explanations. See [optimization improvements](docs/optimization-improvements.md). Original fixed-constraint optimization remains available.
-
-Codex extended verified repair proposals to initial-water shortages, added seven-crew regression coverage, and simplified shortage explanations while retaining exact diagnostics in details.
-
-Codex assisted with a permission-gated Gemini improvement tool and structured resource-by-resource manual/optimized explanations. Calculated comparison rows remain authoritative; AI prose is reviewable.
-
-Codex assisted with concise result notices, a combined unchecked-systems status, expandable diagnostics and shorter AI comparison text. Full scientific warnings remain available.
-
-Codex assisted with reference-equipment defaults for new missions and an advanced custom-assumptions section. Loaded custom missions retain their saved values and expose their custom controls.
-
-Codex restored a prominent no-prompt optimize/compare/apply/AI-explain workflow in the AI assistance monitor while retaining the optional prompt-based assistant.
-
-Codex shortened AI-panel labels, progress messages and guidance while retaining detailed audits and disclosures.
-
-Codex consolidated systems results into a compact outcome, one selectable resource chart and a collapsed Research & technical details section. Exact events, equations and scientific sources remain accessible.
-
-Codex moved simulation and comparison graphs to the left resource console and retained AI tools in Systems & results. Planet selection and simulation behavior were unchanged.
+**Design. Simulate. Optimize. Explore Beyond Earth.**
