@@ -409,3 +409,33 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 /* Playback controls stay opposite the resource box. */
 .surface-playback-scene>.surface-day-counter{left:12px;right:auto;top:42px}
 @media(max-width:600px){.surface-playback-scene>.surface-day-counter{left:8px;right:auto;top:36px}}
+
+/* Tutorial uses the established mission-control type and the team's planet artwork. */
+.animated-briefing{max-width:1120px}
+.animated-briefing .briefing-top h1,.animated-briefing #briefing-lesson-title,.briefing-explanations h3,.briefing-detailed-help h2{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:500;letter-spacing:1px;color:#ff9865}
+.animated-briefing .briefing-top h1{font-size:24px}.animated-briefing #briefing-lesson-title{font-size:26px}
+.briefing-lesson-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:32px;align-items:center;margin:24px 0}
+.animated-briefing .briefing-caption{font-size:16px;line-height:1.6;margin:0;max-width:70ch}
+.briefing-explanations section+section{margin-top:28px}.briefing-explanations h3{font-size:16px;line-height:1.5;margin:0 0 10px;letter-spacing:0}
+.briefing-explanations p{font-size:15px;line-height:1.65;color:#d6dfe8;margin:0}
+.briefing-explanations .briefing-constraint-note{font-size:13px;color:#b2bfcd;margin-top:24px}
+.briefing-world-art{display:block;object-fit:contain;width:72px;height:72px;clip-path:circle(36.5% at 51.5% 48.5%);margin:0 auto 8px}
+.briefing-example{border:0;border-radius:0;background:#101720;min-height:360px;padding:24px}
+.briefing-world{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:10px 5px}
+.briefing-world.is-selected{background:transparent;border-color:#ff9865}
+.briefing-world small,.briefing-selection,.briefing-scene-label{font-size:12px}
+.briefing-outcome{border:0;border-left:2px solid #344253;border-radius:0;padding:16px}
+.briefing-run-example{grid-template-columns:1fr;gap:18px}.briefing-example-run{max-width:180px;border-radius:4px}
+.briefing-detailed-help{background:transparent;border:0;border-top:1px solid #344253;border-radius:0;padding:24px 0;margin-top:24px}
+.briefing-detailed-help h2{font-size:18px}.briefing-detailed-help .welcome-secondary{font-size:14px}
+@media(max-width:800px){.briefing-lesson-grid{grid-template-columns:1fr;gap:24px}.briefing-explanations{display:grid;grid-template-columns:1fr 1fr;gap:24px}.briefing-explanations section+section{margin-top:0}.briefing-constraint-note{grid-column:1/-1}.briefing-example{min-height:0}}
+@media(max-width:500px){.briefing-explanations{grid-template-columns:1fr}.briefing-world-art{width:58px;height:58px}.animated-briefing #briefing-lesson-title{font-size:22px}.briefing-worlds{gap:8px}.briefing-world strong{font-size:14px}}
+
+/* Keep the animated setup labels consistent and the caption below the example. */
+.animated-briefing .briefing-setting,.animated-briefing .briefing-duration{font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:0}
+.animated-briefing .briefing-setting>span,.animated-briefing .briefing-setting>strong{font-size:14px;line-height:1.5}
+.animated-briefing .briefing-caption{margin:16px 0 20px}
+
+.animated-briefing .briefing-top h1{font-size:36px;color:#f0f5fa;letter-spacing:1px}
+.briefing-lesson-grid.briefing-visual-only{grid-template-columns:1fr}
+@media(max-width:500px){.animated-briefing .briefing-top h1{font-size:30px}}
