@@ -443,3 +443,38 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .animated-briefing .briefing-top h1{font-size:36px;color:#f0f5fa;letter-spacing:1px}
 .briefing-lesson-grid.briefing-visual-only{grid-template-columns:1fr}
 @media(max-width:500px){.animated-briefing .briefing-top h1{font-size:30px}}
+
+/* Approved four-step mission configuration and matching brief. */
+.mission-editor h2,.mission-editor h3,.mission-brief h2,.mission-brief h3{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:500;letter-spacing:.5px;color:var(--accent,#ff9b64)}
+.mission-editor .wizard-heading{display:block!important;padding-bottom:0!important}
+.mission-editor .editor-library-actions{justify-content:flex-end;margin-bottom:12px!important}
+.mission-editor .editor-step-nav{gap:22px;margin:0 0 24px!important;padding-bottom:14px;border-bottom:1px solid #354352;flex-wrap:wrap}
+.mission-editor .editor-step-nav button{padding:8px 0;border:0;border-radius:0;background:transparent;color:#afbdcc;font-size:14px}
+.mission-editor .editor-step-nav button[aria-current]{color:var(--accent);box-shadow:0 2px var(--accent)}
+.mission-editor .build-step-intro{font-size:14px;line-height:1.6;margin:0 0 24px;color:#afbdcc}
+.mission-editor .wizard-body>section>h2{font-size:24px;margin-bottom:10px}
+.build-supply-row,.build-system-row{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;padding:18px 0;border-top:1px solid #354352}
+.mission-editor .build-supply-row label,.mission-editor .build-system-row label{margin:0}
+.build-supply-row p,.build-system-row p{font-size:13px;line-height:1.6;color:#afbdcc;margin:0}
+.build-system-row h3{font-size:16px;line-height:1.5;margin:0 0 6px}
+.build-system-row>div>label+label{margin-top:12px!important}
+.build-custom-system{margin:16px 0}.build-custom-note{font-size:13px;color:#afbdcc}
+.mission-build-summary{font-size:14px}.build-summary-line{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-top:1px solid #354352;font-variant-numeric:tabular-nums}
+.build-summary-line span,.build-summary-line dt{color:#afbdcc}.build-summary-line strong,.build-summary-line dd{font-weight:500;text-align:right;margin:0;max-width:65%;overflow-wrap:anywhere}
+.build-summary-group{margin:20px 0}.build-summary-group h3{font-size:16px;line-height:1.5;margin:0 0 6px}.build-summary-group dl{margin:0}
+.mission-brief{gap:20px}.mission-brief .brief-header h2{font-size:24px}.mission-brief .mission-build-summary{flex:1}.mission-brief .build-summary-line{padding:8px 0;font-size:13px}.mission-brief .build-summary-group{margin:14px 0}.mission-brief .brief-actions{gap:16px}
+@media(min-width:801px){.station-setup:has(.mission-brief){height:min(620px,calc(100dvh - 220px))}.mission-brief .mission-build-summary{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}.mission-brief .mission-build-summary>.build-summary-line{grid-column:1/-1}.mission-brief .build-summary-line dd{max-width:60%}}
+@media(max-width:600px){.build-supply-row,.build-system-row{grid-template-columns:1fr;gap:12px}.mission-editor .editor-step-nav{gap:12px 20px}.build-summary-line{flex-wrap:wrap;gap:6px}.build-summary-line dd,.build-summary-line strong{text-align:left;max-width:100%}.mission-editor h2{font-size:21px}}
+
+.mission-brief .brief-header{padding:0;border:0}
+.mission-brief{padding:20px;gap:14px}
+.mission-brief .mission-build-summary{flex:0}
+.mission-brief .build-summary-group{margin:10px 0}
+.mission-brief .build-summary-line{padding:6px 0;line-height:1.4}
+.mission-brief .brief-status .note{padding:6px 10px}
+
+/* Match the Home/Tutorial wordmark without changing Mission Lab navigation. */
+.shell.operator-shell[data-planet]>header .brand{color:#f0f5fa;font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:16px;font-weight:750;letter-spacing:2px}
+.shell.operator-shell[data-planet]>header .brand .mark{color:#84ddcd;font-size:30px}
+.shell.operator-shell[data-planet]>header .brand small{font-size:9px;color:#94a4b5;letter-spacing:1.5px}
+@media(max-width:600px){.shell.operator-shell[data-planet]>header .brand{font-size:14px}}
