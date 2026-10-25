@@ -327,3 +327,9 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .operator-experience[data-star-motion="false"] .operator-room::before{animation-play-state:paused;will-change:auto}
 @media(max-width:800px){.operator-room::before{background-size:800px 550px;animation:none;transform:none;will-change:auto}}
 @media(prefers-reduced-motion:reduce){.operator-room::before{animation:none;transform:none;will-change:auto}}
+
+/* Original homepage with the Titan palette. */
+.original-home{--welcome-accent:#77d9b0}
+.original-home .welcome-start{background:var(--welcome-accent);border-color:var(--welcome-accent);color:#10251f}
+.original-home .welcome-start:hover{background:#9ce9c9;border-color:#9ce9c9}
+.original-home :is(a,button):focus-visible{outline-color:var(--welcome-accent)}
