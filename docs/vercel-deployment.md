@@ -26,3 +26,7 @@ The deployment configuration is prepared locally and tested below. Account acces
 - https://vercel.com/docs/frameworks/backend/fastapi
 - https://vercel.com/docs/functions/runtimes/python
 - https://vercel.com/docs/project-configuration
+
+
+## First Vercel build correction
+Vercel rejected the nested -r include in the root requirements file. I replaced it with the explicit pinned entries from backend/requirements.lock.txt so Vercel can parse the deployment dependencies directly. The simulation code did not change. The hosted copy is a private repository at serenedavis/beyond-earth-deployment; updates to the team repository are not automatically mirrored there.
