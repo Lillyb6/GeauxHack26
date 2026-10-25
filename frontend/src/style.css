@@ -558,3 +558,11 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .optimization-primary-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .optimization-primary-actions>button{flex:1 1 170px}
 .mission-agent .action-feedback>.run,.mission-agent .action-feedback>p+.run{margin:8px 12px 8px 0}
+
+.account-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 12px;font-size:13px;max-width:100%}
+.account-controls button{background:transparent;border:1px solid #526171;color:#e6edf3;border-radius:4px;padding:9px 14px;min-height:40px;font:inherit}
+.account-controls small{color:#afbdcc;font-size:12px}.account-controls .alert{flex-basis:100%;margin:0}
+.mission-library>.account-controls{justify-content:flex-start;margin:16px 0}
+.mission-save-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:14px 0}
+.mission-save-actions small{color:#afbdcc}.operator-shell>header{flex-wrap:wrap;gap:14px}
+@media(max-width:600px){.welcome-header{flex-wrap:wrap;gap:16px}.account-controls{justify-content:flex-start}.account-controls button{min-height:44px}}

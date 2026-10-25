@@ -1,0 +1,2 @@
+# Reuse the dependency versions verified by the backend tests.
+-r backend/requirements.lock.txt

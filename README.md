@@ -189,3 +189,7 @@ Codex shortened AI-panel labels, progress messages and guidance while retaining 
 Codex consolidated systems results into a compact outcome, one selectable resource chart and a collapsed Research & technical details section. Exact events, equations and scientific sources remain accessible.
 
 Codex moved simulation and comparison graphs to the left resource console and retained AI tools in Systems & results. Planet selection and simulation behavior were unchanged.
+
+
+## Optional Google account and cloud missions
+On the google-signin-cloud-missions branch, signed-in users can run a mission and explicitly save its input configuration privately to Supabase. Guests use JSON import/export; Run and Apply do not automatically create browser saves. Previous local saves remain accessible for export. Supabase is optional for simulation and Gemini. See [setup and code explanation](docs/google-cloud-missions.md) for Google OAuth configuration, environment variables, the database migration and ownership tests. A cloud save contains inputs, not calculated results; run again after loading.
