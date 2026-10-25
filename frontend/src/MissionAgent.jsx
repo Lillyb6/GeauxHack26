@@ -28,9 +28,9 @@ export default function MissionAgent({baseline,onApply}) {
  }
  return <section className="panel mission-agent" aria-label="Mission design agent">
   <p className="eyebrow">GEMINI / LOCAL SIMULATION TOOLS</p><h2>AI mission designer</h2>
-  <p>Describe your goal. Review changes before applying.</p>
-  <form onSubmit={submit}><label htmlFor="agent_goal">Mission goal<textarea id="agent_goal" required minLength={5} maxLength={1500} rows={4} value={goal} onChange={e=>{setGoal(e.target.value);setApplied(false);}}/></label><label className="checkbox-label agent-adjustment"><input type="checkbox" checked={allowAdjustments} onChange={e=>{setAllowAdjustments(e.target.checked);setApplied(false);}}/>Allow AI to propose more power and starting water. Review before applying.</label><button className="run" disabled={busy||goal.trim().length<5}>{busy?'Testing goal… please wait':response?(stale&&!applied?'Inputs changed · Test again':'✓ Response received · Test again'):error?'Try goal again':'Test goal'}</button></form>
-  <div className="action-feedback" role="status" aria-live="polite" aria-atomic="true">{busy&&<p><span className="activity-spinner" aria-hidden="true"/>Testing your goal with Gemini and local tools. This can take up to a minute. Results will appear below.</p>}{response&&<><p>{applied?'Proposal applied. Manual inputs and simulation charts now show this design.':stale?'Goal or inputs changed. Test again to refresh this response.':response.proposed_scenario?'Goal tested. Review the proposed changes below; manual settings have not changed.':response.status==='needs_clarification'?'More information needed. Read the response below.':response.status==='unavailable'?'AI unavailable. Read the response below for the reason.':response.status==='partial'||response.status==='limited'?'Goal test stopped early. Review the available results below.':'Goal test finished. Read the result below; no design is available to apply.'}</p><button type="button" className="result-jump" onClick={viewResponse}>View goal response ↓</button></>}{error&&<p>Goal test failed. See the error below, then try again.</p>}</div>
+  <p>Describe your mission.</p>
+  <form onSubmit={submit}><label htmlFor="agent_goal">Mission goal<textarea id="agent_goal" required minLength={5} maxLength={1500} rows={4} value={goal} onChange={e=>{setGoal(e.target.value);setApplied(false);}}/></label><label className="checkbox-label agent-adjustment"><input type="checkbox" checked={allowAdjustments} onChange={e=>{setAllowAdjustments(e.target.checked);setApplied(false);}}/>Allow power & water increases</label><button className="run" disabled={busy||goal.trim().length<5}>{busy?'Testing goal… please wait':response?(stale&&!applied?'Inputs changed · Test again':'✓ Response received · Test again'):error?'Try goal again':'Test goal'}</button></form>
+  <div className="action-feedback" role="status" aria-live="polite" aria-atomic="true">{busy&&<p><span className="activity-spinner" aria-hidden="true"/>Creating a tested design…</p>}{response&&<><p>{applied?'Applied. Simulation updated.':stale?'Inputs changed. Test again.':response.proposed_scenario?'Design ready. Review, then apply.':response.status==='needs_clarification'?'More details needed. See below.':response.status==='unavailable'?'AI unavailable. See details.':response.status==='partial'||response.status==='limited'?'Stopped early. Review results.':'Finished. No design to apply.'}</p><button type="button" className="result-jump" onClick={viewResponse}>View design ↓</button></>}{error&&<p>Failed. See error below.</p>}</div>
   <details><summary>Example goals</summary><button type="button" className="agent-example" onClick={()=>{setGoal('Enable cabin CO2 screening for six crew for 30 days on Mars, with 100 m3 free cabin volume, 0.4 mmHg initial CO2, 14 kW generation, 400 kg initial water and no ending wastewater backlog. Find the lightest catalog design. Keep all other inputs unchanged.');setApplied(false);}}>Try a CO₂ screening goal</button>
   <button type="button" className="agent-example" onClick={()=>{setGoal('Enable cabin atmosphere screening and evaluate the current design at 101.325 kPa total cabin pressure and 20.9 percent dry oxygen. Keep every other mission, equipment, supply and screening setting unchanged. Explain dry versus inspired oxygen partial pressure.');setApplied(false);}}>Try an atmosphere screening goal</button>
   </details><p className="muted">Your goal and mission settings are sent to Google Gemini.</p><details><summary>How AI uses your data</summary><p className="muted">Uses the existing Gemini API only. Your goal, current settings, catalog evidence and compact tool results are sent to Google. Up to three local tool calls and four Gemini requests per run. Starting supplies and settings change only in a reviewable proposal.</p>
@@ -38,7 +38,7 @@ export default function MissionAgent({baseline,onApply}) {
    {error&&<p role="alert" className="alert">{error}</p>}
    {response&&<div ref={resultTarget} tabIndex={-1} className="result-target" aria-label="Goal test response">
     <p className="note">{response.model?`AI mission agent · ${response.model}`:'Mission agent unavailable'} · {response.status.replaceAll('_',' ')}</p>
-    {stale&&!applied&&<p className="alert">The goal or mission inputs changed. Run the agent again before applying this proposal.</p>}
+    {stale&&!applied&&<p className="alert">Inputs changed. Test again before applying.</p>}
     {run ? <>
      <h3>{response.comparison?.optimized?'Recommended configuration':'Calculated design'}</h3>
      <div className="agent-metrics">
@@ -59,11 +59,11 @@ export default function MissionAgent({baseline,onApply}) {
      {changes.length?<div className="table-wrap"><table><caption>All changes from your original settings</caption><thead><tr><th>Input</th><th>Current at request</th><th>Proposed</th></tr></thead><tbody>{changes.map(([key,before,after])=><tr key={key}><th scope="row">{key}</th><td>{format(before)}</td><td>{format(after)}</td></tr>)}</tbody></table></div>:<p>The evaluated proposal matches your current settings.</p>}
      <button type="button" className="run" disabled={busy||stale||applied} onClick={apply}>{applied?'Proposal applied':'Apply to manual mode'}</button>
     </>}
-    {!response.proposed_scenario&&response.audit.length>0&&<p>No qualifying calculated design is available to apply. Review the audit and adjust the goal if needed.</p>}
-    {applied&&<p role="status">Proposal applied to Manual Mode. The result charts now show that evaluated design.</p>}
+    {!response.proposed_scenario&&response.audit.length>0&&<p>No passing design to apply.</p>}
+    {applied&&<p role="status">Applied. Controls and charts updated.</p>}
     {run&&<details><summary>Evidence from the calculated design</summary><EvidenceList evidence={run.evidence} sources={run.sources}/></details>}
     <details><summary>AI limitations</summary><ul>{response.limitations.map(note=><li key={note}>{note}</li>)}</ul></details>
-    <p>AI prose can contain mistakes. Check the tool audit and evidence; the agent cannot apply changes automatically.</p>
+    <p>Review AI advice before applying.</p>
    </div>}
   </div>
  </section>;

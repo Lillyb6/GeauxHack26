@@ -312,3 +312,7 @@ summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visi
 .editor-life-support-grid .editor-subsection{margin:0;padding:0;border:0;min-width:0}
 .mission-editor .editor-life-support-grid h3{font-size:16px;margin:0 0 16px}
 @media(max-width:600px){.editor-life-support-grid{grid-template-columns:1fr}}
+
+.optional-prompt{margin-top:18px;border-top:1px solid #34485b;padding-top:15px}.optional-prompt>summary{font-weight:600}.optimization-workflow .advisor{margin-top:18px}.optimization-workflow .result-jump{margin:6px 0}
+
+.outcome-readouts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.outcome-readouts dt{font-size:12px;color:#9fb1c2}.outcome-readouts dd{margin:5px 0;font-size:22px;color:#e6edf4}.technical-details{margin-top:18px}.technical-details>summary{font-weight:600}.technical-details[open]>summary{margin-bottom:16px}.technical-details .panel{margin-top:14px}
