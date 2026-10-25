@@ -30,3 +30,15 @@ The deployment configuration is prepared locally and tested below. Account acces
 
 ## First Vercel build correction
 Vercel rejected the nested -r include in the root requirements file. I replaced it with the explicit pinned entries from backend/requirements.lock.txt so Vercel can parse the deployment dependencies directly. The simulation code did not change. The hosted copy is a private repository at serenedavis/beyond-earth-deployment; updates to the team repository are not automatically mirrored there.
+
+## Live deployment verification, October 25, 2026
+
+I deployed the application to https://beyond-earth-deployment.vercel.app using the private serenedavis/beyond-earth-deployment deployment repository. The earlier team main is preserved on backup/main-before-google-vercel-2026-10-25. The deployment repository is a separate copy and does not automatically follow team-repository changes.
+
+I configured the public Supabase URL and publishable key in Vercel Production and rebuilt the app. I verified HTTP 200 responses for the health API, planetary environments, simulation page and tutorial. A live one-day Mars simulation completed all 24 hours.
+
+I saved the production Site URL and exact /simulation return URLs for production, localhost:5173 and 127.0.0.1:5173. I created the missions table and ran the rollback-only ownership tests in Supabase. They passed owner isolation, rejection of cross-owner writes and rejection of anonymous reads.
+
+Google sign-in was verified successfully after the owner corrected the provider secret. The signed-in session survived a refresh, and the private mission library loaded. No secret is included in this document.
+
+The owner configured the production Gemini API key directly in Vercel. Live AI requests were verified, including an intentionally failing water scenario with a reviewable proposal and water depletion at hour 2. Verification totals after the Apply fix are 370 backend tests and 58 frontend tests, plus the successful live SQL privacy checks.
