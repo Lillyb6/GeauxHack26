@@ -71,6 +71,12 @@ def simulate(req: HabitatRequest) -> SimulationResult:
             / 24
         )
     co2_summary=resolve_co2_equipment(req.co2_equipment_id,req.co2_equipment_quantity) if req.co2_enabled else None
+    if co2_summary and req.crew_size * CREW_CO2_KG_DAY > co2_summary["co2_capacity_kg_day"] + 1e-9:
+        warnings.append(
+            f"CO2 removal capacity ({co2_summary['co2_capacity_kg_day']:.3f} kg/day at the reference pressure) "
+            f"is below crew generation ({req.crew_size * CREW_CO2_KG_DAY:.3f} kg/day). "
+            "CO2 can accumulate; the simulated hourly average determines failure, not this capacity warning."
+        )
     alpha=pressure_per_kg(req.habitat_volume_m3,req.interior_temperature_c) if req.co2_enabled else None
     co2_pressure=req.initial_co2_mmhg if req.co2_enabled else None
     co2_removed=0.0
@@ -223,6 +229,9 @@ def simulate(req: HabitatRequest) -> SimulationResult:
         evidence=evidence, sources=sources_for(evidence, req.environment_id, equipment_summary, water_equipment_summary), environment_reference=env,
         water_equipment_summary=water_equipment_summary, water_balance=water_balance, warnings=warnings,
         atmosphere_summary=atmosphere_summary, co2_equipment_summary=co2_summary,
-        co2_balance={"initial_kg":req.initial_co2_mmhg/alpha,"generated_kg":req.crew_size*CREW_CO2_KG_DAY*hour/24,
+        co2_balance={"crew_generation_kg_day":req.crew_size*CREW_CO2_KG_DAY,
+            "installed_capacity_kg_day":co2_summary["co2_capacity_kg_day"],
+            "capacity_margin_kg_day":co2_summary["co2_capacity_kg_day"]-req.crew_size*CREW_CO2_KG_DAY,
+            "initial_kg":req.initial_co2_mmhg/alpha,"generated_kg":req.crew_size*CREW_CO2_KG_DAY*hour/24,
             "removed_kg":co2_removed,"end_kg":co2_pressure/alpha,"limit_mmhg":CO2_LIMIT_MMHG,
             "limit_basis":"one-hour average; initial state separately screened","response_curve":"unvalidated linear below 2 mmHg, capped above"} if req.co2_enabled else None)

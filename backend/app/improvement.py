@@ -1,4 +1,4 @@
-"""Explicit power-adjustment proposals; the fixed-constraint optimizer stays unchanged."""
+"""Explicit power, water and thermal-capacity proposals; the fixed-constraint optimizer stays unchanged."""
 from math import ceil
 from collections import Counter
 from .models import CandidateSummary
@@ -12,7 +12,15 @@ def improve(request):
         return fixed
     # A bounded second search asks whether power alone can unlock the same equipment bounds.
     ceiling = 100.0
-    scenario = request.scenario.model_copy(update={"generation_kw": ceiling})
+    updates = {"generation_kw": ceiling}
+    thermal = fixed.manual.thermal_summary
+    if request.scenario.thermal_capacity_enabled and not thermal["capacity_sufficient"]:
+        field = "heating_capacity_kw" if thermal["mode"] == "heating" else "cooling_capacity_kw"
+        required = ceil(thermal["required_thermal_kw"] * 1000) / 1000
+        # Stay inside the public input bounds. Never disable a failed check.
+        if required <= 1000:
+            updates[field] = max(getattr(request.scenario, field), required)
+    scenario = request.scenario.model_copy(update=updates)
     expanded = optimize(request.model_copy(update={"scenario": scenario}))
     expanded.recovery_attempted = True
     expanded.recovery_search_generation_kw = ceiling
@@ -20,9 +28,9 @@ def improve(request):
     expanded.search_request = request
     expanded.manual = fixed.manual
     expanded.manual_known_hardware_mass_kg = fixed.manual_known_hardware_mass_kg
-    expanded.limitations = [line for line in expanded.limitations if not line.startswith("Search changes catalog IDs/counts only")]
-    expanded.limitations.insert(1, "A second equipment search allows up to 100 kW continuous generation. Equipment counts/IDs, proposed generation and (if needed) initial water may change; crew, duration, oxygen inventory, battery and all screening settings stay fixed. Counts in the audit refer to the 100 kW search; fixed-budget constraints are recorded separately.")
-    expanded.limitations.append("Power-system hardware, fuel and storage are not designed or included in equipment mass. Proposed generation must be engineered separately; no minimum-power or global optimum is claimed.")
+    expanded.limitations = [line for line in expanded.limitations if not line.startswith(("Search changes catalog IDs/counts only", "Optional thermal screening keeps"))]
+    expanded.limitations.insert(1, "A second equipment search allows up to 100 kW continuous generation. Equipment counts/IDs, proposed generation and (if needed) initial water and enabled heating/cooling capacity may change. Thermal capacity is sized to the modeled load, up to 1000 kW thermal. Planet, crew, duration, oxygen inventory, battery, target temperature, conductance, COP, atmosphere settings and check enable flags stay fixed. Counts in the audit refer to the 100 kW search; fixed-budget constraints are recorded separately.")
+    expanded.limitations.append("Thermal and power-system hardware, fuel and storage are not designed or included in equipment mass. Proposed generation must be engineered separately; no minimum-power or global optimum is claimed.")
     if expanded.optimized is None:
         # Water shortfall can prevent even correctly sized life support from completing.
         # Search the same hardware envelope with ample water, derive its peak net use,
@@ -63,7 +71,7 @@ def improve(request):
         expanded.recovery_search_water_kg = water_ceiling
         expanded.limitations.append("Water-repair audit candidates use 100 kW and 100000 kg initial water as search ceilings. Final proposed inputs are independently verified. Rank verified repairs by least added starting water, then known equipment mass, power and counts. Supplies and power-system mass are not part of equipment mass; no global optimum is claimed.")
         if not verified:
-            expanded.explanation = "No verified proposal passed even after testing higher power and starting water within the model bounds. Atmosphere settings, thermal capacities or equipment limits may still prevent completion. These settings were not silently changed."
+            expanded.explanation = "No verified proposal passed even after testing higher power, starting water and enabled thermal capacity within the model bounds. Fixed atmosphere settings or equipment and model bounds may still prevent completion. No check was disabled."
             return expanded
         expanded.optimized = min(verified,key=lambda entry:entry[0])[1]
         expanded.status = "feasible"
@@ -93,5 +101,7 @@ def improve(request):
         + f", and proposes {checked.request.generation_kw:g} kW continuous generation (was {request.scenario.generation_kw:g}). "
         f"Starting water: {request.scenario.water_kg:g} to {checked.request.water_kg:g} kg. "
         f"It was re-simulated at those inputs and completed {checked.evaluated_hours} hours with {checked.demand_kw:g} kW demand. "
-        "Crew, duration, starting oxygen, battery and screening settings are unchanged. This is a tested model result, not a survival certification.")
+        f"Heating capacity: {request.scenario.heating_capacity_kw:g} to {checked.request.heating_capacity_kw:g} kW thermal. "
+        f"Cooling capacity: {request.scenario.cooling_capacity_kw:g} to {checked.request.cooling_capacity_kw:g} kW thermal. "
+        "Planet, crew, duration, starting oxygen, battery, atmosphere settings and check enable flags are unchanged. This is a tested model result, not a survival certification.")
     return expanded

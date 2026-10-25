@@ -1,4 +1,4 @@
-const labels={oxygen:'Oxygen shortage',water:'Water shortage',power:'Power shortage',co2:'CO₂ too high',atmosphere:'Atmosphere outside limits',thermal:'Heating/cooling limit'};
+const labels={cabin_pressure:'Cabin pressure outside range',inspired_oxygen:'Inspired oxygen outside target',inert_diluent:'Not enough inert gas',oxygen:'Oxygen shortage',water:'Water shortage',power:'Power shortage',co2:'CO₂ too high',atmosphere:'Atmosphere outside limits',thermal:'Heating/cooling limit'};
 export default function ResultNotices({result}) {
  const unchecked=[!result.request.thermal_capacity_enabled&&'Heating/cooling capacity',!result.request.co2_enabled&&'CO₂',!result.request.atmosphere_enabled&&'Atmosphere'].filter(Boolean);
  const otherWarnings=result.warnings.filter(text=>!text.includes('screening is disabled'));

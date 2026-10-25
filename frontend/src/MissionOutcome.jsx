@@ -1,4 +1,4 @@
-const names={power:'Power shortage',oxygen:'Oxygen shortage',water:'Water shortage',co2:'CO₂ too high',atmosphere:'Atmosphere outside limits',thermal:'Heating/cooling limit'};
+const names={cabin_pressure:'Cabin pressure outside range',inspired_oxygen:'Inspired oxygen outside target',inert_diluent:'Not enough inert gas',power:'Power shortage',oxygen:'Oxygen shortage',water:'Water shortage',co2:'CO₂ too high',atmosphere:'Atmosphere outside limits',thermal:'Heating/cooling limit'};
 export default function MissionOutcome({result,loading,error,stale,outcomeRef,onOptimize,optimizing=false,disabled=false,optimized=false}) {
  const firstFailure=result?.events?.length?Math.min(...result.events.map(event=>event.hour)):null;
  const completed=result?(result.resource_balance_complete?result.evaluated_hours:Math.max(0,(firstFailure??result.evaluated_hours)-1)):0;

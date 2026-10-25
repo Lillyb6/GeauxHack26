@@ -89,3 +89,37 @@ def test_recovery_also_runs_when_original_power_is_already_at_ceiling():
     assert result.optimized is not None
     assert result.optimized.request.generation_kw==100
     assert result.optimized.request.water_kg>300
+
+
+import pytest
+
+@pytest.mark.parametrize("planet,field,minimum", [
+    ("mars", "heating_capacity_kw", 3.2),
+    ("venus", "cooling_capacity_kw", 17.72),
+    ("titan", "heating_capacity_kw", 8.04),
+])
+def test_planet_thermal_repair_is_verified_without_disabling_checks(planet, field, minimum):
+    original = request(environment_id=planet, generation_kw=12,
+        thermal_capacity_enabled=True, heating_capacity_kw=0, cooling_capacity_kw=0,
+        co2_enabled=True, co2_equipment_quantity=2,
+        atmosphere_enabled=True, cabin_pressure_kpa=101.325, cabin_oxygen_percent=20.9)
+    before = original.model_dump()
+    result = improve(original)
+    assert original.model_dump() == before
+    assert result.optimized is not None
+    proposed = result.optimized.request
+    assert getattr(proposed, field) >= minimum
+    assert proposed.environment_id == planet
+    assert proposed.thermal_capacity_enabled and proposed.co2_enabled and proposed.atmosphere_enabled
+    assert proposed.crew_size == original.scenario.crew_size
+    assert proposed.duration_days == original.scenario.duration_days
+    assert result.manual.evaluated_hours == 0
+    assert simulate(proposed).resource_balance_complete
+    assert result.optimized.evaluated_hours == 720
+
+
+def test_thermal_repair_respects_capacity_bound():
+    result = improve(request(environment_id="venus", thermal_capacity_enabled=True,
+        heat_loss_kw_k=10))
+    assert result.optimized is None
+    assert result.manual.request.thermal_capacity_enabled
