@@ -181,3 +181,9 @@ Codex assisted with a permission-gated Gemini improvement tool and structured re
 Codex assisted with concise result notices, a combined unchecked-systems status, expandable diagnostics and shorter AI comparison text. Full scientific warnings remain available.
 
 Codex assisted with reference-equipment defaults for new missions and an advanced custom-assumptions section. Loaded custom missions retain their saved values and expose their custom controls.
+
+Codex restored a prominent no-prompt optimize/compare/apply/AI-explain workflow in the AI assistance monitor while retaining the optional prompt-based assistant.
+
+Codex shortened AI-panel labels, progress messages and guidance while retaining detailed audits and disclosures.
+
+Codex consolidated systems results into a compact outcome, one selectable resource chart and a collapsed Research & technical details section. Exact events, equations and scientific sources remain accessible.

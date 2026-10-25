@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SurfacePlayback from './SurfacePlayback';
 
 export default function MissionControl({ form, setForm, env, result, stale, sceneOnly = false }) {
  const [selectedCrew, setSelectedCrew] = useState(null);
@@ -15,17 +16,20 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
   </aside>
   <section className="console-monitor center-monitor">
    {!sceneOnly&&<div className="monitor-bar"><span>02 / {env.name.toUpperCase()} SURFACE VIEW</span><span>CONFIGURATION PREVIEW</span></div>}
+   <PlaybackScene result={currentResult?result:null}>
    <div className="planet-scene">
     <img className="planet-art" src={`/mission/${form.environment_id}.webp`} alt={`${env.name} surface artwork`} />
+    <div className="surface-habitat" role="img" aria-label="Crew habitat"><img src="/mission/habitat-transparent.png" alt="" width="1553" height="1013"/></div>
+    <img className="surface-explosion" src="/mission/explosion-transparent.png" alt="" aria-hidden="true" width="959" height="1641"/>
     <div className="scene-label"><span className="signal-dot"/> {env.name.toUpperCase()} / CREW {count.toString().padStart(2,'0')}</div>
     {Array.from({length:count},(_,i)=>{
-     const row=Math.floor(i/4), col=i%4;
-     const left=12+col*8+row*2;
-     const top=69+Math.pow((left-50)/42,2)*14+row*6.5;
-     return <button key={i} className={`crew-sprite ${selectedCrew===i?'selected':''}`} style={{left:`${left}%`,top:`${top}%`}} aria-label={`Inspect crew member ${i+1}`} aria-pressed={selectedCrew===i} onClick={()=>setSelectedCrew(selectedCrew===i?null:i)}><span className="crew-art" aria-hidden="true"/><span className="crew-id">{String(i+1).padStart(2,'0')}</span></button>;
+     const row=Math.floor(i/6), col=i%6;
+     const left=16+col*5+(row?2:0);
+     const top=95+row*2;
+     return <button key={i} className={`crew-sprite ${selectedCrew===i?'selected':''}`} style={{left:`${left}%`,top:`${top}%`,'--crew-exit-delay':`${1.2+i*.4}s`}} aria-label={`Inspect crew member ${i+1}`} aria-pressed={selectedCrew===i} onClick={()=>setSelectedCrew(selectedCrew===i?null:i)}><span className="crew-art" aria-hidden="true"/><span className="crew-id">{String(i+1).padStart(2,'0')}</span></button>;
     })}
    </div>
-   <div className="scene-footer" role="status"><span>{selectedCrew!==null&&selectedCrew<count?`CREW ${String(selectedCrew+1).padStart(2,'0')} / assigned to ${env.name}`:'Select a crew member to inspect'}</span><span>Visual preview · no surface activity model</span></div>
+   </PlaybackScene>
   </section>
   <aside className="console-monitor telemetry-monitor">
    <div className="monitor-bar"><span>03 / SCIENCE & SYSTEMS</span><i aria-hidden="true"/></div>
@@ -35,3 +39,5 @@ export default function MissionControl({ form, setForm, env, result, stale, scen
   </aside>
  </section>;
 }
+
+function PlaybackScene({result,children}){return result?<SurfacePlayback result={result}>{children}</SurfacePlayback>:children;}

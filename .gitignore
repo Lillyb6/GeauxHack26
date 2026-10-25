@@ -9,4 +9,5 @@ __pycache__/
 *.log
 
 # Local design inspection screenshots and reports
+
 .taste-skill/

@@ -14,6 +14,28 @@ export default function OperatorStation({ setup, designer, surface, systems, act
  const [reducedMotion,setReducedMotion]=useState(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches);
  useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setReducedMotion(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
 
+ // Derive each stand from the actual monitor height, including playback layout changes.
+ useEffect(()=>{
+  if(!active)return;
+  const room=viewport.current?.querySelector('.operator-room');
+  if(!room)return;
+  const monitors=[...room.querySelectorAll('[data-station]')];
+  let frame=0;
+  const measure=()=>{
+   frame=0;
+   if(window.matchMedia('(max-width: 800px)').matches)return;
+   const deskTop=Math.max(1480,...monitors.map(monitor=>monitor.offsetTop+monitor.offsetHeight+100));
+   room.style.setProperty('--desk-top',`${deskTop}px`);
+   room.style.setProperty('--room-height',`${deskTop+180}px`);
+   monitors.forEach(monitor=>monitor.style.setProperty('--stand-height',`${Math.max(0,deskTop-monitor.offsetTop-monitor.offsetHeight)}px`));
+  };
+  const observer=new ResizeObserver(()=>{if(!frame)frame=requestAnimationFrame(measure)});
+  monitors.forEach(monitor=>observer.observe(monitor));
+  window.addEventListener('resize',measure);
+  measure();
+  return()=>{observer.disconnect();cancelAnimationFrame(frame);window.removeEventListener('resize',measure)};
+ },[active]);
+
  function lookAt(id, focus=false) {
   const view=viewport.current, monitor=view?.querySelector(`[data-station="${id}"]`);
   if(!view||!monitor)return;
@@ -61,6 +83,7 @@ export default function OperatorStation({ setup, designer, surface, systems, act
  }
  useEffect(()=>{if(!active)return;const release=e=>{if(e.key==='Escape'){pointer.current=null;setLocked(null);document.activeElement?.blur();}};window.addEventListener('keydown',release);return()=>window.removeEventListener('keydown',release);},[active]);
  return <div data-active={active} data-star-motion={active && !locked && !booting} className={`operator-experience ${booting?'station-booting':''}`}>
+
   <div ref={viewport} className="operator-viewport" onPointerMove={e=>{if(e.pointerType==='mouse'){const rect=e.currentTarget.getBoundingClientRect();pointer.current={x:e.clientX-rect.left,y:e.clientY-rect.top};wake.current();}}} onPointerLeave={()=>{pointer.current=null;wake.current();}} onPointerDown={e=>{pointer.current=null;const monitor=e.target.closest('[data-station]');if(monitor)setLocked(monitor.dataset.station);else{setLocked(null);document.activeElement?.blur();}}} onClick={e=>{const monitor=e.target.closest('[data-station]');if(monitor&&!e.target.closest('.result-jump')&&!window.matchMedia('(max-width: 800px)').matches)lookAt(monitor.dataset.station);}} onFocusCapture={onFocus}>
    <div className="operator-room" inert={booting}>
     <div className="room-wall-label">BEYOND EARTH / HABITAT OPERATIONS DIVISION</div>
