@@ -70,3 +70,8 @@ I matched the Life support heading to Supplies & power using the same heading le
 ## Final life support headings
 
 I changed the orange headings to Oxygen generation system and Water recovery system, using the previously smaller technical names as the main labels. I removed the duplicate text underneath and kept spacing before the equipment controls. No simulation behavior changed.
+
+
+## Integration with main
+
+I pulled the latest main changes and resolved overlapping mission setup code by keeping the reviewed three-step editor. I removed duplicate App declarations and duplicate monitor markup introduced by the overlapping integration, while retaining the incoming reference equipment defaults, improvement endpoint, comparison state, apply-optimized behavior, and result notices. The combined frontend passed all 37 tests and the production build.
